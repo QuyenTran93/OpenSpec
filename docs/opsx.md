@@ -67,6 +67,8 @@ This creates skills in `.claude/skills/` (or equivalent) that AI coding assistan
 
 By default, OpenSpec uses the `core` workflow profile (`propose`, `explore`, `apply`, `update`, `sync`, `archive`). If you want the expanded workflow commands (`new`, `continue`, `ff`, `verify`, `bulk-archive`, `onboard`), configure them with `openspec config profile` and apply with `openspec update`.
 
+OpenSpec also supports the `brainstorm` profile (`propose`, `brainstorm`, `new`, `writing-plans`, `apply`, `archive`) for brainstorm-first execution. In this profile, `/opsx:brainstorm` writes `openspec/changes/<name>/brainstorm.md`, `/opsx:propose` reconciles `tasks.md` from the brainstorm, and `/opsx:writing-plans` writes `openspec/changes/<name>/plan.md`. The brainstorm profile no longer ships `/opsx:continue`; rerun `/opsx:propose` whenever `tasks.md` needs to be regenerated or refreshed from `brainstorm.md`.
+
 During setup, you'll be prompted to create a **project config** (`openspec/config.yaml`). This is optional but recommended.
 
 ## Project Configuration
@@ -183,6 +185,10 @@ Think through ideas, investigate problems, compare options. No structure require
 /opsx:propose
 ```
 Creates the change and generates planning artifacts needed before implementation.
+After artifacts are generated, hand off in this order:
+1. Run `writing-plans`
+2. Save the resulting plan to `openspec/changes/<name>/plan.md`
+3. Then run `/opsx:apply`
 
 If you've enabled expanded workflows, you can instead use:
 
@@ -207,6 +213,7 @@ Creates all planning artifacts at once. Use when you have a clear picture of wha
 ```
 /opsx:apply
 ```
+Before running apply, make sure `plan.md` exists for the change (generated via `writing-plans` at `openspec/changes/<name>/plan.md`).
 Works through tasks, checking them off as you go. If you're juggling multiple changes, you can run `/opsx:apply <name>`; otherwise it should infer from the conversation and prompt you to choose if it can't tell.
 
 ### Updating a change

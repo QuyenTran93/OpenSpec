@@ -160,6 +160,8 @@ program
   .option('--profile <profile>', 'Override global config profile (core or custom)')
   .option('--no-animation', 'Show a static welcome screen instead of the animated one')
   .action(async (targetPath = '.', options?: { tools?: string; force?: boolean; profile?: string; animation?: boolean }) => {
+  .option('--profile <profile>', 'Override global config profile (core, custom, or brainstorm)')
+  .action(async (targetPath = '.', options?: { tools?: string; force?: boolean; profile?: string }) => {
     try {
       // Validate that the path is a valid directory
       const resolvedPath = path.resolve(targetPath);

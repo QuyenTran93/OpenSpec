@@ -1,0 +1,181 @@
+name: brainstorm-root
+version: 2
+description: Brainstorm-first slim workflow — brainstorm.md → tasks.md → plan.md → apply
+artifacts:
+  - id: tasks
+    generates: tasks.md
+    description: Trackable implementation checklist
+    template: tasks.md
+    requires: [brainstorm]
+    instruction: |
+      PRECHECK — read `openspec/changes/<name>/brainstorm.md` for the agreed
+      approach, key decisions, and open questions before drafting/updating tasks.
+
+      On every (re-)invocation:
+      - Re-read brainstorm.md (it may have been edited since the last propose
+        run).
+      - Reconcile current tasks.md against the latest brainstorm: add new
+        tasks, remove tasks for dropped scope, rename/rephrase tasks whose
+        underlying decision changed.
+      - Preserve `- [x]` completion state for tasks whose meaning is unchanged.
+
+      Format requirements:
+      - Group tasks under `## N. Group Name` numbered headings.
+      - Each task MUST be `- [ ] N.M Task description` (apply phase parses
+        these checkboxes).
+      - Tasks should be small enough to complete in one session.
+      - Order tasks by dependency.
+
+brainstorm:
+  generates: brainstorm.md
+  template: brainstorm.md
+  requires: []
+  instruction: |
+    PRECHECK: `superpowers:brainstorming` must appear in your skills list; if missing, STOP
+    (plugin install or manual `brainstorm.md`). No silent fallback.
+
+    Use the Skill tool to invoke **superpowers:brainstorming**.
+
+    OpenSpec overrides:
+    - Write to `openspec/changes/<name>/brainstorm.md` (never `docs/superpowers/specs/`).
+    - Next step is `/opsx:propose` → `tasks.md` (not `/opsx:writing-plans` or `/opsx:apply` direct).
+
+    Interactive flow (mandatory):
+    1. Explore project context
+    2. Ask clarifying questions (one at a time)
+    3. Propose 2-3 approaches with trade-offs
+    4. Present design sections for approval
+    5. Write `openspec/changes/<name>/brainstorm.md` (schema template; filled — no empty shell)
+    6. Spec self-review (**execute** on the file — do **not** paste this step into `brainstorm.md`):
+       Fix substantive sections until Placeholder scan, Internal consistency, Scope check, and
+       Ambiguity check pass (superpowers:brainstorming bar). Do **not** add standalone
+       self-review/procedure headings — edit content inline; re-read; `spec_self_review_passed`
+       only after substantive edits (not checklist copy-paste).
+    7. User review gate: user reviews `brainstorm.md`; on changes, edit file and repeat 6–7 until
+       approval or explicit `/opsx:propose`.
+
+    Readiness gate → `/opsx:propose`:
+    all_questions_resolved; design_approved; spec_self_review_passed (step 6);
+    user_acknowledged_brainstorm (step 7)
+
+    Guardrail: no empty templates without **superpowers:brainstorming** flow (unless manual opt-in).
+
+plan:
+  generates: plan.md
+  template: plan.md
+  requires: [brainstorm, tasks]
+  instruction: |
+    PRECHECK — required skill availability:
+    Confirm `superpowers:writing-plans` appears in your available skills list.
+    If missing, STOP and inform the user. Do NOT silently fall back.
+
+    Use the Skill tool to invoke **superpowers:writing-plans**.
+
+    OpenSpec overrides (non-negotiable):
+    - Write the plan to `openspec/changes/<name>/plan.md`
+      (NEVER `docs/superpowers/plans/`).
+    - Read both `brainstorm.md` (architecture/decisions) and `tasks.md`
+      (coarse checklist) before drafting. Decompose each coarse task into
+      2–5 minute TDD micro-steps with exact file paths, concrete commands, and
+      expected outcomes — same quality bar as the skill; only the destination path changes.
+
+    Run AFTER `/opsx:propose` has produced `tasks.md`, BEFORE `/opsx:apply`.
+    `/opsx:apply` owns execution policy: default is **inline** in the primary session; subagents or Task tool are only for **review** or **read-only research** per `apply.instruction`. Do not sequence full-plan subagent orchestration here.
+
+    Mandatory planning flow (align with superpowers:writing-plans):
+    1. **Announce** (one line): you are using **writing-plans** to draft the implementation plan.
+    2. **Read inputs**: load `brainstorm.md` and `tasks.md` fully; note scope and dependencies.
+    3. **Scope check**: if work spans multiple independent subsystems, split into separate plans
+       or clearly separated sections — one coherent execution thread per `plan.md` unless
+       `tasks.md` already scoped a single change (see skill *Scope Check*).
+    4. **File / unit map**: before task breakdown, outline files to create or modify and each
+       file’s responsibility (see skill *File Structure* — informs decomposition).
+    5. **Draft `plan.md`**: follow the schema template and the skill’s required plan header,
+       bite-sized steps, and *No Placeholders* rule (no TBD/TODO shell steps, no vague “add
+       validation” without concrete actions — see skill).
+    6. **Plan self-review** (same checklist as superpowers:writing-plans *Self-Review* — fix inline):
+       - **Spec coverage:** each requirement implied by `brainstorm.md` and each coarse
+         `tasks.md` item maps to at least one plan task; add tasks for gaps.
+       - **Placeholder scan:** eliminate patterns forbidden in the skill (TBD, “implement later”,
+         steps without real code/commands where required, etc.).
+       - **Type / name consistency:** types, signatures, and identifiers match across tasks.
+    7. **User review gate**: ask the user to review `plan.md` before `/opsx:apply`. If they want
+       edits, update the file and repeat steps 6–7 until they approve or explicitly direct apply.
+
+    Readiness gate before handoff to `/opsx:apply`:
+    - `plan.md` exists and is materially complete (not an empty template)
+    - plan_self_review_passed = true (step 6)
+    - user_acknowledged_plan = true (step 7)
+
+    Guardrail — no silent scaffolding:
+    Do NOT write an empty `plan.md` without completing the flow above via **superpowers:writing-plans**
+    (unless the user explicitly opts into manual authoring).
+
+apply:
+  requires: [tasks, plan]
+  tracks: tasks.md
+  executionPlan: plan.md
+  instruction: |
+    Before implementing, confirm skills and execution path:
+
+    0. **Pre-flight — verify required Superpowers skills**
+
+       This schema's apply phase requires ALL of the following skills. Confirm
+       each appears in your available skills list before proceeding:
+
+       - **superpowers:test-driven-development**
+       - **superpowers:requesting-code-review**
+       - **superpowers:verification-before-completion**
+
+       If any required skill is missing, STOP and inform the user — do NOT
+       proceed and do NOT silently fall back.
+
+    1. **Primary path — inline in the primary session (default)**
+
+       By default, YOU (the primary agent in this session) implement `plan.md`
+       micro-tasks and update `tasks.md` checkboxes as coarse tasks complete.
+
+       Discipline contract (follow these skills from the primary session; do not
+       skip their rules):
+
+       - **superpowers:test-driven-development** — RED-GREEN-REFACTOR; delete
+         implementation code written before a failing test exists.
+       - **superpowers:requesting-code-review** — run review rounds after
+         substantive work per that skill. Review delegation to a subagent or
+         Task-style reviewer is allowed **only** for this review work.
+       - **superpowers:verification-before-completion** — run the verification
+         gate before claiming apply is complete or marking remaining work done.
+
+       Working agreements:
+
+       - Read `plan.md` in this change directory for micro-tasks.
+       - Do NOT run `git commit` while executing this flow unless the user
+         explicitly asks for a commit; track progress with `tasks.md` checkboxes
+         and working-tree changes only.
+       - Do **not** default to `using-git-worktrees` unless the user explicitly
+         asks for isolated worktrees.
+
+       Do **not** invoke **superpowers:subagent-driven-development** to run the
+       full apply implementation loop. That orchestration model is not the default
+       for this schema.
+
+    2. **Delegated subagents / Task tool — review and research only**
+
+       You MAY use subagents or the Task tool **only** for:
+
+       - **Review** passes aligned with `superpowers:requesting-code-review`.
+       - **Research** / read-only exploration (for example mapping code or
+         locating call sites) to support implementation decisions.
+
+       You MUST NOT hand off bulk implementation of `plan.md` micro-tasks to
+       implementation subagents in place of the primary inline path.
+
+    3. **No `superpowers:executing-plans` substitute**
+
+       This schema does NOT support `superpowers:executing-plans` as a shortcut
+       that replaces the TDD + code-review + verification discipline in sections
+       0–1. If you cannot satisfy the required skills in section 0, STOP and
+       explain the gap — do not substitute `superpowers:executing-plans`.
+
+       Lack of Task/subagent support does **not** excuse skipping section 0; the
+       default path is inline in this session, not multi-subagent implementation.

@@ -5,12 +5,16 @@ import {
   getCommandContents,
   generateSkillContent,
 } from '../../../src/core/shared/skill-generation.js';
+import { BRAINSTORM_ROOT_GATE_POLICY_BLOCK } from '../../../src/core/templates/workflows/brainstorm-root/superpowers-openspec-mapping.js';
 
 describe('skill-generation', () => {
   describe('getSkillTemplates', () => {
     it('should return all 12 skill templates', () => {
       const templates = getSkillTemplates();
       expect(templates).toHaveLength(12);
+    it('should return all 13 skill templates', () => {
+      const templates = getSkillTemplates();
+      expect(templates).toHaveLength(13);
     });
 
     it('should have unique directory names', () => {
@@ -36,6 +40,8 @@ describe('skill-generation', () => {
       expect(dirNames).toContain('openspec-verify-change');
       expect(dirNames).toContain('openspec-onboard');
       expect(dirNames).toContain('openspec-propose');
+      expect(dirNames).toContain('openspec-brainstorm');
+      expect(dirNames).toContain('openspec-writing-plans');
     });
 
     it('should have valid template structure', () => {
@@ -86,12 +92,57 @@ describe('skill-generation', () => {
       expect(filtered[0].workflowId).toBe('propose');
       expect(filtered[0].dirName).toBe('openspec-propose');
     });
+
+    it('should include propose for brainstorm default workflow filter', () => {
+      const brainstormDefaults = ['propose', 'brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive'];
+      const filtered = getSkillTemplates(brainstormDefaults);
+      const proposeTemplate = filtered.find(template => template.workflowId === 'propose');
+
+      expect(proposeTemplate).toBeDefined();
+      expect(proposeTemplate?.dirName).toBe('openspec-propose');
+    });
+
+    it('defaults to core profile so overlapping apply matches spec-driven', () => {
+      const explicitCore = getSkillTemplates(['apply'], 'core')[0];
+      const defaulted = getSkillTemplates(['apply'])[0];
+      expect(explicitCore.template.instructions).toEqual(defaulted.template.instructions);
+      expect(explicitCore.template.instructions).not.toContain('Gate on execution plan before implementation loop');
+    });
+
+    it('uses brainstorm-root apply when profile is brainstorm', () => {
+      const entry = getSkillTemplates(['apply'], 'brainstorm')[0];
+      expect(entry.template.instructions).toContain('Gate on execution plan before implementation loop');
+      expect(entry.template.instructions).toContain('plan.md');
+      expect(entry.template.instructions).not.toContain('execution-plan.md');
+    });
+
+    it('enforces brainstorm gate policy language for brainstorm-root propose/new', () => {
+      const entries = getSkillTemplates(['propose', 'new'], 'brainstorm');
+
+      for (const entry of entries) {
+        expect(entry.template.instructions).toContain(BRAINSTORM_ROOT_GATE_POLICY_BLOCK);
+        expect(entry.template.instructions).toContain(
+          'If ambiguous/conflicting, do not pass gate automatically; ask one explicit confirmation question'
+        );
+      }
+    });
+
+    it('keeps brainstorm gate policy out of core/spec-driven propose/new templates', () => {
+      const coreEntries = getSkillTemplates(['propose', 'new'], 'core');
+
+      for (const entry of coreEntries) {
+        expect(entry.template.instructions).not.toContain(BRAINSTORM_ROOT_GATE_POLICY_BLOCK);
+      }
+    });
   });
 
   describe('getCommandTemplates', () => {
     it('should return all 12 command templates', () => {
       const templates = getCommandTemplates();
       expect(templates).toHaveLength(12);
+    it('should return all 13 command templates', () => {
+      const templates = getCommandTemplates();
+      expect(templates).toHaveLength(13);
     });
 
     it('should have unique IDs', () => {
@@ -117,6 +168,8 @@ describe('skill-generation', () => {
       expect(ids).toContain('verify');
       expect(ids).toContain('onboard');
       expect(ids).toContain('propose');
+      expect(ids).toContain('brainstorm');
+      expect(ids).toContain('writing-plans');
     });
 
     it('should filter by workflow IDs when provided', () => {
@@ -141,12 +194,23 @@ describe('skill-generation', () => {
       const filtered = getCommandTemplates(['nonexistent']);
       expect(filtered).toHaveLength(0);
     });
+
+    it('should include propose command for brainstorm default workflow filter', () => {
+      const brainstormDefaults = ['propose', 'brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive'];
+      const filtered = getCommandTemplates(brainstormDefaults);
+      const ids = filtered.map(template => template.id);
+
+      expect(ids).toContain('propose');
+    });
   });
 
   describe('getCommandContents', () => {
     it('should return all 12 command contents', () => {
       const contents = getCommandContents();
       expect(contents).toHaveLength(12);
+    it('should return all 13 command contents', () => {
+      const contents = getCommandContents();
+      expect(contents).toHaveLength(13);
     });
 
     it('should have valid content structure', () => {
@@ -183,6 +247,28 @@ describe('skill-generation', () => {
       const all = getCommandContents();
       const noFilter = getCommandContents(undefined);
       expect(noFilter).toHaveLength(all.length);
+    });
+
+    it('should include brainstorm and writing-plans artifact guidance', () => {
+      const brainstorm = getCommandContents(['brainstorm'])[0];
+      const writingPlans = getCommandContents(['writing-plans'])[0];
+
+      expect(brainstorm.body).toContain('brainstorm.md');
+      expect(writingPlans.body).toContain('plan.md');
+      expect(writingPlans.body).not.toContain('execution-plan.md');
+    });
+
+    it('applies brainstorm gate policy only to brainstorm profile propose/new commands', () => {
+      const brainstormEntries = getCommandContents(['propose', 'new'], 'brainstorm');
+      const coreEntries = getCommandContents(['propose', 'new'], 'core');
+
+      for (const entry of brainstormEntries) {
+        expect(entry.body).toContain(BRAINSTORM_ROOT_GATE_POLICY_BLOCK);
+      }
+
+      for (const entry of coreEntries) {
+        expect(entry.body).not.toContain(BRAINSTORM_ROOT_GATE_POLICY_BLOCK);
+      }
     });
   });
 

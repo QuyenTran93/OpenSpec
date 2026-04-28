@@ -19,3 +19,42 @@ export { getVerifyChangeSkillTemplate, getOpsxVerifyCommandTemplate } from './wo
 export { getOnboardSkillTemplate, getOpsxOnboardCommandTemplate } from './workflows/onboard.js';
 export { getOpsxProposeSkillTemplate, getOpsxProposeCommandTemplate } from './workflows/propose.js';
 export { getFeedbackSkillTemplate } from './workflows/feedback.js';
+export {
+  getExploreSkillTemplate,
+  getOpsxExploreCommandTemplate,
+  getNewChangeSkillTemplate,
+  getOpsxNewCommandTemplate,
+  getContinueChangeSkillTemplate,
+  getOpsxContinueCommandTemplate,
+  getApplyChangeSkillTemplate,
+  getOpsxApplyCommandTemplate,
+  getFfChangeSkillTemplate,
+  getOpsxFfCommandTemplate,
+  getSyncSpecsSkillTemplate,
+  getOpsxSyncCommandTemplate,
+  getArchiveChangeSkillTemplate,
+  getOpsxArchiveCommandTemplate,
+  getBulkArchiveChangeSkillTemplate,
+  getOpsxBulkArchiveCommandTemplate,
+  getVerifyChangeSkillTemplate,
+  getOpsxVerifyCommandTemplate,
+  getOnboardSkillTemplate,
+  getOpsxOnboardCommandTemplate,
+  getOpsxProposeSkillTemplate,
+  getOpsxProposeCommandTemplate,
+  getFeedbackSkillTemplate,
+} from './workflows/spec-driven/index.js';
+export {
+  getBrainstormRootBrainstormSkillTemplate,
+  getOpsxBrainstormRootBrainstormCommandTemplate,
+  getBrainstormRootProposeSkillTemplate,
+  getOpsxBrainstormRootProposeCommandTemplate,
+  getBrainstormRootWritingPlansSkillTemplate,
+  getOpsxBrainstormRootWritingPlansCommandTemplate,
+  getBrainstormRootApplyChangeSkillTemplate,
+  getOpsxBrainstormRootApplyCommandTemplate,
+  getBrainstormRootNewChangeSkillTemplate,
+  getOpsxBrainstormRootNewCommandTemplate,
+  getBrainstormRootArchiveChangeSkillTemplate,
+  getOpsxBrainstormRootArchiveCommandTemplate,
+} from './workflows/brainstorm-root/index.js';

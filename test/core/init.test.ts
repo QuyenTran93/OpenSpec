@@ -430,6 +430,21 @@ describe('InitCommand', () => {
       expect(content).toBe(existingContent);
     });
 
+  it('should not create config.yaml when config.yml already exists', async () => {
+    const openspecDir = path.join(testDir, 'openspec');
+    await fs.mkdir(openspecDir, { recursive: true });
+    const configYmlPath = path.join(openspecDir, 'config.yml');
+    const existingContent = 'schema: custom-schema\ncontext: keep-me\n';
+    await fs.writeFile(configYmlPath, existingContent);
+
+    const initCommand = new InitCommand({ tools: 'claude', force: true, profile: 'brainstorm' });
+    await initCommand.execute(testDir);
+
+    const content = await fs.readFile(configYmlPath, 'utf-8');
+    expect(content).toBe(existingContent);
+    expect(await fileExists(path.join(openspecDir, 'config.yaml'))).toBe(false);
+  });
+
     it('should handle non-existent target directory', async () => {
       const newDir = path.join(testDir, 'new-project');
       const initCommand = new InitCommand({ tools: 'claude', force: true });
@@ -731,6 +746,24 @@ describe('InitCommand - profile and detection features', () => {
     await expect(initCommand.execute(testDir)).rejects.toThrow(
       /Invalid profile "invalid-profile"/
     );
+  });
+
+  it('should set openspec/config.yaml schema to brainstorm-root when --profile brainstorm', async () => {
+    const initCommand = new InitCommand({ tools: 'claude', force: true, profile: 'brainstorm' });
+    await initCommand.execute(testDir);
+    const content = await fs.readFile(path.join(testDir, 'openspec', 'config.yaml'), 'utf-8');
+    expect(content).toContain('schema: brainstorm-root');
+  });
+
+  it('should generate propose skill and command when --profile brainstorm', async () => {
+    const initCommand = new InitCommand({ tools: 'claude', force: true, profile: 'brainstorm' });
+    await initCommand.execute(testDir);
+
+    const proposeSkill = path.join(testDir, '.claude', 'skills', 'openspec-propose', 'SKILL.md');
+    const proposeCommand = path.join(testDir, '.claude', 'commands', 'opsx', 'propose.md');
+
+    expect(await fileExists(proposeSkill)).toBe(true);
+    expect(await fileExists(proposeCommand)).toBe(true);
   });
 
   it('should use detected tools in non-interactive mode when no --tools flag', async () => {

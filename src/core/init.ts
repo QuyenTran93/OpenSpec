@@ -49,7 +49,7 @@ import {
   type ToolSkillStatus,
 } from './shared/index.js';
 import { getGlobalConfig, type Delivery, type Profile } from './global-config.js';
-import { getProfileWorkflows, CORE_WORKFLOWS, ALL_WORKFLOWS } from './profiles.js';
+import { getProfileWorkflows, ALL_WORKFLOWS } from './profiles.js';
 import { getAvailableTools } from './available-tools.js';
 import { migrateIfNeeded, migrateLegacyToolDirs, describeLegacyMigration, keptInPlaceNotice, hasMovableContent, scanInstalledWorkflows as scanInstalledWorkflowsShared } from './migration.js';
 import {
@@ -60,6 +60,8 @@ import {
   shouldReconcileCommandFilesForTool,
   shouldRemoveSkillsForTool,
 } from './command-surface.js';
+import { migrateIfNeeded } from './migration.js';
+import { ensureProjectConfigExistsForWorkflows, BRAINSTORM_PROJECT_SCHEMA } from './project-config-normalizer.js';
 
 const require = createRequire(import.meta.url);
 const { version: OPENSPEC_VERSION } = require('../../package.json');
@@ -88,6 +90,8 @@ const WORKFLOW_TO_SKILL_DIR: Record<string, string> = {
   'verify': 'openspec-verify-change',
   'onboard': 'openspec-onboard',
   'propose': 'openspec-propose',
+  'brainstorm': 'openspec-brainstorm',
+  'writing-plans': 'openspec-writing-plans',
 };
 
 // -----------------------------------------------------------------------------
@@ -263,11 +267,11 @@ export class InitCommand {
       return undefined;
     }
 
-    if (this.profileOverride === 'core' || this.profileOverride === 'custom') {
+    if (this.profileOverride === 'core' || this.profileOverride === 'custom' || this.profileOverride === 'brainstorm') {
       return this.profileOverride;
     }
 
-    throw new Error(`Invalid profile "${this.profileOverride}". Available profiles: core, custom`);
+    throw new Error(`Invalid profile "${this.profileOverride}". Available profiles: core, custom, brainstorm`);
   }
 
   /**
@@ -698,11 +702,16 @@ export class InitCommand {
     const profile: Profile = this.resolveProfileOverride() ?? globalConfig.profile ?? 'core';
     const delivery: Delivery = globalConfig.delivery ?? 'both';
     const workflows = getProfileWorkflows(profile, globalConfig.workflows);
+    await ensureProjectConfigExistsForWorkflows(projectPath, workflows);
 
     // Get skill and command templates filtered by profile workflows
     const deliveryIncludesCommands = delivery !== 'skills';
     const skillTemplates = getSkillTemplates(workflows);
     const commandContents = getCommandContents(workflows);
+    const shouldGenerateSkills = delivery !== 'commands';
+    const shouldGenerateCommands = delivery !== 'skills';
+    const skillTemplates = shouldGenerateSkills ? getSkillTemplates(workflows, profile) : [];
+    const commandContents = shouldGenerateCommands ? getCommandContents(workflows, profile) : [];
 
     // Process each tool
     for (const tool of tools) {
@@ -802,7 +811,11 @@ export class InitCommand {
 
 
     try {
-      const yamlContent = serializeConfig({ schema: DEFAULT_SCHEMA });
+      const globalConfig = getGlobalConfig();
+      const profile: Profile = this.resolveProfileOverride() ?? globalConfig.profile ?? 'core';
+      const workflows = getProfileWorkflows(profile, globalConfig.workflows);
+      const schema = workflows.includes('brainstorm') ? BRAINSTORM_PROJECT_SCHEMA : DEFAULT_SCHEMA;
+      const yamlContent = serializeConfig({ schema });
       await FileSystemUtils.writeFile(configPath, yamlContent);
       return 'created';
     } catch {
@@ -844,7 +857,7 @@ export class InitCommand {
     const successfulTools = [...results.createdTools, ...results.refreshedTools];
     if (successfulTools.length > 0) {
       const globalConfig = getGlobalConfig();
-      const profile: Profile = (this.profileOverride as Profile) ?? globalConfig.profile ?? 'core';
+      const profile: Profile = this.resolveProfileOverride() ?? globalConfig.profile ?? 'core';
       const delivery: Delivery = globalConfig.delivery ?? 'both';
       const workflows = getProfileWorkflows(profile, globalConfig.workflows);
       const toolDirs = [...new Set(successfulTools.map((t) => t.skillsDir))].join(', ');
@@ -854,6 +867,8 @@ export class InitCommand {
       const commandCount = successfulTools.some((tool) => shouldGenerateCommandsForTool(tool.value, delivery))
         ? getCommandContents(workflows).length
         : 0;
+      const skillCount = delivery !== 'commands' ? getSkillTemplates(workflows, profile).length : 0;
+      const commandCount = delivery !== 'skills' ? getCommandContents(workflows, profile).length : 0;
       if (skillCount > 0 && commandCount > 0) {
         console.log(`${skillCount} skills and ${commandCount} commands in ${toolDirs}/`);
       } else if (skillCount > 0) {
@@ -892,7 +907,11 @@ export class InitCommand {
 
     // Config status
     if (configStatus === 'created') {
-      console.log(`Config: openspec/config.yaml (schema: ${DEFAULT_SCHEMA})`);
+      const globalConfig = getGlobalConfig();
+      const profile: Profile = this.resolveProfileOverride() ?? globalConfig.profile ?? 'core';
+      const workflows = getProfileWorkflows(profile, globalConfig.workflows);
+      const createdSchema = workflows.includes('brainstorm') ? BRAINSTORM_PROJECT_SCHEMA : DEFAULT_SCHEMA;
+      console.log(`Config: openspec/config.yaml (schema: ${createdSchema})`);
     } else if (configStatus === 'exists') {
       // Show actual filename (config.yaml or config.yml)
       const configYaml = path.join(projectPath, OPENSPEC_DIR_NAME, 'config.yaml');

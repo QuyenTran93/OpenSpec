@@ -355,6 +355,29 @@
 - [#1111](https://github.com/Fission-AI/OpenSpec/pull/1111) [`7fdb177`](https://github.com/Fission-AI/OpenSpec/commit/7fdb1771585b1688597d73dde5a8bc906084d0de) Thanks [@TabishB](https://github.com/TabishB)! - ### Fixed
 
   - Preserve workspace planning detection when Windows short paths or symlink aliases resolve to a canonical workspace root.
+## Unreleased
+
+### BREAKING
+
+- **`brainstorm-root` schema v2 — slim workflow.** The `brainstorm-root` schema has been re-architected to track a single artifact (`tasks.md`). `brainstorm.md` and `plan.md` are now schema-tracked **phases**, not artifacts, with their canonical instructions sourced from new top-level `brainstorm:` and `plan:` blocks in `schemas/brainstorm-root/schema.yaml`. `design.md` and `specs/**/*.md` artifacts have been removed from the schema, along with the `/opsx:continue` command.
+  - **Migration impact:** in-flight `brainstorm-root` change folders that already contain `design.md`, `specs/**/*.md`, or `execution-plan.md` keep working but those files are no longer schema-tracked. Move any required content into `tasks.md`/`plan.md` before the next archive.
+  - **Renames:** `execution-plan.md` → `plan.md`. `apply.executionPlan` now points to `plan.md`.
+  - **`/opsx:propose` simplification:** the propose command now only generates or reconciles `tasks.md` from `brainstorm.md`, preserving completion status across reruns.
+  - **`/opsx:continue` removed:** the single-artifact workflow makes a separate continue step redundant — `/opsx:propose` is the recovery skill when `tasks.md` is missing.
+  - **Unified dependency graph:** `requires` fields in artifacts and phases now uniformly accept references to either artifact ids or phase ids. Cycle detection spans both node types.
+  - **CLI:** `openspec instructions <id>` now resolves both artifact and phase ids; `openspec status --json` returns a top-level `phases[]` array alongside `artifacts[]` for `brainstorm-root` change folders.
+  - **Action required:** rerun `openspec install` to pick up the new slim skill/command bodies.
+
+### Changed
+
+- Config bootstrap now follows create-if-missing semantics:
+  - `init`, `update`, and `migration` no longer normalize or rewrite schema in existing `openspec/config.yaml|yml`.
+  - When config is missing, OpenSpec creates `openspec/config.yaml` with minimal `schema` content derived from active workflows.
+- `brainstorm-root` schema is now the single-source-of-truth for `/opsx:brainstorm` and `/opsx:apply` artifact creation guidance. Skill/command bodies have been shrunk to thin orchestrators delegating to `openspec instructions <artifact-id> --json`. **Recommended:** rerun `openspec install` to pick up the slimmer bodies (~17% token saving on full brainstorm-root flows). Existing installations continue to work without changes.
+
+### Schema harmonization
+
+- `schemas/brainstorm-root/schema.yaml` `apply.instruction`: combined `Use the Skill tool to invoke **superpowers:subagent-driven-development**` onto a single line, and added `using-git-worktrees` defaulting policy (promoted from skill body to schema as part of single-source-of-truth migration).
 
 ## 1.3.1
 
@@ -397,7 +420,7 @@
 
 - [#747](https://github.com/Fission-AI/OpenSpec/pull/747) [`1e94443`](https://github.com/Fission-AI/OpenSpec/commit/1e94443a3551b228eecbc89e95d96d3b9600a192) Thanks [@TabishB](https://github.com/TabishB)! - ### New Features
 
-  - **Profile system** — Choose between `core` (4 essential workflows) and `custom` (pick any subset) profiles to control which skills get installed. Manage profiles with the new `openspec config profile` command
+  - **Profile system** — Choose between `core` (4 essential workflows), `brainstorm` (`brainstorm`, `new`, `continue`, `writing-plans`, `apply`, `archive`), and `custom` (pick any subset) profiles to control which skills get installed. Manage profiles with `openspec config profile`
   - **Propose workflow** — New one-step workflow creates a complete change proposal with design, specs, and tasks from a single request — no need to run `new` then `ff` separately
   - **AI tool auto-detection** — `openspec init` now scans your project for existing tool directories (`.claude/`, `.cursor/`, etc.) and pre-selects detected tools
   - **Pi (pi.dev) support** — Pi coding agent is now a supported tool with prompt and skill generation
@@ -719,6 +742,9 @@
 
 ### Minor Changes
 
+- Add a built-in `brainstorm-root` workflow schema (`brainstorm -> specs -> tasks`) with template scaffolds for brainstorm-first changes.
+- Require `execution-plan.md` before `/opsx:apply` when the schema config declares `apply.executionPlan`, and guide users to run `writing-plans` first.
+- Update `/opsx:propose` guidance to hand off through `writing-plans` and save plans to `openspec/changes/<name>/execution-plan.md` before apply.
 - Add Continue slash command support so `openspec init` can generate `.continue/prompts/openspec-*.prompt` files with MARKDOWN frontmatter and `$ARGUMENTS` placeholder, and refresh them on `openspec update`.
 
 - Add Antigravity slash command support so `openspec init` can generate `.agent/workflows/openspec-*.md` files with description-only frontmatter and `openspec update` refreshes existing workflows alongside Windsurf.

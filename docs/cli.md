@@ -757,15 +757,32 @@ something that requires it - and artifacts that become ready at the same time
 (spec-driven's `specs` and `design` both need only `proposal`) keep the order the
 schema declares them rather than an alphabetical one. So the first `ready` entry
 is the artifact to write next.
+For `brainstorm-root` v2, status also includes a top-level `phases[]` array (phases are tracked workflow steps that produce files but do not gate `isComplete`):
+
+```json
+{
+  "changeName": "add-dark-mode",
+  "schemaName": "brainstorm-root",
+  "isComplete": false,
+  "applyRequires": ["tasks", "plan"],
+  "artifacts": [
+    {"id": "tasks", "outputPath": "tasks.md", "status": "ready", "missingDeps": []}
+  ],
+  "phases": [
+    {"id": "brainstorm", "outputPath": "brainstorm.md", "status": "done"},
+    {"id": "plan", "outputPath": "plan.md", "status": "blocked", "missingDeps": ["tasks"]}
+  ]
+}
+```
 
 ---
 
 ### `openspec instructions`
 
-Get enriched instructions for creating an artifact or applying tasks. Used by AI agents to understand what to create next.
+Get enriched instructions for creating an artifact, completing a phase, or applying tasks. Used by AI agents to understand what to create next.
 
 ```
-openspec instructions [artifact] [options]
+openspec instructions [id] [options]
 ```
 
 **Arguments:**
@@ -773,6 +790,7 @@ openspec instructions [artifact] [options]
 | Argument | Required | Description |
 |----------|----------|-------------|
 | `artifact` | No | Artifact ID, or workflow input surface: `apply` or `archive` |
+| `id` | No | Artifact ID, phase ID, or `apply`. Spec-driven schema: `proposal`, `specs`, `design`, `tasks`. Brainstorm-root v2: artifact `tasks`; phases `brainstorm`, `plan`. |
 
 **Options:**
 
@@ -785,15 +803,20 @@ openspec instructions [artifact] [options]
 **Special cases:** Use `apply` to get task implementation instructions. Use
 `archive` to fetch current, read-only archive inputs (`context` and
 `operationGuidance`) for a valid change; it does not archive or mutate anything.
+**Special case:** Use `apply` as the id to get task implementation instructions.
 
 **Examples:**
 
 ```bash
-# Get instructions for next artifact
+# Get instructions for next artifact/phase
 openspec instructions --change add-dark-mode
 
-# Get specific artifact instructions
+# Get specific artifact instructions (spec-driven)
 openspec instructions design --change add-dark-mode
+
+# Get phase instructions (brainstorm-root v2)
+openspec instructions brainstorm --change add-dark-mode
+openspec instructions plan --change add-dark-mode
 
 # Get apply/implementation instructions
 openspec instructions apply --change add-dark-mode
@@ -802,7 +825,7 @@ openspec instructions apply --change add-dark-mode
 openspec instructions archive --change add-dark-mode --json
 
 # JSON for agent consumption
-openspec instructions design --change add-dark-mode --json
+openspec instructions plan --change add-dark-mode --json
 ```
 
 **Output includes:**

@@ -20,7 +20,13 @@ import {
   validateConfig,
   DEFAULT_CONFIG,
 } from '../core/config-schema.js';
-import { CORE_WORKFLOWS, ALL_WORKFLOWS, getProfileWorkflows } from '../core/profiles.js';
+import {
+  CORE_WORKFLOWS,
+  BRAINSTORM_WORKFLOWS,
+  ALL_WORKFLOWS,
+  getProfileWorkflows,
+  ensureWritingPlansWhenBrainstormSelected,
+} from '../core/profiles.js';
 import { OPENSPEC_DIR_NAME } from '../core/config.js';
 import { hasProjectConfigDrift } from '../core/profile-sync-drift.js';
 import { UpdateCommand } from '../core/update.js';
@@ -470,15 +476,24 @@ export function registerConfigCommand(program: Command): void {
         return;
       }
 
+      if (preset === 'brainstorm') {
+        const config = getGlobalConfig();
+        config.profile = 'brainstorm';
+        config.workflows = [...BRAINSTORM_WORKFLOWS];
+        saveGlobalConfig(config);
+        console.log('Config updated. Run `openspec update` in your projects to apply.');
+        return;
+      }
+
       if (preset) {
-        console.error(`Error: Unknown profile preset "${preset}". Available presets: core`);
+        console.error(`Error: Unknown profile preset "${preset}". Available presets: core, brainstorm`);
         process.exitCode = 1;
         return;
       }
 
       // Non-interactive check
       if (!process.stdout.isTTY) {
-        console.error('Interactive mode required. Use `openspec config profile core` or set config via environment/flags.');
+        console.error('Interactive mode required. Use `openspec config profile core` or `openspec config profile brainstorm`, or set config via environment/flags.');
         process.exitCode = 1;
         return;
       }
@@ -594,8 +609,9 @@ export function registerConfigCommand(program: Command): void {
             },
             choices: ALL_WORKFLOWS.map(formatWorkflowChoice),
           });
-          nextState.workflows = selectedWorkflows;
-          nextState.profile = deriveProfileFromWorkflowSelection(selectedWorkflows);
+          const withWritingPlans = ensureWritingPlansWhenBrainstormSelected(selectedWorkflows);
+          nextState.workflows = stableWorkflowOrder(withWritingPlans);
+          nextState.profile = deriveProfileFromWorkflowSelection(nextState.workflows);
         }
 
         const diff = diffProfileState(currentState, nextState);

@@ -166,3 +166,5 @@ opencode.json
 
 # Cursor
 .cursor/
+# Local git worktrees
+.worktrees/

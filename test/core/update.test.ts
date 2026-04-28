@@ -2103,6 +2103,49 @@ More user content after markers.
   });
 
   describe('profile-aware updates', () => {
+    it('should not mutate openspec/config.yaml when global profile is brainstorm', async () => {
+      setMockConfig({
+        featureFlags: {},
+        profile: 'brainstorm',
+        delivery: 'both',
+      });
+
+      await fs.mkdir(path.join(testDir, 'openspec'), { recursive: true });
+      const configPath = path.join(testDir, 'openspec', 'config.yaml');
+      await fs.writeFile(configPath, 'schema: spec-driven\ncontext: keep-me\n');
+
+      const skillsDir = path.join(testDir, '.claude', 'skills');
+      await fs.mkdir(path.join(skillsDir, 'openspec-explore'), { recursive: true });
+      await fs.writeFile(path.join(skillsDir, 'openspec-explore', 'SKILL.md'), 'old');
+
+      await updateCommand.execute(testDir);
+
+      const content = await fs.readFile(configPath, 'utf-8');
+      expect(content).toBe('schema: spec-driven\ncontext: keep-me\n');
+    });
+
+    it('should not create config.yaml when config.yml already exists', async () => {
+      setMockConfig({
+        featureFlags: {},
+        profile: 'brainstorm',
+        delivery: 'both',
+      });
+
+      const openspecDir = path.join(testDir, 'openspec');
+      await fs.mkdir(openspecDir, { recursive: true });
+      const configYmlPath = path.join(openspecDir, 'config.yml');
+      await fs.writeFile(configYmlPath, 'schema: custom\ncontext: keep-me\n');
+
+      const skillsDir = path.join(testDir, '.claude', 'skills');
+      await fs.mkdir(path.join(skillsDir, 'openspec-explore'), { recursive: true });
+      await fs.writeFile(path.join(skillsDir, 'openspec-explore', 'SKILL.md'), 'old');
+
+      await updateCommand.execute(testDir);
+
+      expect(await fs.readFile(configYmlPath, 'utf-8')).toBe('schema: custom\ncontext: keep-me\n');
+      expect(await FileSystemUtils.fileExists(path.join(openspecDir, 'config.yaml'))).toBe(false);
+    });
+
     it('should generate only profile workflows when custom profile is set', async () => {
       // Set custom profile with only explore and new
       setMockConfig({

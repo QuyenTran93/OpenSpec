@@ -133,12 +133,22 @@ export function printStatusText(status: ChangeStatus): void {
   }
   const skippedSuffix = skippedCount > 0 ? ` (${skippedCount} skipped)` : '';
   console.log(`Progress: ${doneCount}/${total} artifacts complete${skippedSuffix}`);
+  const required = status.artifacts.filter((a) => !a.optional);
+  const doneCount = required.filter((a) => a.status === 'done').length;
+  const total = required.length;
+
+  console.log(`Change: ${status.changeName}`);
+  console.log(`Schema: ${status.schemaName}`);
+  console.log(`Progress: ${doneCount}/${total} required artifacts complete`);
   console.log();
 
   for (const artifact of status.artifacts) {
     const indicator = getStatusIndicator(artifact.status);
     const color = getStatusColor(artifact.status);
     let line = `${indicator} ${artifact.id}`;
+    if (artifact.optional) {
+      line += ' (optional)';
+    }
 
     if (artifact.status === 'skipped') {
       line += color(' (skipped: change declares skip_specs)');
@@ -153,6 +163,6 @@ export function printStatusText(status: ChangeStatus): void {
 
   if (status.isComplete) {
     console.log();
-    console.log(chalk.green('All artifacts complete!'));
+    console.log(chalk.green('All required artifacts complete!'));
   }
 }

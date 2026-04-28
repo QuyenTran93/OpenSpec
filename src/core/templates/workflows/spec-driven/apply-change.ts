@@ -6,6 +6,8 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import type { SkillTemplate, CommandTemplate } from '../../types.js';
+import { APPLY_EXECUTION_ENVIRONMENT_POLICY_BLOCK } from '../shared/execution-environment-policy.js';
 
 export function getApplyChangeSkillTemplate(): SkillTemplate {
   return {
@@ -89,7 +91,11 @@ ${STORE_SELECTION_GUIDANCE}
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+6. **Execution environment policy**
+
+   ${APPLY_EXECUTION_ENVIRONMENT_POLICY_BLOCK}
+
+7. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
@@ -104,7 +110,7 @@ ${STORE_SELECTION_GUIDANCE}
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session
@@ -274,7 +280,11 @@ ${STORE_SELECTION_GUIDANCE}
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+6. **Execution environment policy**
+
+   ${APPLY_EXECUTION_ENVIRONMENT_POLICY_BLOCK}
+
+7. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
@@ -289,7 +299,7 @@ ${STORE_SELECTION_GUIDANCE}
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session

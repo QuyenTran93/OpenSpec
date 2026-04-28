@@ -42,6 +42,7 @@ import { isInteractive } from '../utils/interactive.js';
 import { getGlobalConfig, type Delivery, type Profile } from './global-config.js';
 import { getProfileWorkflows, ALL_WORKFLOWS, CORE_WORKFLOWS } from './profiles.js';
 import { getOnboardingCommands } from './onboarding-commands.js';
+import { getProfileWorkflows, ALL_WORKFLOWS } from './profiles.js';
 import { getAvailableTools } from './available-tools.js';
 import {
   WORKFLOW_TO_SKILL_DIR,
@@ -67,6 +68,7 @@ import {
   shouldReconcileCommandFilesForTool,
   shouldRemoveSkillsForTool,
 } from './command-surface.js';
+import { ensureProjectConfigExistsForWorkflows } from './project-config-normalizer.js';
 
 const require = createRequire(import.meta.url);
 const { version: OPENSPEC_VERSION } = require('../../package.json');
@@ -148,12 +150,16 @@ export class UpdateCommand {
     const desiredWorkflows = profileWorkflows.filter((workflow): workflow is (typeof ALL_WORKFLOWS)[number] =>
       (ALL_WORKFLOWS as readonly string[]).includes(workflow)
     );
+    await ensureProjectConfigExistsForWorkflows(resolvedProjectPath, desiredWorkflows);
+    const shouldGenerateSkills = delivery !== 'commands';
+    const shouldGenerateCommands = delivery !== 'skills';
 
     // 4. Detect and handle legacy artifacts + upgrade legacy tools using effective config
     const legacyUpgrade = await this.handleLegacyCleanup(
       resolvedProjectPath,
       desiredWorkflows,
-      delivery
+      delivery,
+      profile
     );
     const {
       newlyConfiguredTools,
@@ -242,6 +248,9 @@ export class UpdateCommand {
 
     // 9. Determine what to generate based on delivery
     const deliveryIncludesCommands = delivery !== 'skills';
+    const skillTemplates = shouldGenerateSkills ? getSkillTemplates(desiredWorkflows, profile) : [];
+    const commandContents = shouldGenerateCommands ? getCommandContents(desiredWorkflows, profile) : [];
+
     // 10. Update tools (all if force, otherwise only those needing update)
     const toolsToUpdate = this.force ? configuredTools : [...toolsToUpdateSet];
     const updatedTools: string[] = [];
@@ -759,6 +768,9 @@ export class UpdateCommand {
     desiredWorkflows: readonly (typeof ALL_WORKFLOWS)[number][],
     delivery: Delivery
   ): Promise<LegacyUpgradeResult> {
+    delivery: Delivery,
+    profile: Profile
+  ): Promise<string[]> {
     // Detect legacy artifacts
     const detection = await detectLegacyArtifacts(projectPath);
 
@@ -799,6 +811,10 @@ export class UpdateCommand {
           detection.globalSlashCommandFiles
         ),
       };
+      // --force flag: proceed with cleanup automatically
+      await this.performLegacyCleanup(projectPath, detection);
+      // Then upgrade legacy tools to new skills
+      return this.upgradeLegacyTools(projectPath, detection, canPrompt, desiredWorkflows, delivery, profile);
     }
 
     if (!canPrompt) {
@@ -832,6 +848,9 @@ export class UpdateCommand {
           detection.globalSlashCommandFiles
         ),
       };
+      await this.performLegacyCleanup(projectPath, detection);
+      // Then upgrade legacy tools to new skills
+      return this.upgradeLegacyTools(projectPath, detection, canPrompt, desiredWorkflows, delivery, profile);
     } else {
       console.log(chalk.dim('Skipping legacy cleanup. Continuing with skill update...'));
       console.log();
@@ -916,6 +935,9 @@ export class UpdateCommand {
     desiredWorkflows: readonly (typeof ALL_WORKFLOWS)[number][],
     delivery: Delivery
   ): Promise<LegacyUpgradeResult> {
+    delivery: Delivery,
+    profile: Profile
+  ): Promise<string[]> {
     // Get tools that had legacy artifacts
     const legacyTools = getToolsFromLegacyArtifacts(detection);
 
@@ -989,6 +1011,10 @@ export class UpdateCommand {
     // Create skills/commands for selected tools using effective profile+delivery.
     const newlyConfigured: string[] = [];
     const workflowOverrides: LegacyUpgradeResult['workflowOverrides'] = {};
+    const shouldGenerateSkills = delivery !== 'commands';
+    const shouldGenerateCommands = delivery !== 'skills';
+    const skillTemplates = shouldGenerateSkills ? getSkillTemplates(desiredWorkflows, profile) : [];
+    const commandContents = shouldGenerateCommands ? getCommandContents(desiredWorkflows, profile) : [];
 
     for (const toolId of selectedTools) {
       const tool = AI_TOOLS.find((t) => t.value === toolId);

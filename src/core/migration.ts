@@ -17,8 +17,10 @@ import { WORKFLOW_TO_SKILL_DIR } from './profile-sync-drift.js';
 import { COMMAND_IDS } from './shared/tool-detection.js';
 import { ALL_WORKFLOWS } from './profiles.js';
 import { getSkillReferenceTransformer, getTransformerForTool } from '../utils/command-references.js';
+import { ALL_WORKFLOWS, BRAINSTORM_WORKFLOWS } from './profiles.js';
 import path from 'path';
 import * as fs from 'fs';
+import { ensureProjectConfigExistsForWorkflowsSync } from './project-config-normalizer.js';
 
 export interface LegacyToolRoot {
   /** Former tool root, e.g. '.kimi' */
@@ -455,6 +457,9 @@ export function migrateIfNeeded(projectPath: string, tools: AIToolOption[]): voi
 
   // If profile is already explicitly set, no migration needed
   if (rawConfig.profile !== undefined) {
+    if (rawConfig.profile === 'brainstorm') {
+      ensureProjectConfigExistsForWorkflowsSync(projectPath, [...BRAINSTORM_WORKFLOWS]);
+    }
     return;
   }
 
@@ -474,6 +479,8 @@ export function migrateIfNeeded(projectPath: string, tools: AIToolOption[]): voi
     config.delivery = inferDelivery(artifacts);
   }
   saveGlobalConfig(config);
+
+  ensureProjectConfigExistsForWorkflowsSync(projectPath, installedWorkflows);
 
   console.log(`Migrated: custom profile with ${installedWorkflows.length} workflows`);
   // Each detected tool resolves to a propose reference for its surface: the

@@ -47,6 +47,7 @@
     "dev": "tsc --watch",
     "dev:cli": "pnpm build && node bin/openspec.js",
     "test": "vitest run",
+    "test:nvm": "bash scripts/test-with-nvm-node.sh",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",

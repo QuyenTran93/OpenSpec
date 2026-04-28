@@ -6,6 +6,7 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 import { STORE_SELECTION_GUIDANCE } from './store-selection.js';
+import type { SkillTemplate, CommandTemplate } from '../../types.js';
 
 export function getVerifyChangeSkillTemplate(): SkillTemplate {
   return {
