@@ -6,6 +6,21 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../types.js';
 
+const APPLY_EXECUTION_PLAN_GATE_STEP = (
+  rerunInstruction: string
+): string => `6. **Gate on execution plan before implementation loop**
+
+   Before implementation starts, check for:
+   - \`openspec/changes/<name>/execution-plan.md\`
+
+   If missing, pause and ask the user to run \`writing-plans\` and save \`execution-plan.md\` at that path, then rerun ${rerunInstruction}.
+
+   Clarify execution mode:
+   - \`execution-plan.md\` guides the micro-step implementation order
+   - \`tasks.md\` remains the checkbox progress tracker (\`- [ ]\` -> \`- [x]\`)
+
+   Mention implementation guidance: use inline execution for small focused tasks, and use \`subagent-driven-development\` or \`executing-plans\` when work is broader or parallelizable.`;
+
 export function getApplyChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-apply-change',
@@ -65,7 +80,9 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+${APPLY_EXECUTION_PLAN_GATE_STEP('apply')}
+
+7. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
@@ -80,7 +97,7 @@ export function getApplyChangeSkillTemplate(): SkillTemplate {
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session
@@ -222,7 +239,9 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+${APPLY_EXECUTION_PLAN_GATE_STEP('`/opsx:apply`')}
+
+7. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
@@ -237,7 +256,7 @@ export function getOpsxApplyCommandTemplate(): CommandTemplate {
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session

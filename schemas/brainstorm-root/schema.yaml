@@ -1,0 +1,62 @@
+name: brainstorm-root
+version: 1
+description: Brainstorm-first workflow - brainstorm -> specs -> tasks
+artifacts:
+  - id: brainstorm
+    generates: brainstorm.md
+    description: Discovery and scoping notes created before implementation planning
+    template: brainstorm.md
+    instruction: |
+      Create a brainstorm document that clarifies intent and scope before implementation.
+
+      Include:
+      - Problem statement and why this change matters now
+      - In-scope and out-of-scope boundaries
+      - Success criteria that can be validated
+      - Constraints, risks, and assumptions
+      - Chosen approach and alternatives considered
+
+      Keep it concise and decision-oriented. This artifact is the root context for specs.
+    requires: []
+
+  - id: specs
+    generates: "specs/**/*.md"
+    description: Behavioral requirements for capabilities
+    template: spec.md
+    instruction: |
+      Create specification files that define WHAT the system should do.
+
+      Create one spec file per capability identified in brainstorm.md.
+      Use normative requirements and scenario-based behavior:
+      - `### Requirement: <name>`
+      - `#### Scenario: <name>` with WHEN/THEN bullets
+
+      Specs should be testable and scoped to the brainstorm decisions.
+    requires:
+      - brainstorm
+
+  - id: tasks
+    generates: tasks.md
+    description: Trackable implementation checklist
+    template: tasks.md
+    instruction: |
+      Create an implementation checklist from specs.
+
+      Requirements:
+      - Use numbered sections
+      - Use checkbox tasks in `- [ ] X.Y Description` format
+      - Keep tasks ordered by dependency
+      - Ensure each task is verifiable
+
+      This file is the source of completion tracking during apply.
+    requires:
+      - specs
+
+apply:
+  requires: [tasks]
+  tracks: tasks.md
+  executionPlan: execution-plan.md
+  instruction: |
+    Read context files and implement pending tasks from tasks.md.
+    Mark completed checklist items as you go.
+    Pause on blockers or unclear requirements.

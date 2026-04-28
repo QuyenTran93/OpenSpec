@@ -403,6 +403,51 @@ describe('artifact-workflow CLI commands', () => {
       expect(result.stdout).toContain('Missing artifacts: tasks');
     });
 
+    it('blocks apply when execution-plan.md is missing for brainstorm-root workflow', async () => {
+      const changeDir = path.join(changesDir, 'brainstorm-apply-no-plan');
+      await fs.mkdir(path.join(changeDir, 'specs', 'capability'), { recursive: true });
+      await fs.writeFile(path.join(changeDir, '.openspec.yaml'), 'schema: brainstorm-root\n');
+      await fs.writeFile(path.join(changeDir, 'brainstorm.md'), '# Brainstorm');
+      await fs.writeFile(path.join(changeDir, 'specs', 'capability', 'spec.md'), '## Purpose\nSpec');
+      await fs.writeFile(path.join(changeDir, 'tasks.md'), '## Tasks\n- [ ] Task 1');
+
+      const result = await runCLI(
+        ['instructions', 'apply', '--change', 'brainstorm-apply-no-plan', '--json'],
+        { cwd: tempDir }
+      );
+      expect(result.exitCode).toBe(0);
+
+      const json = JSON.parse(result.stdout);
+      expect(json.schemaName).toBe('brainstorm-root');
+      expect(json.state).toBe('blocked');
+      expect(json.instruction).toContain('execution-plan.md');
+      expect(json.instruction).toContain('writing-plans');
+    });
+
+    it('allows apply when execution-plan.md exists for brainstorm-root workflow', async () => {
+      const changeDir = path.join(changesDir, 'brainstorm-apply-with-plan');
+      await fs.mkdir(path.join(changeDir, 'specs', 'capability'), { recursive: true });
+      await fs.writeFile(path.join(changeDir, '.openspec.yaml'), 'schema: brainstorm-root\n');
+      await fs.writeFile(path.join(changeDir, 'brainstorm.md'), '# Brainstorm');
+      await fs.writeFile(
+        path.join(changeDir, 'specs', 'capability', 'spec.md'),
+        '## ADDED Requirements\n\n### Requirement: Capability\nThe system SHALL support it.\n\n#### Scenario: Works\n- **WHEN** enabled\n- **THEN** it works\n'
+      );
+      await fs.writeFile(path.join(changeDir, 'tasks.md'), '- [ ] 1.1 Implement capability');
+      await fs.writeFile(path.join(changeDir, 'execution-plan.md'), '# Execution plan');
+
+      const result = await runCLI(
+        ['instructions', 'apply', '--change', 'brainstorm-apply-with-plan', '--json'],
+        { cwd: tempDir }
+      );
+
+      expect(result.exitCode).toBe(0);
+      const json = JSON.parse(result.stdout);
+      expect(json.schemaName).toBe('brainstorm-root');
+      expect(json.state).toBe('ready');
+      expect(json.instruction).not.toContain('Missing required plan file');
+    });
+
     it('outputs JSON for apply instructions', async () => {
       await createTestChange('json-apply', ['proposal', 'design', 'specs', 'tasks']);
 

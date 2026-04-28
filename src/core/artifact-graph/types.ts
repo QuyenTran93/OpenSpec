@@ -16,6 +16,8 @@ export const ApplyPhaseSchema = z.object({
   requires: z.array(z.string()).min(1, { error: 'At least one required artifact' }),
   // Path to file with checkboxes for progress (relative to change dir), or null if no tracking
   tracks: z.string().nullable().optional(),
+  // Optional required execution plan file path for apply gating
+  executionPlan: z.string().nullable().optional(),
   // Custom guidance for the apply phase
   instruction: z.string().optional(),
 });

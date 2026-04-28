@@ -37,6 +37,7 @@ export function parseSchema(yamlContent: string): SchemaYaml {
 
   // Check that all requires references are valid
   validateRequiresReferences(schema.artifacts);
+  validateApplyRequiresReferences(schema.artifacts, schema.apply?.requires);
 
   // Check for cycles
   validateNoCycles(schema.artifacts);
@@ -70,6 +71,25 @@ function validateRequiresReferences(artifacts: Artifact[]): void {
           `Invalid dependency reference in artifact '${artifact.id}': '${req}' does not exist`
         );
       }
+    }
+  }
+}
+
+/**
+ * Validates that apply.requires references point to valid artifact IDs.
+ */
+function validateApplyRequiresReferences(
+  artifacts: Artifact[],
+  applyRequires: string[] | undefined
+): void {
+  if (!applyRequires) return;
+
+  const validIds = new Set(artifacts.map((a) => a.id));
+  for (const req of applyRequires) {
+    if (!validIds.has(req)) {
+      throw new SchemaValidationError(
+        `Invalid apply.requires reference: '${req}' does not exist in artifacts`
+      );
     }
   }
 }

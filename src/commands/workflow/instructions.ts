@@ -255,6 +255,12 @@ export async function generateApplyInstructions(
   // Get the full schema to access the apply phase configuration
   const schema = resolveSchema(context.schemaName, projectRoot);
   const applyConfig = schema.apply;
+  const configuredExecutionPlan = applyConfig?.executionPlan ?? null;
+  const executionPlanPath = configuredExecutionPlan
+    ? path.join(changeDir, configuredExecutionPlan)
+    : null;
+  const requiresExecutionPlan = Boolean(configuredExecutionPlan);
+  const hasExecutionPlan = executionPlanPath ? fs.existsSync(executionPlanPath) : true;
 
   // Determine required artifacts and tracking file from schema
   // Fallback: if no apply block, require all artifacts
@@ -304,6 +310,10 @@ export async function generateApplyInstructions(
   if (missingArtifacts.length > 0) {
     state = 'blocked';
     instruction = `Cannot apply this change yet. Missing artifacts: ${missingArtifacts.join(', ')}.\nUse the openspec-continue-change skill to create the missing artifacts first.`;
+  } else if (requiresExecutionPlan && !hasExecutionPlan) {
+    state = 'blocked';
+    const missingPlan = configuredExecutionPlan ?? 'execution-plan.md';
+    instruction = `Missing required plan file: ${missingPlan}.\nRun writing-plans and save it to openspec/changes/<name>/${missingPlan} before applying.`;
   } else if (tracksFile && !tracksFileExists) {
     // Tracking file configured but doesn't exist yet
     const tracksFilename = path.basename(tracksFile);

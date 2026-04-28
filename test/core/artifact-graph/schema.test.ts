@@ -114,6 +114,28 @@ artifacts:
       expect(() => parseSchema(yaml)).toThrow(/Invalid dependency reference.*nonexistent/);
     });
 
+    it('should throw on invalid apply.requires reference', () => {
+      const yaml = `
+name: test
+version: 1
+artifacts:
+  - id: brainstorm
+    generates: brainstorm.md
+    description: Brainstorm
+    template: templates/brainstorm.md
+  - id: tasks
+    generates: tasks.md
+    description: Tasks
+    template: templates/tasks.md
+apply:
+  requires:
+    - nonexistent
+  tracks: tasks.md
+`;
+      expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
+      expect(() => parseSchema(yaml)).toThrow(/Invalid apply\.requires reference.*nonexistent/);
+    });
+
     it('should detect self-referencing cycle', () => {
       const yaml = `
 name: test

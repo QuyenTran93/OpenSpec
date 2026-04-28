@@ -363,6 +363,9 @@
 
 ### Minor Changes
 
+- Add a built-in `brainstorm-root` workflow schema (`brainstorm -> specs -> tasks`) with template scaffolds for brainstorm-first changes.
+- Require `execution-plan.md` before `/opsx:apply` when the schema config declares `apply.executionPlan`, and guide users to run `writing-plans` first.
+- Update `/opsx:propose` guidance to hand off through `writing-plans` and save plans to `openspec/changes/<name>/execution-plan.md` before apply.
 - Add Continue slash command support so `openspec init` can generate `.continue/prompts/openspec-*.prompt` files with MARKDOWN frontmatter and `$ARGUMENTS` placeholder, and refresh them on `openspec update`.
 
 - Add Antigravity slash command support so `openspec init` can generate `.agent/workflows/openspec-*.md` files with description-only frontmatter and `openspec update` refreshes existing workflows alongside Windsurf.

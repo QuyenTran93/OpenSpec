@@ -182,6 +182,10 @@ Think through ideas, investigate problems, compare options. No structure require
 /opsx:propose
 ```
 Creates the change and generates planning artifacts needed before implementation.
+After artifacts are generated, hand off in this order:
+1. Run `writing-plans`
+2. Save the resulting plan to `openspec/changes/<name>/execution-plan.md`
+3. Then run `/opsx:apply`
 
 If you've enabled expanded workflows, you can instead use:
 
@@ -206,6 +210,7 @@ Creates all planning artifacts at once. Use when you have a clear picture of wha
 ```
 /opsx:apply
 ```
+Before running apply, make sure `execution-plan.md` exists for the change (generated via `writing-plans` at `openspec/changes/<name>/execution-plan.md`).
 Works through tasks, checking them off as you go. If you're juggling multiple changes, you can run `/opsx:apply <name>`; otherwise it should infer from the conversation and prompt you to choose if it can't tell.
 
 ### Finish up

@@ -131,6 +131,58 @@ describe('artifact-graph workflow integration', () => {
     });
   });
 
+  describe('brainstorm-root workflow', () => {
+    it('should resolve brainstorm-root built-in schema', () => {
+      const schema = resolveSchema('brainstorm-root');
+      const graph = ArtifactGraph.fromSchema(schema);
+
+      expect(graph.getName()).toBe('brainstorm-root');
+      expect(graph.getAllArtifacts()).toHaveLength(3);
+      expect(graph.getBuildOrder()).toEqual(['brainstorm', 'specs', 'tasks']);
+      expect(schema.artifacts.map((artifact) => artifact.template)).toEqual([
+        'brainstorm.md',
+        'spec.md',
+        'tasks.md',
+      ]);
+      expect(schema.apply?.tracks).toBe('tasks.md');
+    });
+
+    it('should progress from brainstorm to specs to tasks', () => {
+      const schema = resolveSchema('brainstorm-root');
+      const graph = ArtifactGraph.fromSchema(schema);
+
+      let completed = detectCompleted(graph, tempDir);
+      expect(completed.size).toBe(0);
+      expect(graph.getNextArtifacts(completed)).toEqual(['brainstorm']);
+      expect(normalizeBlocked(graph.getBlocked(completed))).toEqual({
+        specs: ['brainstorm'],
+        tasks: ['specs'],
+      });
+
+      fs.writeFileSync(path.join(tempDir, 'brainstorm.md'), '# Brainstorm');
+      completed = detectCompleted(graph, tempDir);
+      expect(completed).toEqual(new Set(['brainstorm']));
+      expect(graph.getNextArtifacts(completed)).toEqual(['specs']);
+      expect(normalizeBlocked(graph.getBlocked(completed))).toEqual({
+        tasks: ['specs'],
+      });
+
+      const specsDir = path.join(tempDir, 'specs', 'feature');
+      fs.mkdirSync(specsDir, { recursive: true });
+      fs.writeFileSync(path.join(specsDir, 'spec.md'), '# Spec');
+      completed = detectCompleted(graph, tempDir);
+      expect(completed).toEqual(new Set(['brainstorm', 'specs']));
+      expect(graph.getNextArtifacts(completed)).toEqual(['tasks']);
+      expect(graph.getBlocked(completed)).toEqual({});
+
+      fs.writeFileSync(path.join(tempDir, 'tasks.md'), '# Tasks');
+      completed = detectCompleted(graph, tempDir);
+      expect(completed).toEqual(new Set(['brainstorm', 'specs', 'tasks']));
+      expect(graph.getNextArtifacts(completed)).toEqual([]);
+      expect(graph.isComplete(completed)).toBe(true);
+    });
+  });
+
   describe('build order consistency', () => {
     it('should return consistent build order across multiple calls', () => {
       const schema = resolveSchema('spec-driven');

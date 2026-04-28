@@ -17,7 +17,10 @@ I'll create a change with artifacts:
 - design.md (how)
 - tasks.md (implementation steps)
 
-When ready to implement, run /opsx:apply
+After artifacts are generated:
+1) Run writing-plans
+2) Save the plan to openspec/changes/<name>/execution-plan.md
+3) Then run /opsx:apply
 
 ---
 
@@ -90,8 +93,8 @@ When ready to implement, run /opsx:apply
 After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run \`/opsx:apply\` or ask me to implement to start working on the tasks."
+- What's ready: "All artifacts created! Ready for planning handoff."
+- Prompt: "Run \`writing-plans\`, save the plan to \`openspec/changes/<name>/execution-plan.md\`, then run \`/opsx:apply\`."
 
 **Artifact Creation Guidelines**
 
@@ -128,7 +131,10 @@ I'll create a change with artifacts:
 - design.md (how)
 - tasks.md (implementation steps)
 
-When ready to implement, run /opsx:apply
+After artifacts are generated:
+1) Run writing-plans
+2) Save the plan to openspec/changes/<name>/execution-plan.md
+3) Then run /opsx:apply
 
 ---
 
@@ -201,8 +207,8 @@ When ready to implement, run /opsx:apply
 After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run \`/opsx:apply\` to start implementing."
+- What's ready: "All artifacts created! Ready for planning handoff."
+- Prompt: "Run \`writing-plans\`, save the plan to \`openspec/changes/<name>/execution-plan.md\`, then run \`/opsx:apply\`."
 
 **Artifact Creation Guidelines**
 
