@@ -47,6 +47,7 @@ import {
   scanInstalledWorkflows as scanInstalledWorkflowsShared,
   migrateIfNeeded as migrateIfNeededShared,
 } from './migration.js';
+import { ensureProjectSchemaForProfile } from './project-config-normalizer.js';
 
 const require = createRequire(import.meta.url);
 const { version: OPENSPEC_VERSION } = require('../../package.json');
@@ -96,6 +97,7 @@ export class UpdateCommand {
     // 3. Read global config for profile/delivery
     const globalConfig = getGlobalConfig();
     const profile = globalConfig.profile ?? 'core';
+    await ensureProjectSchemaForProfile(resolvedProjectPath, profile);
     const delivery: Delivery = globalConfig.delivery ?? 'both';
     const profileWorkflows = getProfileWorkflows(profile, globalConfig.workflows);
     const desiredWorkflows = profileWorkflows.filter((workflow): workflow is (typeof ALL_WORKFLOWS)[number] =>

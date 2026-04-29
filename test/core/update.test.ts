@@ -1393,6 +1393,26 @@ More user content after markers.
   });
 
   describe('profile-aware updates', () => {
+    it('should normalize openspec/config.yaml schema when global profile is brainstorm', async () => {
+      setMockConfig({
+        featureFlags: {},
+        profile: 'brainstorm',
+        delivery: 'both',
+      });
+
+      await fs.mkdir(path.join(testDir, 'openspec'), { recursive: true });
+      await fs.writeFile(path.join(testDir, 'openspec', 'config.yaml'), 'schema: spec-driven\n');
+
+      const skillsDir = path.join(testDir, '.claude', 'skills');
+      await fs.mkdir(path.join(skillsDir, 'openspec-explore'), { recursive: true });
+      await fs.writeFile(path.join(skillsDir, 'openspec-explore', 'SKILL.md'), 'old');
+
+      await updateCommand.execute(testDir);
+
+      const content = await fs.readFile(path.join(testDir, 'openspec', 'config.yaml'), 'utf-8');
+      expect(content).toContain('schema: brainstorm-root');
+    });
+
     it('should generate only profile workflows when custom profile is set', async () => {
       // Set custom profile with only explore and new
       setMockConfig({

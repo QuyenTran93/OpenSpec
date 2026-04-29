@@ -231,6 +231,23 @@ describe('global-config', () => {
         expect(config.workflows).toEqual(['propose', 'review']);
       });
 
+      it('should preserve explicit brainstorm profile values from config', () => {
+        process.env.XDG_CONFIG_HOME = tempDir;
+        const configDir = path.join(tempDir, 'openspec');
+        const configPath = path.join(configDir, 'config.json');
+
+        fs.mkdirSync(configDir, { recursive: true });
+        fs.writeFileSync(configPath, JSON.stringify({
+          featureFlags: {},
+          profile: 'brainstorm',
+          delivery: 'both',
+          workflows: ['brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive']
+        }));
+
+        const config = getGlobalConfig();
+        expect(config.profile).toBe('brainstorm');
+      });
+
       it('should round-trip new fields correctly', () => {
         process.env.XDG_CONFIG_HOME = tempDir;
         const originalConfig = {

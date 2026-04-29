@@ -113,6 +113,22 @@ describe('migration', () => {
     expect(config.workflows).toBeUndefined();
   });
 
+  it('normalizes project config schema when explicit profile is brainstorm', async () => {
+    saveGlobalConfig({
+      featureFlags: {},
+      profile: 'brainstorm',
+      delivery: 'both',
+    });
+    const projectConfigPath = path.join(projectDir, 'openspec', 'config.yaml');
+    await fsp.mkdir(path.dirname(projectConfigPath), { recursive: true });
+    await fsp.writeFile(projectConfigPath, 'schema: spec-driven\n', 'utf-8');
+
+    migrateIfNeeded(projectDir, [ensureClaudeTool()]);
+
+    const content = fs.readFileSync(projectConfigPath, 'utf-8');
+    expect(content).toContain('schema: brainstorm-root');
+  });
+
   it('preserves explicit delivery value during migration', async () => {
     // Raw config has explicit delivery but no profile yet.
     saveGlobalConfig({

@@ -20,14 +20,15 @@ describe('profiles', () => {
   });
 
   describe('ALL_WORKFLOWS', () => {
-    it('should contain all 11 workflows', () => {
-      expect(ALL_WORKFLOWS).toHaveLength(11);
+    it('should contain all 13 workflows', () => {
+      expect(ALL_WORKFLOWS).toHaveLength(13);
     });
 
     it('should contain expected workflow IDs', () => {
       const expected = [
         'propose', 'explore', 'new', 'continue', 'apply',
         'ff', 'sync', 'archive', 'bulk-archive', 'verify', 'onboard',
+        'brainstorm', 'writing-plans',
       ];
       expect([...ALL_WORKFLOWS]).toEqual(expected);
     });
@@ -58,6 +59,16 @@ describe('profiles', () => {
     it('should return empty array for custom profile with empty customWorkflows', () => {
       const result = getProfileWorkflows('custom', []);
       expect(result).toEqual([]);
+    });
+
+    it('should return brainstorm workflows for brainstorm profile', () => {
+      const result = getProfileWorkflows('brainstorm');
+      expect(result).toEqual(['brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive']);
+    });
+
+    it('should ignore customWorkflows for brainstorm profile', () => {
+      const result = getProfileWorkflows('brainstorm', ['propose']);
+      expect(result).toEqual(['brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive']);
     });
   });
 });

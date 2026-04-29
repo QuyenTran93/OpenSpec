@@ -12,6 +12,7 @@ import { WORKFLOW_TO_SKILL_DIR } from './profile-sync-drift.js';
 import { ALL_WORKFLOWS } from './profiles.js';
 import path from 'path';
 import * as fs from 'fs';
+import { ensureProjectSchemaForProfileSync } from './project-config-normalizer.js';
 
 interface InstalledWorkflowArtifacts {
   workflows: string[];
@@ -106,6 +107,9 @@ export function migrateIfNeeded(projectPath: string, tools: AIToolOption[]): voi
 
   // If profile is already explicitly set, no migration needed
   if (rawConfig.profile !== undefined) {
+    if (rawConfig.profile === 'brainstorm') {
+      ensureProjectSchemaForProfileSync(projectPath, 'brainstorm');
+    }
     return;
   }
 

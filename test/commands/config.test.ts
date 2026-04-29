@@ -266,7 +266,24 @@ describe('config profile command', () => {
 
     expect(validateConfig({ featureFlags: {}, profile: 'core', delivery: 'both' }).success).toBe(true);
     expect(validateConfig({ featureFlags: {}, profile: 'custom', delivery: 'skills' }).success).toBe(true);
+    expect(validateConfig({ featureFlags: {}, profile: 'brainstorm', delivery: 'both' }).success).toBe(true);
     expect(validateConfig({ featureFlags: {}, profile: 'custom', delivery: 'commands', workflows: ['explore'] }).success).toBe(true);
+  });
+
+  it('brainstorm preset should set profile and workflows', async () => {
+    const { getGlobalConfig, saveGlobalConfig } = await import('../../src/core/global-config.js');
+    const { BRAINSTORM_WORKFLOWS } = await import('../../src/core/profiles.js');
+
+    saveGlobalConfig({ featureFlags: {}, profile: 'core', delivery: 'both', workflows: ['propose'] });
+
+    const config = getGlobalConfig();
+    config.profile = 'brainstorm';
+    config.workflows = [...BRAINSTORM_WORKFLOWS];
+    saveGlobalConfig(config);
+
+    const result = getGlobalConfig();
+    expect(result.profile).toBe('brainstorm');
+    expect(result.workflows).toEqual([...BRAINSTORM_WORKFLOWS]);
   });
 
   it('config schema should reject invalid profile values', async () => {

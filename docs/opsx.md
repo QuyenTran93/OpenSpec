@@ -67,6 +67,8 @@ This creates skills in `.claude/skills/` (or equivalent) that AI coding assistan
 
 By default, OpenSpec uses the `core` workflow profile (`propose`, `explore`, `apply`, `archive`). If you want the expanded workflow commands (`new`, `continue`, `ff`, `verify`, `sync`, `bulk-archive`, `onboard`), configure them with `openspec config profile` and apply with `openspec update`.
 
+OpenSpec also supports the `brainstorm` profile (`brainstorm`, `new`, `continue`, `writing-plans`, `apply`, `archive`) for brainstorm-first execution. In this profile, `/opsx:brainstorm` writes `openspec/changes/<name>/brainstorm.md`, and `/opsx:writing-plans` writes `openspec/changes/<name>/execution-plan.md`.
+
 During setup, you'll be prompted to create a **project config** (`openspec/config.yaml`). This is optional but recommended.
 
 ## Project Configuration

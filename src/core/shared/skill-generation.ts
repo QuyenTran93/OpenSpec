@@ -16,6 +16,8 @@ import {
   getVerifyChangeSkillTemplate,
   getOnboardSkillTemplate,
   getOpsxProposeSkillTemplate,
+  getBrainstormSkillTemplate,
+  getWritingPlansSkillTemplate,
   getOpsxExploreCommandTemplate,
   getOpsxNewCommandTemplate,
   getOpsxContinueCommandTemplate,
@@ -27,6 +29,8 @@ import {
   getOpsxVerifyCommandTemplate,
   getOpsxOnboardCommandTemplate,
   getOpsxProposeCommandTemplate,
+  getOpsxBrainstormCommandTemplate,
+  getOpsxWritingPlansCommandTemplate,
   type SkillTemplate,
 } from '../templates/skill-templates.js';
 import type { CommandContent } from '../command-generation/index.js';
@@ -66,6 +70,8 @@ export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemp
     { template: getVerifyChangeSkillTemplate(), dirName: 'openspec-verify-change', workflowId: 'verify' },
     { template: getOnboardSkillTemplate(), dirName: 'openspec-onboard', workflowId: 'onboard' },
     { template: getOpsxProposeSkillTemplate(), dirName: 'openspec-propose', workflowId: 'propose' },
+    { template: getBrainstormSkillTemplate(), dirName: 'openspec-brainstorm', workflowId: 'brainstorm' },
+    { template: getWritingPlansSkillTemplate(), dirName: 'openspec-writing-plans', workflowId: 'writing-plans' },
   ];
 
   if (!workflowFilter) return all;
@@ -92,6 +98,8 @@ export function getCommandTemplates(workflowFilter?: readonly string[]): Command
     { template: getOpsxVerifyCommandTemplate(), id: 'verify' },
     { template: getOpsxOnboardCommandTemplate(), id: 'onboard' },
     { template: getOpsxProposeCommandTemplate(), id: 'propose' },
+    { template: getOpsxBrainstormCommandTemplate(), id: 'brainstorm' },
+    { template: getOpsxWritingPlansCommandTemplate(), id: 'writing-plans' },
   ];
 
   if (!workflowFilter) return all;

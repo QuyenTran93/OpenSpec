@@ -45,6 +45,7 @@ import { getGlobalConfig, type Delivery, type Profile } from './global-config.js
 import { getProfileWorkflows, CORE_WORKFLOWS, ALL_WORKFLOWS } from './profiles.js';
 import { getAvailableTools } from './available-tools.js';
 import { migrateIfNeeded } from './migration.js';
+import { ensureProjectSchemaForProfile } from './project-config-normalizer.js';
 
 const require = createRequire(import.meta.url);
 const { version: OPENSPEC_VERSION } = require('../../package.json');
@@ -72,6 +73,8 @@ const WORKFLOW_TO_SKILL_DIR: Record<string, string> = {
   'verify': 'openspec-verify-change',
   'onboard': 'openspec-onboard',
   'propose': 'openspec-propose',
+  'brainstorm': 'openspec-brainstorm',
+  'writing-plans': 'openspec-writing-plans',
 };
 
 // -----------------------------------------------------------------------------
@@ -182,11 +185,11 @@ export class InitCommand {
       return undefined;
     }
 
-    if (this.profileOverride === 'core' || this.profileOverride === 'custom') {
+    if (this.profileOverride === 'core' || this.profileOverride === 'custom' || this.profileOverride === 'brainstorm') {
       return this.profileOverride;
     }
 
-    throw new Error(`Invalid profile "${this.profileOverride}". Available profiles: core, custom`);
+    throw new Error(`Invalid profile "${this.profileOverride}". Available profiles: core, custom, brainstorm`);
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -512,6 +515,7 @@ export class InitCommand {
     // Read global config for profile and delivery settings (use --profile override if set)
     const globalConfig = getGlobalConfig();
     const profile: Profile = this.resolveProfileOverride() ?? globalConfig.profile ?? 'core';
+    await ensureProjectSchemaForProfile(projectPath, profile);
     const delivery: Delivery = globalConfig.delivery ?? 'both';
     const workflows = getProfileWorkflows(profile, globalConfig.workflows);
 

@@ -12,6 +12,7 @@ import type { Profile } from './global-config.js';
  * These provide the streamlined experience for new users.
  */
 export const CORE_WORKFLOWS = ['propose', 'explore', 'apply', 'archive'] as const;
+export const BRAINSTORM_WORKFLOWS = ['brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive'] as const;
 
 /**
  * All available workflows in the system.
@@ -28,6 +29,8 @@ export const ALL_WORKFLOWS = [
   'bulk-archive',
   'verify',
   'onboard',
+  'brainstorm',
+  'writing-plans',
 ] as const;
 
 export type WorkflowId = (typeof ALL_WORKFLOWS)[number];
@@ -45,6 +48,9 @@ export function getProfileWorkflows(
 ): readonly string[] {
   if (profile === 'custom') {
     return customWorkflows ?? [];
+  }
+  if (profile === 'brainstorm') {
+    return BRAINSTORM_WORKFLOWS;
   }
   return CORE_WORKFLOWS;
 }
