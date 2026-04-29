@@ -159,3 +159,6 @@ opencode.json
 
 # Bob
 .bob/
+
+# Local git worktrees
+.worktrees/
