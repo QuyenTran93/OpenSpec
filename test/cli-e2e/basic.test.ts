@@ -131,9 +131,10 @@ describe('openspec CLI e2e basics', () => {
       await fs.mkdir(emptyProjectDir, { recursive: true });
 
       const codexHome = path.join(emptyProjectDir, '.codex');
+      const configHome = path.join(emptyProjectDir, '.xdg-config');
       const result = await runCLI(['init', '--tools', 'all'], {
         cwd: emptyProjectDir,
-        env: { CODEX_HOME: codexHome },
+        env: { CODEX_HOME: codexHome, XDG_CONFIG_HOME: configHome },
       });
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('OpenSpec Setup Complete');
@@ -149,8 +150,12 @@ describe('openspec CLI e2e basics', () => {
       const projectDir = await prepareFixture('tmp-init');
       const emptyProjectDir = path.join(projectDir, '..', 'empty-project');
       await fs.mkdir(emptyProjectDir, { recursive: true });
+      const configHome = path.join(emptyProjectDir, '.xdg-config');
 
-      const result = await runCLI(['init', '--tools', 'claude'], { cwd: emptyProjectDir });
+      const result = await runCLI(['init', '--tools', 'claude'], {
+        cwd: emptyProjectDir,
+        env: { XDG_CONFIG_HOME: configHome },
+      });
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('OpenSpec Setup Complete');
       expect(result.stdout).toContain('Claude Code');

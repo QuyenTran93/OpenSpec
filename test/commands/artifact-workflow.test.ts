@@ -733,8 +733,10 @@ artifacts:
     });
 
     it('creates skills for Claude tool', async () => {
+      const configHome = path.join(tempDir, '.xdg-config');
       const result = await runCLI(['experimental', '--tool', 'claude'], {
         cwd: tempDir,
+        env: { XDG_CONFIG_HOME: configHome },
       });
       expect(result.exitCode).toBe(0);
       const output = normalizePaths(getOutput(result));
@@ -748,8 +750,10 @@ artifacts:
     });
 
     it('creates skills for Cursor tool', async () => {
+      const configHome = path.join(tempDir, '.xdg-config');
       const result = await runCLI(['experimental', '--tool', 'cursor'], {
         cwd: tempDir,
+        env: { XDG_CONFIG_HOME: configHome },
       });
       expect(result.exitCode).toBe(0);
       const output = normalizePaths(getOutput(result));
@@ -768,8 +772,10 @@ artifacts:
     });
 
     it('creates skills for Windsurf tool', async () => {
+      const configHome = path.join(tempDir, '.xdg-config');
       const result = await runCLI(['experimental', '--tool', 'windsurf'], {
         cwd: tempDir,
+        env: { XDG_CONFIG_HOME: configHome },
       });
       expect(result.exitCode).toBe(0);
       const output = normalizePaths(getOutput(result));
