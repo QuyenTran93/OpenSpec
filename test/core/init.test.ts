@@ -531,6 +531,17 @@ describe('InitCommand - profile and detection features', () => {
     expect(content).toContain('schema: brainstorm-root');
   });
 
+  it('should generate propose skill and command when --profile brainstorm', async () => {
+    const initCommand = new InitCommand({ tools: 'claude', force: true, profile: 'brainstorm' });
+    await initCommand.execute(testDir);
+
+    const proposeSkill = path.join(testDir, '.claude', 'skills', 'openspec-propose', 'SKILL.md');
+    const proposeCommand = path.join(testDir, '.claude', 'commands', 'opsx', 'propose.md');
+
+    expect(await fileExists(proposeSkill)).toBe(true);
+    expect(await fileExists(proposeCommand)).toBe(true);
+  });
+
   it('should use detected tools in non-interactive mode when no --tools flag', async () => {
     // Create a .claude directory to simulate detected tool
     await fs.mkdir(path.join(testDir, '.claude'), { recursive: true });
