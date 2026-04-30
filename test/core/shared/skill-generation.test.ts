@@ -87,6 +87,15 @@ describe('skill-generation', () => {
       expect(filtered[0].workflowId).toBe('propose');
       expect(filtered[0].dirName).toBe('openspec-propose');
     });
+
+    it('should include propose for brainstorm default workflow filter', () => {
+      const brainstormDefaults = ['propose', 'brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive'];
+      const filtered = getSkillTemplates(brainstormDefaults);
+      const proposeTemplate = filtered.find(template => template.workflowId === 'propose');
+
+      expect(proposeTemplate).toBeDefined();
+      expect(proposeTemplate?.dirName).toBe('openspec-propose');
+    });
   });
 
   describe('getCommandTemplates', () => {
@@ -142,6 +151,14 @@ describe('skill-generation', () => {
     it('should return empty array when filter matches nothing', () => {
       const filtered = getCommandTemplates(['nonexistent']);
       expect(filtered).toHaveLength(0);
+    });
+
+    it('should include propose command for brainstorm default workflow filter', () => {
+      const brainstormDefaults = ['propose', 'brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive'];
+      const filtered = getCommandTemplates(brainstormDefaults);
+      const ids = filtered.map(template => template.id);
+
+      expect(ids).toContain('propose');
     });
   });
 
