@@ -14,6 +14,8 @@ function expectPlanGatePrecedesImplementationLoop(template: string): void {
   expect(step6To7).not.toBeNull();
   expect(step6To7?.[1]).toContain('execution-plan.md');
   expect(step6To7?.[1]).toContain('writing-plans');
+  expect(step6To7?.[1]).toContain('superpowers:subagent-driven-development');
+  expect(step6To7?.[1]).toContain('using-git-worktrees');
 }
 
 describe('apply change template plan gate', () => {

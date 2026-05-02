@@ -19,7 +19,10 @@ const APPLY_EXECUTION_PLAN_GATE_STEP = (
    - \`execution-plan.md\` guides the micro-step implementation order
    - \`tasks.md\` remains the checkbox progress tracker (\`- [ ]\` -> \`- [x]\`)
 
-   Mention implementation guidance: use inline execution for small focused tasks, and use \`subagent-driven-development\` or \`executing-plans\` when work is broader or parallelizable.`;
+   Implementation guidance:
+   - **Small, narrowly scoped work:** continue inline in this session.
+   - **Broader work, multi-step plans, or work that splits cleanly across parallel lanes:** if Task/subagent capabilities are **available**, read and follow \`superpowers:subagent-driven-development\`; **otherwise** read and follow \`superpowers:executing-plans\`, treating \`execution-plan.md\` as the authoritative step ordering.
+   - **Do not** default to \`using-git-worktrees\` for OpenSpec apply flows unless the user **explicitly** asks for isolated git worktrees.`;
 
 export function getBrainstormRootApplyChangeSkillTemplate(): SkillTemplate {
   return {
