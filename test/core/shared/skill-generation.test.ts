@@ -5,6 +5,7 @@ import {
   getCommandContents,
   generateSkillContent,
 } from '../../../src/core/shared/skill-generation.js';
+import { BRAINSTORM_GATE_POLICY_BLOCK } from '../../../src/core/templates/workflows/brainstorm-root/brainstorm-gate-policy.js';
 
 describe('skill-generation', () => {
   describe('getSkillTemplates', () => {
@@ -108,6 +109,25 @@ describe('skill-generation', () => {
       const entry = getSkillTemplates(['apply'], 'brainstorm')[0];
       expect(entry.template.instructions).toContain('Gate on execution plan before implementation loop');
       expect(entry.template.instructions).toContain('execution-plan.md');
+    });
+
+    it('enforces brainstorm gate policy language for brainstorm-root propose/new', () => {
+      const entries = getSkillTemplates(['propose', 'new'], 'brainstorm');
+
+      for (const entry of entries) {
+        expect(entry.template.instructions).toContain(BRAINSTORM_GATE_POLICY_BLOCK);
+        expect(entry.template.instructions).toContain(
+          'If ambiguous/conflicting, do not pass gate automatically; ask one explicit confirmation question'
+        );
+      }
+    });
+
+    it('keeps brainstorm gate policy out of core/spec-driven propose/new templates', () => {
+      const coreEntries = getSkillTemplates(['propose', 'new'], 'core');
+
+      for (const entry of coreEntries) {
+        expect(entry.template.instructions).not.toContain(BRAINSTORM_GATE_POLICY_BLOCK);
+      }
     });
   });
 
@@ -223,6 +243,19 @@ describe('skill-generation', () => {
 
       expect(brainstorm.body).toContain('brainstorm.md');
       expect(writingPlans.body).toContain('execution-plan.md');
+    });
+
+    it('applies brainstorm gate policy only to brainstorm profile propose/new commands', () => {
+      const brainstormEntries = getCommandContents(['propose', 'new'], 'brainstorm');
+      const coreEntries = getCommandContents(['propose', 'new'], 'core');
+
+      for (const entry of brainstormEntries) {
+        expect(entry.body).toContain(BRAINSTORM_GATE_POLICY_BLOCK);
+      }
+
+      for (const entry of coreEntries) {
+        expect(entry.body).not.toContain(BRAINSTORM_GATE_POLICY_BLOCK);
+      }
     });
   });
 

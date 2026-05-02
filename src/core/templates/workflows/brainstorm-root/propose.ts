@@ -5,6 +5,7 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
+import { BRAINSTORM_GATE_POLICY_BLOCK } from './brainstorm-gate-policy.js';
 
 export function getBrainstormRootProposeSkillTemplate(): SkillTemplate {
   return {
@@ -21,6 +22,8 @@ After artifacts are generated:
 1) Run writing-plans
 2) Save the plan to openspec/changes/<name>/execution-plan.md
 3) Then run /opsx:apply
+
+${BRAINSTORM_GATE_POLICY_BLOCK}
 
 ---
 
@@ -135,6 +138,8 @@ After artifacts are generated:
 1) Run writing-plans
 2) Save the plan to openspec/changes/<name>/execution-plan.md
 3) Then run /opsx:apply
+
+${BRAINSTORM_GATE_POLICY_BLOCK}
 
 ---
 
