@@ -54,3 +54,17 @@ export function getProfileWorkflows(
   }
   return CORE_WORKFLOWS;
 }
+
+/**
+ * When the user enables brainstorm but did not pick writing-plans, add writing-plans.
+ * Preset brainstorm already includes both workflows.
+ */
+export function ensureWritingPlansWhenBrainstormSelected(workflows: readonly string[]): string[] {
+  if (!workflows.includes('brainstorm')) {
+    return [...workflows];
+  }
+  if (workflows.includes('writing-plans')) {
+    return [...workflows];
+  }
+  return [...workflows, 'writing-plans'];
+}

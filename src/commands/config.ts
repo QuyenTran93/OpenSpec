@@ -19,7 +19,13 @@ import {
   validateConfig,
   DEFAULT_CONFIG,
 } from '../core/config-schema.js';
-import { CORE_WORKFLOWS, BRAINSTORM_WORKFLOWS, ALL_WORKFLOWS, getProfileWorkflows } from '../core/profiles.js';
+import {
+  CORE_WORKFLOWS,
+  BRAINSTORM_WORKFLOWS,
+  ALL_WORKFLOWS,
+  getProfileWorkflows,
+  ensureWritingPlansWhenBrainstormSelected,
+} from '../core/profiles.js';
 import { OPENSPEC_DIR_NAME } from '../core/config.js';
 import { hasProjectConfigDrift } from '../core/profile-sync-drift.js';
 
@@ -598,8 +604,9 @@ export function registerConfigCommand(program: Command): void {
             },
             choices: ALL_WORKFLOWS.map(formatWorkflowChoice),
           });
-          nextState.workflows = selectedWorkflows;
-          nextState.profile = deriveProfileFromWorkflowSelection(selectedWorkflows);
+          const withWritingPlans = ensureWritingPlansWhenBrainstormSelected(selectedWorkflows);
+          nextState.workflows = stableWorkflowOrder(withWritingPlans);
+          nextState.profile = deriveProfileFromWorkflowSelection(nextState.workflows);
         }
 
         const diff = diffProfileState(currentState, nextState);

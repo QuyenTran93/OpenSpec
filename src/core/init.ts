@@ -42,10 +42,10 @@ import {
   type ToolSkillStatus,
 } from './shared/index.js';
 import { getGlobalConfig, type Delivery, type Profile } from './global-config.js';
-import { getProfileWorkflows, CORE_WORKFLOWS, ALL_WORKFLOWS } from './profiles.js';
+import { getProfileWorkflows, ALL_WORKFLOWS } from './profiles.js';
 import { getAvailableTools } from './available-tools.js';
 import { migrateIfNeeded } from './migration.js';
-import { ensureProjectSchemaForProfile } from './project-config-normalizer.js';
+import { ensureProjectSchemaForWorkflows, BRAINSTORM_PROJECT_SCHEMA } from './project-config-normalizer.js';
 
 const require = createRequire(import.meta.url);
 const { version: OPENSPEC_VERSION } = require('../../package.json');
@@ -515,9 +515,9 @@ export class InitCommand {
     // Read global config for profile and delivery settings (use --profile override if set)
     const globalConfig = getGlobalConfig();
     const profile: Profile = this.resolveProfileOverride() ?? globalConfig.profile ?? 'core';
-    await ensureProjectSchemaForProfile(projectPath, profile);
     const delivery: Delivery = globalConfig.delivery ?? 'both';
     const workflows = getProfileWorkflows(profile, globalConfig.workflows);
+    await ensureProjectSchemaForWorkflows(projectPath, workflows);
 
     // Get skill and command templates filtered by profile workflows
     const shouldGenerateSkills = delivery !== 'commands';
@@ -615,7 +615,11 @@ export class InitCommand {
     }
 
     try {
-      const yamlContent = serializeConfig({ schema: DEFAULT_SCHEMA });
+      const globalConfig = getGlobalConfig();
+      const profile: Profile = this.resolveProfileOverride() ?? globalConfig.profile ?? 'core';
+      const workflows = getProfileWorkflows(profile, globalConfig.workflows);
+      const schema = workflows.includes('brainstorm') ? BRAINSTORM_PROJECT_SCHEMA : DEFAULT_SCHEMA;
+      const yamlContent = serializeConfig({ schema });
       await FileSystemUtils.writeFile(configPath, yamlContent);
       return 'created';
     } catch {
@@ -689,7 +693,11 @@ export class InitCommand {
 
     // Config status
     if (configStatus === 'created') {
-      console.log(`Config: openspec/config.yaml (schema: ${DEFAULT_SCHEMA})`);
+      const globalConfig = getGlobalConfig();
+      const profile: Profile = this.resolveProfileOverride() ?? globalConfig.profile ?? 'core';
+      const workflows = getProfileWorkflows(profile, globalConfig.workflows);
+      const createdSchema = workflows.includes('brainstorm') ? BRAINSTORM_PROJECT_SCHEMA : DEFAULT_SCHEMA;
+      console.log(`Config: openspec/config.yaml (schema: ${createdSchema})`);
     } else if (configStatus === 'exists') {
       // Show actual filename (config.yaml or config.yml)
       const configYaml = path.join(projectPath, OPENSPEC_DIR_NAME, 'config.yaml');

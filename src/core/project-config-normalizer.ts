@@ -2,10 +2,10 @@ import path from 'node:path';
 import { promises as fs } from 'node:fs';
 import * as fsSync from 'node:fs';
 import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import type { Profile } from './global-config.js';
 import { serializeConfig } from './config-prompts.js';
 
-const BRAINSTORM_SCHEMA = 'brainstorm-root';
+export const BRAINSTORM_PROJECT_SCHEMA = 'brainstorm-root';
+export const SPEC_DRIVEN_WORKFLOW_SCHEMA = 'spec-driven';
 
 async function fileExists(filePath: string): Promise<boolean> {
   try {
@@ -25,11 +25,18 @@ function fileExistsSync(filePath: string): boolean {
   }
 }
 
-export async function ensureProjectSchemaForProfile(projectPath: string, profile: Profile): Promise<void> {
-  if (profile !== 'brainstorm') {
-    return;
+function resolveTargetWorkflowSchema(currentSchema: unknown, effectiveWorkflows: readonly string[]): string | undefined {
+  const wantBrainstorm = effectiveWorkflows.includes('brainstorm');
+  if (wantBrainstorm) {
+    return BRAINSTORM_PROJECT_SCHEMA;
   }
+  if (currentSchema === BRAINSTORM_PROJECT_SCHEMA) {
+    return SPEC_DRIVEN_WORKFLOW_SCHEMA;
+  }
+  return undefined;
+}
 
+export async function ensureProjectSchemaForWorkflows(projectPath: string, effectiveWorkflows: readonly string[]): Promise<void> {
   const openspecDir = path.join(projectPath, 'openspec');
   const configYamlPath = path.join(openspecDir, 'config.yaml');
   const configYmlPath = path.join(openspecDir, 'config.yml');
@@ -41,7 +48,10 @@ export async function ensureProjectSchemaForProfile(projectPath: string, profile
     : (await fileExists(configYmlPath) ? configYmlPath : configYamlPath);
 
   if (!(await fileExists(existingPath))) {
-    await fs.writeFile(configYamlPath, serializeConfig({ schema: BRAINSTORM_SCHEMA }), 'utf-8');
+    if (!effectiveWorkflows.includes('brainstorm')) {
+      return;
+    }
+    await fs.writeFile(configYamlPath, serializeConfig({ schema: BRAINSTORM_PROJECT_SCHEMA }), 'utf-8');
     return;
   }
 
@@ -52,15 +62,18 @@ export async function ensureProjectSchemaForProfile(projectPath: string, profile
     throw new Error(`Invalid YAML object in ${existingPath}`);
   }
 
-  const next = { ...(parsed as Record<string, unknown>), schema: BRAINSTORM_SCHEMA };
-  await fs.writeFile(existingPath, stringifyYaml(next), 'utf-8');
-}
+  const record = parsed as Record<string, unknown>;
+  const targetSchema = resolveTargetWorkflowSchema(record.schema, effectiveWorkflows);
 
-export function ensureProjectSchemaForProfileSync(projectPath: string, profile: Profile): void {
-  if (profile !== 'brainstorm') {
+  if (targetSchema === undefined) {
     return;
   }
 
+  const next = { ...record, schema: targetSchema };
+  await fs.writeFile(existingPath, stringifyYaml(next), 'utf-8');
+}
+
+export function ensureProjectSchemaForWorkflowsSync(projectPath: string, effectiveWorkflows: readonly string[]): void {
   const openspecDir = path.join(projectPath, 'openspec');
   const configYamlPath = path.join(openspecDir, 'config.yaml');
   const configYmlPath = path.join(openspecDir, 'config.yml');
@@ -72,7 +85,10 @@ export function ensureProjectSchemaForProfileSync(projectPath: string, profile: 
     : (fileExistsSync(configYmlPath) ? configYmlPath : configYamlPath);
 
   if (!fileExistsSync(existingPath)) {
-    fsSync.writeFileSync(configYamlPath, serializeConfig({ schema: BRAINSTORM_SCHEMA }), 'utf-8');
+    if (!effectiveWorkflows.includes('brainstorm')) {
+      return;
+    }
+    fsSync.writeFileSync(configYamlPath, serializeConfig({ schema: BRAINSTORM_PROJECT_SCHEMA }), 'utf-8');
     return;
   }
 
@@ -81,6 +97,14 @@ export function ensureProjectSchemaForProfileSync(projectPath: string, profile: 
   if (!parsed || typeof parsed !== 'object') {
     throw new Error(`Invalid YAML object in ${existingPath}`);
   }
-  const next = { ...(parsed as Record<string, unknown>), schema: BRAINSTORM_SCHEMA };
+
+  const record = parsed as Record<string, unknown>;
+  const targetSchema = resolveTargetWorkflowSchema(record.schema, effectiveWorkflows);
+
+  if (targetSchema === undefined) {
+    return;
+  }
+
+  const next = { ...record, schema: targetSchema };
   fsSync.writeFileSync(existingPath, stringifyYaml(next), 'utf-8');
 }
