@@ -1,6 +1,6 @@
-import type { SkillTemplate, CommandTemplate } from '../types.js';
+import type { SkillTemplate, CommandTemplate } from '../../types.js';
 
-export function getWritingPlansSkillTemplate(): SkillTemplate {
+export function getBrainstormRootWritingPlansSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-writing-plans',
     description: 'Create a concrete execution plan from approved design artifacts.',
@@ -20,7 +20,7 @@ Requirements:
   };
 }
 
-export function getOpsxWritingPlansCommandTemplate(): CommandTemplate {
+export function getOpsxBrainstormRootWritingPlansCommandTemplate(): CommandTemplate {
   return {
     name: 'OPSX: Writing Plans',
     description: 'Generate an execution plan and write execution-plan.md',
