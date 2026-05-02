@@ -96,6 +96,19 @@ describe('skill-generation', () => {
       expect(proposeTemplate).toBeDefined();
       expect(proposeTemplate?.dirName).toBe('openspec-propose');
     });
+
+    it('defaults to core profile so overlapping apply matches spec-driven', () => {
+      const explicitCore = getSkillTemplates(['apply'], 'core')[0];
+      const defaulted = getSkillTemplates(['apply'])[0];
+      expect(explicitCore.template.instructions).toEqual(defaulted.template.instructions);
+      expect(explicitCore.template.instructions).not.toContain('Gate on execution plan before implementation loop');
+    });
+
+    it('uses brainstorm-root apply when profile is brainstorm', () => {
+      const entry = getSkillTemplates(['apply'], 'brainstorm')[0];
+      expect(entry.template.instructions).toContain('Gate on execution plan before implementation loop');
+      expect(entry.template.instructions).toContain('execution-plan.md');
+    });
   });
 
   describe('getCommandTemplates', () => {
