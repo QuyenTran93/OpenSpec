@@ -4,6 +4,7 @@
  * Shared utilities for generating skill and command files.
  */
 
+import type { Profile } from '../global-config.js';
 import {
   getExploreSkillTemplate,
   getNewChangeSkillTemplate,
@@ -16,8 +17,6 @@ import {
   getVerifyChangeSkillTemplate,
   getOnboardSkillTemplate,
   getOpsxProposeSkillTemplate,
-  getBrainstormSkillTemplate,
-  getWritingPlansSkillTemplate,
   getOpsxExploreCommandTemplate,
   getOpsxNewCommandTemplate,
   getOpsxContinueCommandTemplate,
@@ -29,8 +28,20 @@ import {
   getOpsxVerifyCommandTemplate,
   getOpsxOnboardCommandTemplate,
   getOpsxProposeCommandTemplate,
-  getOpsxBrainstormCommandTemplate,
-  getOpsxWritingPlansCommandTemplate,
+  getBrainstormRootBrainstormSkillTemplate,
+  getBrainstormRootWritingPlansSkillTemplate,
+  getBrainstormRootProposeSkillTemplate,
+  getBrainstormRootNewChangeSkillTemplate,
+  getBrainstormRootContinueChangeSkillTemplate,
+  getBrainstormRootApplyChangeSkillTemplate,
+  getBrainstormRootArchiveChangeSkillTemplate,
+  getOpsxBrainstormRootBrainstormCommandTemplate,
+  getOpsxBrainstormRootWritingPlansCommandTemplate,
+  getOpsxBrainstormRootProposeCommandTemplate,
+  getOpsxBrainstormRootNewCommandTemplate,
+  getOpsxBrainstormRootContinueCommandTemplate,
+  getOpsxBrainstormRootApplyCommandTemplate,
+  getOpsxBrainstormRootArchiveCommandTemplate,
   type SkillTemplate,
 } from '../templates/skill-templates.js';
 import type { CommandContent } from '../command-generation/index.js';
@@ -52,26 +63,59 @@ export interface CommandTemplateEntry {
   id: string;
 }
 
+function isBrainstormProfile(profile: Profile): boolean {
+  return profile === 'brainstorm';
+}
+
 /**
  * Gets skill templates with their directory names, optionally filtered by workflow IDs.
  *
  * @param workflowFilter - If provided, only return templates whose workflowId is in this array
+ * @param profile - Template variant (`brainstorm` uses brainstorm-root overlapping workflows)
  */
-export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemplateEntry[] {
+export function getSkillTemplates(
+  workflowFilter?: readonly string[],
+  profile: Profile = 'core'
+): SkillTemplateEntry[] {
+  const brainstorm = isBrainstormProfile(profile);
   const all: SkillTemplateEntry[] = [
     { template: getExploreSkillTemplate(), dirName: 'openspec-explore', workflowId: 'explore' },
-    { template: getNewChangeSkillTemplate(), dirName: 'openspec-new-change', workflowId: 'new' },
-    { template: getContinueChangeSkillTemplate(), dirName: 'openspec-continue-change', workflowId: 'continue' },
-    { template: getApplyChangeSkillTemplate(), dirName: 'openspec-apply-change', workflowId: 'apply' },
+    {
+      template: brainstorm ? getBrainstormRootNewChangeSkillTemplate() : getNewChangeSkillTemplate(),
+      dirName: 'openspec-new-change',
+      workflowId: 'new',
+    },
+    {
+      template: brainstorm ? getBrainstormRootContinueChangeSkillTemplate() : getContinueChangeSkillTemplate(),
+      dirName: 'openspec-continue-change',
+      workflowId: 'continue',
+    },
+    {
+      template: brainstorm ? getBrainstormRootApplyChangeSkillTemplate() : getApplyChangeSkillTemplate(),
+      dirName: 'openspec-apply-change',
+      workflowId: 'apply',
+    },
     { template: getFfChangeSkillTemplate(), dirName: 'openspec-ff-change', workflowId: 'ff' },
     { template: getSyncSpecsSkillTemplate(), dirName: 'openspec-sync-specs', workflowId: 'sync' },
-    { template: getArchiveChangeSkillTemplate(), dirName: 'openspec-archive-change', workflowId: 'archive' },
+    {
+      template: brainstorm ? getBrainstormRootArchiveChangeSkillTemplate() : getArchiveChangeSkillTemplate(),
+      dirName: 'openspec-archive-change',
+      workflowId: 'archive',
+    },
     { template: getBulkArchiveChangeSkillTemplate(), dirName: 'openspec-bulk-archive-change', workflowId: 'bulk-archive' },
     { template: getVerifyChangeSkillTemplate(), dirName: 'openspec-verify-change', workflowId: 'verify' },
     { template: getOnboardSkillTemplate(), dirName: 'openspec-onboard', workflowId: 'onboard' },
-    { template: getOpsxProposeSkillTemplate(), dirName: 'openspec-propose', workflowId: 'propose' },
-    { template: getBrainstormSkillTemplate(), dirName: 'openspec-brainstorm', workflowId: 'brainstorm' },
-    { template: getWritingPlansSkillTemplate(), dirName: 'openspec-writing-plans', workflowId: 'writing-plans' },
+    {
+      template: brainstorm ? getBrainstormRootProposeSkillTemplate() : getOpsxProposeSkillTemplate(),
+      dirName: 'openspec-propose',
+      workflowId: 'propose',
+    },
+    { template: getBrainstormRootBrainstormSkillTemplate(), dirName: 'openspec-brainstorm', workflowId: 'brainstorm' },
+    {
+      template: getBrainstormRootWritingPlansSkillTemplate(),
+      dirName: 'openspec-writing-plans',
+      workflowId: 'writing-plans',
+    },
   ];
 
   if (!workflowFilter) return all;
@@ -84,22 +128,42 @@ export function getSkillTemplates(workflowFilter?: readonly string[]): SkillTemp
  * Gets command templates with their IDs, optionally filtered by workflow IDs.
  *
  * @param workflowFilter - If provided, only return templates whose id is in this array
+ * @param profile - Template variant (`brainstorm` uses brainstorm-root overlapping workflows)
  */
-export function getCommandTemplates(workflowFilter?: readonly string[]): CommandTemplateEntry[] {
+export function getCommandTemplates(
+  workflowFilter?: readonly string[],
+  profile: Profile = 'core'
+): CommandTemplateEntry[] {
+  const brainstorm = isBrainstormProfile(profile);
   const all: CommandTemplateEntry[] = [
     { template: getOpsxExploreCommandTemplate(), id: 'explore' },
-    { template: getOpsxNewCommandTemplate(), id: 'new' },
-    { template: getOpsxContinueCommandTemplate(), id: 'continue' },
-    { template: getOpsxApplyCommandTemplate(), id: 'apply' },
+    {
+      template: brainstorm ? getOpsxBrainstormRootNewCommandTemplate() : getOpsxNewCommandTemplate(),
+      id: 'new',
+    },
+    {
+      template: brainstorm ? getOpsxBrainstormRootContinueCommandTemplate() : getOpsxContinueCommandTemplate(),
+      id: 'continue',
+    },
+    {
+      template: brainstorm ? getOpsxBrainstormRootApplyCommandTemplate() : getOpsxApplyCommandTemplate(),
+      id: 'apply',
+    },
     { template: getOpsxFfCommandTemplate(), id: 'ff' },
     { template: getOpsxSyncCommandTemplate(), id: 'sync' },
-    { template: getOpsxArchiveCommandTemplate(), id: 'archive' },
+    {
+      template: brainstorm ? getOpsxBrainstormRootArchiveCommandTemplate() : getOpsxArchiveCommandTemplate(),
+      id: 'archive',
+    },
     { template: getOpsxBulkArchiveCommandTemplate(), id: 'bulk-archive' },
     { template: getOpsxVerifyCommandTemplate(), id: 'verify' },
     { template: getOpsxOnboardCommandTemplate(), id: 'onboard' },
-    { template: getOpsxProposeCommandTemplate(), id: 'propose' },
-    { template: getOpsxBrainstormCommandTemplate(), id: 'brainstorm' },
-    { template: getOpsxWritingPlansCommandTemplate(), id: 'writing-plans' },
+    {
+      template: brainstorm ? getOpsxBrainstormRootProposeCommandTemplate() : getOpsxProposeCommandTemplate(),
+      id: 'propose',
+    },
+    { template: getOpsxBrainstormRootBrainstormCommandTemplate(), id: 'brainstorm' },
+    { template: getOpsxBrainstormRootWritingPlansCommandTemplate(), id: 'writing-plans' },
   ];
 
   if (!workflowFilter) return all;
@@ -112,9 +176,13 @@ export function getCommandTemplates(workflowFilter?: readonly string[]): Command
  * Converts command templates to CommandContent array, optionally filtered by workflow IDs.
  *
  * @param workflowFilter - If provided, only return contents whose id is in this array
+ * @param profile - Template variant (`brainstorm` uses brainstorm-root overlapping workflows)
  */
-export function getCommandContents(workflowFilter?: readonly string[]): CommandContent[] {
-  const commandTemplates = getCommandTemplates(workflowFilter);
+export function getCommandContents(
+  workflowFilter?: readonly string[],
+  profile: Profile = 'core'
+): CommandContent[] {
+  const commandTemplates = getCommandTemplates(workflowFilter, profile);
   return commandTemplates.map(({ template, id }) => ({
     id,
     name: template.name,

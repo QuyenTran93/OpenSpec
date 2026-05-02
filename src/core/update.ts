@@ -34,7 +34,7 @@ import {
   type LegacyDetectionResult,
 } from './legacy-cleanup.js';
 import { isInteractive } from '../utils/interactive.js';
-import { getGlobalConfig, type Delivery } from './global-config.js';
+import { getGlobalConfig, type Delivery, type Profile } from './global-config.js';
 import { getProfileWorkflows, ALL_WORKFLOWS } from './profiles.js';
 import { getAvailableTools } from './available-tools.js';
 import {
@@ -110,7 +110,8 @@ export class UpdateCommand {
     const newlyConfiguredTools = await this.handleLegacyCleanup(
       resolvedProjectPath,
       desiredWorkflows,
-      delivery
+      delivery,
+      profile
     );
 
     // 5. Find configured tools
@@ -169,8 +170,8 @@ export class UpdateCommand {
     console.log();
 
     // 9. Determine what to generate based on delivery
-    const skillTemplates = shouldGenerateSkills ? getSkillTemplates(desiredWorkflows) : [];
-    const commandContents = shouldGenerateCommands ? getCommandContents(desiredWorkflows) : [];
+    const skillTemplates = shouldGenerateSkills ? getSkillTemplates(desiredWorkflows, profile) : [];
+    const commandContents = shouldGenerateCommands ? getCommandContents(desiredWorkflows, profile) : [];
 
     // 10. Update tools (all if force, otherwise only those needing update)
     const toolsToUpdate = this.force ? configuredTools : [...toolsToUpdateSet];
@@ -498,7 +499,8 @@ export class UpdateCommand {
   private async handleLegacyCleanup(
     projectPath: string,
     desiredWorkflows: readonly (typeof ALL_WORKFLOWS)[number][],
-    delivery: Delivery
+    delivery: Delivery,
+    profile: Profile
   ): Promise<string[]> {
     // Detect legacy artifacts
     const detection = await detectLegacyArtifacts(projectPath);
@@ -518,7 +520,7 @@ export class UpdateCommand {
       // --force flag: proceed with cleanup automatically
       await this.performLegacyCleanup(projectPath, detection);
       // Then upgrade legacy tools to new skills
-      return this.upgradeLegacyTools(projectPath, detection, canPrompt, desiredWorkflows, delivery);
+      return this.upgradeLegacyTools(projectPath, detection, canPrompt, desiredWorkflows, delivery, profile);
     }
 
     if (!canPrompt) {
@@ -539,7 +541,7 @@ export class UpdateCommand {
     if (shouldCleanup) {
       await this.performLegacyCleanup(projectPath, detection);
       // Then upgrade legacy tools to new skills
-      return this.upgradeLegacyTools(projectPath, detection, canPrompt, desiredWorkflows, delivery);
+      return this.upgradeLegacyTools(projectPath, detection, canPrompt, desiredWorkflows, delivery, profile);
     } else {
       console.log(chalk.dim('Skipping legacy cleanup. Continuing with skill update...'));
       console.log();
@@ -575,7 +577,8 @@ export class UpdateCommand {
     detection: LegacyDetectionResult,
     canPrompt: boolean,
     desiredWorkflows: readonly (typeof ALL_WORKFLOWS)[number][],
-    delivery: Delivery
+    delivery: Delivery,
+    profile: Profile
   ): Promise<string[]> {
     // Get tools that had legacy artifacts
     const legacyTools = getToolsFromLegacyArtifacts(detection);
@@ -649,8 +652,8 @@ export class UpdateCommand {
     const newlyConfigured: string[] = [];
     const shouldGenerateSkills = delivery !== 'commands';
     const shouldGenerateCommands = delivery !== 'skills';
-    const skillTemplates = shouldGenerateSkills ? getSkillTemplates(desiredWorkflows) : [];
-    const commandContents = shouldGenerateCommands ? getCommandContents(desiredWorkflows) : [];
+    const skillTemplates = shouldGenerateSkills ? getSkillTemplates(desiredWorkflows, profile) : [];
+    const commandContents = shouldGenerateCommands ? getCommandContents(desiredWorkflows, profile) : [];
 
     for (const toolId of selectedTools) {
       const tool = AI_TOOLS.find((t) => t.value === toolId);

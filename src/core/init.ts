@@ -522,8 +522,8 @@ export class InitCommand {
     // Get skill and command templates filtered by profile workflows
     const shouldGenerateSkills = delivery !== 'commands';
     const shouldGenerateCommands = delivery !== 'skills';
-    const skillTemplates = shouldGenerateSkills ? getSkillTemplates(workflows) : [];
-    const commandContents = shouldGenerateCommands ? getCommandContents(workflows) : [];
+    const skillTemplates = shouldGenerateSkills ? getSkillTemplates(workflows, profile) : [];
+    const commandContents = shouldGenerateCommands ? getCommandContents(workflows, profile) : [];
 
     // Process each tool
     for (const tool of tools) {
@@ -656,12 +656,12 @@ export class InitCommand {
     const successfulTools = [...results.createdTools, ...results.refreshedTools];
     if (successfulTools.length > 0) {
       const globalConfig = getGlobalConfig();
-      const profile: Profile = (this.profileOverride as Profile) ?? globalConfig.profile ?? 'core';
+      const profile: Profile = this.resolveProfileOverride() ?? globalConfig.profile ?? 'core';
       const delivery: Delivery = globalConfig.delivery ?? 'both';
       const workflows = getProfileWorkflows(profile, globalConfig.workflows);
       const toolDirs = [...new Set(successfulTools.map((t) => t.skillsDir))].join(', ');
-      const skillCount = delivery !== 'commands' ? getSkillTemplates(workflows).length : 0;
-      const commandCount = delivery !== 'skills' ? getCommandContents(workflows).length : 0;
+      const skillCount = delivery !== 'commands' ? getSkillTemplates(workflows, profile).length : 0;
+      const commandCount = delivery !== 'skills' ? getCommandContents(workflows, profile).length : 0;
       if (skillCount > 0 && commandCount > 0) {
         console.log(`${skillCount} skills and ${commandCount} commands in ${toolDirs}/`);
       } else if (skillCount > 0) {
