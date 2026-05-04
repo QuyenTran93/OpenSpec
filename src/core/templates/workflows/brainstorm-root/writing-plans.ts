@@ -1,19 +1,17 @@
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
+import { BRAINSTORM_ROOT_WRITING_PLANS_SHARED_BODY } from './superpowers-openspec-mapping.js';
 
 export function getBrainstormRootWritingPlansSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-writing-plans',
     description: 'Create a concrete execution plan from approved design artifacts.',
-    instructions: `Run the superpowers \`writing-plans\` skill using the approved design/spec artifacts.
+    instructions: `Run the superpowers \`writing-plans\` skill using the approved design and artifacts for the change (for example \`brainstorm.md\` and other completed files under \`openspec/changes/<change-name>/\`).
 
-Mandatory output artifact:
-- Create or update \`openspec/changes/<change-name>/execution-plan.md\`
+---
 
-Requirements:
-- Keep tasks executable and testable with explicit file paths.
-- Include verification steps and expected outcomes.
-- Do not start implementation in this workflow.
-`,
+**Input**: The user's request may name a change (kebab-case) or rely on session context; resolve the active change before drafting the plan.
+
+${BRAINSTORM_ROOT_WRITING_PLANS_SHARED_BODY}`,
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
     metadata: { author: 'openspec', version: '1.0' },
@@ -28,12 +26,10 @@ export function getOpsxBrainstormRootWritingPlansCommandTemplate(): CommandTempl
     tags: ['workflow', 'planning', 'execution-plan'],
     content: `Use the superpowers \`writing-plans\` skill for the active change.
 
-Mandatory output artifact:
-- Create or update \`openspec/changes/<change-name>/execution-plan.md\`
+---
 
-Requirements:
-- Keep the plan actionable with concrete steps and verification commands.
-- Ensure the plan is complete before \`/opsx:apply\`.
-`,
+**Input**: The argument after \`/opsx:writing-plans\` is the change name (kebab-case), if provided; otherwise infer from session context.
+
+${BRAINSTORM_ROOT_WRITING_PLANS_SHARED_BODY}`,
   };
 }
