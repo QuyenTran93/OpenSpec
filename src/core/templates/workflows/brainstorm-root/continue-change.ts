@@ -5,12 +5,15 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
+import { BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK } from './superpowers-openspec-mapping.js';
 
 export function getBrainstormRootContinueChangeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-continue-change',
     description: 'Continue working on an OpenSpec change by creating the next artifact. Use when the user wants to progress their change, create the next artifact, or continue their workflow.',
     instructions: `Continue working on a change by creating the next artifact.
+
+${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -46,7 +49,8 @@ export function getBrainstormRootContinueChangeSkillTemplate(): SkillTemplate {
    **If all artifacts are complete (\`isComplete: true\`)**:
    - Congratulate the user
    - Show final status including the schema used
-   - Suggest: "All artifacts created! You can now implement this change or archive it."
+   - If \`schemaName\` is \`brainstorm-root\`: suggest next run \`/opsx:writing-plans\` (then \`/opsx:apply\` after \`execution-plan.md\` exists); mention \`/opsx:archive\` when fully done.
+   - Otherwise: suggest "All artifacts created! You can now implement this change with \`/opsx:apply\` or archive it with \`/opsx:archive\`."
    - STOP
 
    ---
@@ -131,6 +135,8 @@ export function getOpsxBrainstormRootContinueCommandTemplate(): CommandTemplate 
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `Continue working on a change by creating the next artifact.
 
+${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
+
 **Input**: Optionally specify a change name after \`/opsx:continue\` (e.g., \`/opsx:continue add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**
@@ -165,7 +171,8 @@ export function getOpsxBrainstormRootContinueCommandTemplate(): CommandTemplate 
    **If all artifacts are complete (\`isComplete: true\`)**:
    - Congratulate the user
    - Show final status including the schema used
-   - Suggest: "All artifacts created! You can now implement this change with \`/opsx:apply\` or archive it with \`/opsx:archive\`."
+   - If \`schemaName\` is \`brainstorm-root\`: suggest next run \`/opsx:writing-plans\` (then \`/opsx:apply\` after \`execution-plan.md\` exists); mention \`/opsx:archive\` when fully done.
+   - Otherwise: suggest "All artifacts created! You can now implement this change with \`/opsx:apply\` or archive it with \`/opsx:archive\`."
    - STOP
 
    ---

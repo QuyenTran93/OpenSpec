@@ -6,6 +6,7 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import { BRAINSTORM_GATE_POLICY_BLOCK } from './brainstorm-gate-policy.js';
+import { BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK } from './superpowers-openspec-mapping.js';
 
 export function getBrainstormRootProposeSkillTemplate(): SkillTemplate {
   return {
@@ -18,10 +19,11 @@ I'll create a change with artifacts:
 - design.md (how)
 - tasks.md (implementation steps)
 
-After artifacts are generated:
-1) Run writing-plans
-2) Save the plan to openspec/changes/<name>/execution-plan.md
-3) Then run /opsx:apply
+After all required artifacts for this schema are done (check \`openspec status --change "<name>" --json\`):
+- For **brainstorm-root**, prompt the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`) so \`openspec/changes/<name>/execution-plan.md\` exists, then \`/opsx:apply\`.
+- For other schemas, infer the next step from status output as usual.
+
+${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
 ${BRAINSTORM_GATE_POLICY_BLOCK}
 
@@ -96,8 +98,8 @@ ${BRAINSTORM_GATE_POLICY_BLOCK}
 After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for planning handoff."
-- Prompt: "Run \`writing-plans\`, save the plan to \`openspec/changes/<name>/execution-plan.md\`, then run \`/opsx:apply\`."
+- What's ready: "All artifacts created! Ready for execution planning."
+- Prompt (brainstorm-root): "Run \`/opsx:writing-plans\`, ensure \`openspec/changes/<name>/execution-plan.md\`, then run \`/opsx:apply\`."
 
 **Artifact Creation Guidelines**
 
@@ -134,10 +136,11 @@ I'll create a change with artifacts:
 - design.md (how)
 - tasks.md (implementation steps)
 
-After artifacts are generated:
-1) Run writing-plans
-2) Save the plan to openspec/changes/<name>/execution-plan.md
-3) Then run /opsx:apply
+After all required artifacts for this schema are done (check \`openspec status --change "<name>" --json\`):
+- For **brainstorm-root**, prompt the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`) so \`openspec/changes/<name>/execution-plan.md\` exists, then \`/opsx:apply\`.
+- For other schemas, infer the next step from status output as usual.
+
+${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
 ${BRAINSTORM_GATE_POLICY_BLOCK}
 
@@ -212,8 +215,8 @@ ${BRAINSTORM_GATE_POLICY_BLOCK}
 After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
-- What's ready: "All artifacts created! Ready for planning handoff."
-- Prompt: "Run \`writing-plans\`, save the plan to \`openspec/changes/<name>/execution-plan.md\`, then run \`/opsx:apply\`."
+- What's ready: "All artifacts created! Ready for execution planning."
+- Prompt (brainstorm-root): "Run \`/opsx:writing-plans\`, ensure \`openspec/changes/<name>/execution-plan.md\`, then run \`/opsx:apply\`."
 
 **Artifact Creation Guidelines**
 

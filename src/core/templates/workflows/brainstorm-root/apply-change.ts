@@ -5,6 +5,7 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
+import { BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK } from './superpowers-openspec-mapping.js';
 
 const APPLY_EXECUTION_PLAN_GATE_STEP = (
   rerunInstruction: string
@@ -13,7 +14,7 @@ const APPLY_EXECUTION_PLAN_GATE_STEP = (
    Before implementation starts, check for:
    - \`openspec/changes/<name>/execution-plan.md\`
 
-   If missing, pause and ask the user to run \`writing-plans\` and save \`execution-plan.md\` at that path, then rerun ${rerunInstruction}.
+   If missing, pause and ask the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`) and save \`execution-plan.md\` at that path, then rerun ${rerunInstruction}.
 
    Clarify execution mode:
    - \`execution-plan.md\` guides the micro-step implementation order
@@ -29,6 +30,8 @@ export function getBrainstormRootApplyChangeSkillTemplate(): SkillTemplate {
     name: 'openspec-apply-change',
     description: 'Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks.',
     instructions: `Implement tasks from an OpenSpec change.
+
+${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -64,7 +67,7 @@ export function getBrainstormRootApplyChangeSkillTemplate(): SkillTemplate {
    - Dynamic instruction based on current state
 
    **Handle states:**
-   - If \`state: "blocked"\` (missing artifacts): show message, suggest using openspec-continue-change
+   - If \`state: "blocked"\` (missing artifacts): show message; if \`schemaName\` is \`brainstorm-root\`, map the blocker to the next slash step (\`/opsx:brainstorm\`, \`/opsx:continue\`, or \`/opsx:writing-plans\` as appropriate) using the workflow sequence above; otherwise suggest \`/opsx:continue\` or the CLI output.
    - If \`state: "all_done"\`: congratulate, suggest archive
    - Otherwise: proceed to implementation
 
@@ -189,6 +192,8 @@ export function getOpsxBrainstormRootApplyCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `Implement tasks from an OpenSpec change.
 
+${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
+
 **Input**: Optionally specify a change name (e.g., \`/opsx:apply add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**
@@ -223,7 +228,7 @@ export function getOpsxBrainstormRootApplyCommandTemplate(): CommandTemplate {
    - Dynamic instruction based on current state
 
    **Handle states:**
-   - If \`state: "blocked"\` (missing artifacts): show message, suggest using \`/opsx:continue\`
+   - If \`state: "blocked"\` (missing artifacts): show message; if \`schemaName\` is \`brainstorm-root\`, map the blocker to the next slash step (\`/opsx:brainstorm\`, \`/opsx:continue\`, or \`/opsx:writing-plans\` as appropriate) using the workflow sequence above; otherwise suggest \`/opsx:continue\` or the CLI output.
    - If \`state: "all_done"\`: congratulate, suggest archive
    - Otherwise: proceed to implementation
 

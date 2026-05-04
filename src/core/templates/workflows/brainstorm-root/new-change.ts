@@ -6,6 +6,7 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import { BRAINSTORM_GATE_POLICY_BLOCK } from './brainstorm-gate-policy.js';
+import { BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK } from './superpowers-openspec-mapping.js';
 
 export function getBrainstormRootNewChangeSkillTemplate(): SkillTemplate {
   return {
@@ -14,6 +15,8 @@ export function getBrainstormRootNewChangeSkillTemplate(): SkillTemplate {
     instructions: `Start a new change using the experimental artifact-driven approach.
 
 ${BRAINSTORM_GATE_POLICY_BLOCK}
+
+${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
 **Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
 
@@ -91,6 +94,8 @@ export function getOpsxBrainstormRootNewCommandTemplate(): CommandTemplate {
     content: `Start a new change using the experimental artifact-driven approach.
 
 ${BRAINSTORM_GATE_POLICY_BLOCK}
+
+${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
 **Input**: The argument after \`/opsx:new\` is the change name (kebab-case), OR a description of what the user wants to build.
 

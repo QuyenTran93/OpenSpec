@@ -70,20 +70,20 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
 };
 
 const EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES: Record<string, string> = {
-  getBrainstormRootBrainstormSkillTemplate: 'b95d247a1369c5ee17fb8dc0e02dc155fbfb1adf13c99e5ed0da53bfc64ac1b1',
-  getBrainstormRootProposeSkillTemplate: '591ab4fd2efec4ed3e12fd8bf9868232414e32e4a7f8b1d59cf627104e20bb2e',
-  getBrainstormRootWritingPlansSkillTemplate: 'd251f959d82745d88b6ba7efe7965297a89315c046813f98bd076b1f4614ec8d',
-  getBrainstormRootContinueChangeSkillTemplate: 'f2e413f0333dfd6641cc2bd1a189273fdea5c399eecdde98ef528b5216f097b3',
-  getBrainstormRootApplyChangeSkillTemplate: 'f617e50216ef53edb1a494d40fc09d810e73793ab75268d62aeab18a93f40842',
-  getBrainstormRootNewChangeSkillTemplate: 'fa747b1e44977afd959c1de3d24e620d52633cbb6112f3bc69129576dcd9dbb2',
-  getBrainstormRootArchiveChangeSkillTemplate: '6f8ca383fdb5a4eb9872aca81e07bf0ba7f25e4de8617d7a047ca914ca7f14b9',
-  getOpsxBrainstormRootBrainstormCommandTemplate: '9e5089bd5f69f9b5b17c4a81936cfcfe5c21c963ad3e18d317fc626f0c55ec57',
-  getOpsxBrainstormRootProposeCommandTemplate: '054598e87d612f265c2ef8ceb2e4e77d9b01ed84abdebbbe03202ad4f41daf5a',
-  getOpsxBrainstormRootWritingPlansCommandTemplate: '0736ec67f049c73f4f57a1f2aa541ece5dadb3b20d4e647f272f4faa70a7a188',
-  getOpsxBrainstormRootContinueCommandTemplate: '8bbaedcc95287f9e822572608137df4f49ad54cedfb08d3342d0d1c4e9716caa',
-  getOpsxBrainstormRootApplyCommandTemplate: 'f519695c471e6445349288742e61e8cf342934bfd51cdb9c37a4a2aadc3bf443',
-  getOpsxBrainstormRootNewCommandTemplate: '9ae1e106377bcce9536a69bb8629a7699285eb2d722f42d113a26df9b26e02be',
-  getOpsxBrainstormRootArchiveCommandTemplate: 'b44cc9748109f61687f9f596604b037bc3ea803abc143b22f09a76aebd98b493',
+  getBrainstormRootBrainstormSkillTemplate: '3a4db5caf36ce3b1f891b95b12131337710cb8a1d566bdad125a593600d83e81',
+  getBrainstormRootProposeSkillTemplate: '7382bca149a832ce92e9877704bca1aba449a013fdd7c68f0f73b20a623038a8',
+  getBrainstormRootWritingPlansSkillTemplate: '2a3416af95db2aa995d426de1792aa395015b0b688eebaa114431fc8e07c26d1',
+  getBrainstormRootContinueChangeSkillTemplate: 'eed671e37f0fdf123fd91639061c7960e3fbd0ceee79d5882c991ced9d43e24d',
+  getBrainstormRootApplyChangeSkillTemplate: '4581a8df3d6e18d312d66f102f28d5863b3cd230111d6d2827fd9b015592f9aa',
+  getBrainstormRootNewChangeSkillTemplate: '3cbc751981c433ea46a3cef77eaaff3411eb562312a00b1d0d984c4d2a4c30de',
+  getBrainstormRootArchiveChangeSkillTemplate: 'd10ee527cde025fd35373a3abc8771a4959c97ffa424e12c80a3ab4a15c0344a',
+  getOpsxBrainstormRootBrainstormCommandTemplate: '3e3f416ed6ec89dd69790344362c9514efa6706d6db73f023ca7ac8f5ce7fb90',
+  getOpsxBrainstormRootProposeCommandTemplate: '2889df7d7707ae63d8b94e8844ee788ad18573c46445222e3134fdb8ba0ac5bc',
+  getOpsxBrainstormRootWritingPlansCommandTemplate: '11b210e739c59c4f45e460d7e835c03128d220faec5ea7cfa5b14431ddc0f061',
+  getOpsxBrainstormRootContinueCommandTemplate: 'badb54a8f2c3e4897ad33897aaecfe87ffbeb532f5343d742b2353a8106a6a2f',
+  getOpsxBrainstormRootApplyCommandTemplate: 'd576b5ebeafb62cc2b8a6b669788db42bb52d871656d4e5bab029ace45507b4a',
+  getOpsxBrainstormRootNewCommandTemplate: 'a1e3371d0a236e1cfb339646e228a7ebfc12fcb38ae2a326434bb3371e8c4873',
+  getOpsxBrainstormRootArchiveCommandTemplate: 'e2e6eca531ee06adf4c833808743d0b4469aee9bc03f280f836927e4632418ae',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
@@ -188,6 +188,16 @@ describe('skill templates split parity', () => {
     expect(brainstormSkill.instructions).toContain('docs/superpowers/specs/');
     expect(writingSkill.instructions).toContain('docs/superpowers/plans/');
     expect(writingSkill.instructions).toContain('execution-plan.md');
+  });
+
+  it('embeds brainstorm-root workflow sequence in core brainstorm-root templates', () => {
+    const proposeSkill = getBrainstormRootProposeSkillTemplate();
+    const applySkill = getBrainstormRootApplyChangeSkillTemplate();
+    const marker = 'Workflow sequence (brainstorm-root)';
+    expect(proposeSkill.instructions).toContain(marker);
+    expect(applySkill.instructions).toContain(marker);
+    expect(getBrainstormRootNewChangeSkillTemplate().instructions).toContain(marker);
+    expect(getBrainstormRootContinueChangeSkillTemplate().instructions).toContain(marker);
   });
 
   it('preserves generated skill file content exactly', () => {
