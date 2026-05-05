@@ -134,10 +134,14 @@ export class ArtifactGraph {
   }
 
   /**
-   * Checks if all artifacts in the graph are completed.
+   * True when every non-optional artifact has completed outputs.
+   * Optional artifacts may be absent without blocking completion.
    */
   isComplete(completed: CompletedSet): boolean {
     for (const artifact of this.artifacts.values()) {
+      if (artifact.optional === true) {
+        continue;
+      }
       if (!completed.has(artifact.id)) {
         return false;
       }

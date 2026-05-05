@@ -5,8 +5,10 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
-import { BRAINSTORM_GATE_POLICY_BLOCK } from './brainstorm-gate-policy.js';
-import { BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK } from './superpowers-openspec-mapping.js';
+import {
+  BRAINSTORM_ROOT_GATE_POLICY_BLOCK,
+  BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK,
+} from './superpowers-openspec-mapping.js';
 
 export function getBrainstormRootNewChangeSkillTemplate(): SkillTemplate {
   return {
@@ -14,7 +16,7 @@ export function getBrainstormRootNewChangeSkillTemplate(): SkillTemplate {
     description: 'Start a new OpenSpec change using the experimental artifact workflow. Use when the user wants to create a new feature, fix, or modification with a structured step-by-step approach.',
     instructions: `Start a new change using the experimental artifact-driven approach.
 
-${BRAINSTORM_GATE_POLICY_BLOCK}
+${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
 
 ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
@@ -93,7 +95,7 @@ export function getOpsxBrainstormRootNewCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `Start a new change using the experimental artifact-driven approach.
 
-${BRAINSTORM_GATE_POLICY_BLOCK}
+${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
 
 ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 

@@ -8,6 +8,8 @@ export const ArtifactSchema = z.object({
   template: z.string().min(1, { error: 'template field is required' }),
   instruction: z.string().optional(),
   requires: z.array(z.string()).default([]),
+  /** When true: absence of output files does not block workflow completion (`isComplete`). */
+  optional: z.boolean().optional(),
 });
 
 // Apply phase configuration for schema-aware apply instructions

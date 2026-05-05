@@ -83,7 +83,7 @@ describe('artifact-workflow CLI commands', () => {
       const result = await runCLI(['status', '--change', 'scaffolded-change'], { cwd: tempDir });
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('scaffolded-change');
-      expect(result.stdout).toContain('0/4 artifacts complete');
+      expect(result.stdout).toContain('0/4 required artifacts complete');
     });
 
     it('shows status for a change with proposal only', async () => {
@@ -94,7 +94,7 @@ describe('artifact-workflow CLI commands', () => {
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('minimal-change');
       expect(result.stdout).toContain('spec-driven');
-      expect(result.stdout).toContain('1/4 artifacts complete');
+      expect(result.stdout).toContain('1/4 required artifacts complete');
     });
 
     it('shows status for a change with proposal and design', async () => {
@@ -102,7 +102,7 @@ describe('artifact-workflow CLI commands', () => {
 
       const result = await runCLI(['status', '--change', 'partial-change'], { cwd: tempDir });
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('2/4 artifacts complete');
+      expect(result.stdout).toContain('2/4 required artifacts complete');
       expect(result.stdout).toContain('[x]');
     });
 
@@ -131,8 +131,8 @@ describe('artifact-workflow CLI commands', () => {
 
       const result = await runCLI(['status', '--change', 'complete-change'], { cwd: tempDir });
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('4/4 artifacts complete');
-      expect(result.stdout).toContain('All artifacts complete!');
+      expect(result.stdout).toContain('4/4 required artifacts complete');
+      expect(result.stdout).toContain('All required artifacts complete!');
     });
 
     it('exits gracefully when no changes exist', async () => {
@@ -403,7 +403,7 @@ describe('artifact-workflow CLI commands', () => {
       expect(result.stdout).toContain('Missing artifacts: tasks');
     });
 
-    it('blocks apply when execution-plan.md is missing for brainstorm-root workflow', async () => {
+    it('blocks apply when brainstorm-root plan artifact is missing', async () => {
       const changeDir = path.join(changesDir, 'brainstorm-apply-no-plan');
       await fs.mkdir(path.join(changeDir, 'specs', 'capability'), { recursive: true });
       await fs.writeFile(path.join(changeDir, '.openspec.yaml'), 'schema: brainstorm-root\n');
@@ -420,8 +420,8 @@ describe('artifact-workflow CLI commands', () => {
       const json = JSON.parse(result.stdout);
       expect(json.schemaName).toBe('brainstorm-root');
       expect(json.state).toBe('blocked');
-      expect(json.instruction).toContain('execution-plan.md');
-      expect(json.instruction).toContain('writing-plans');
+      expect(json.instruction).toContain('Missing artifacts: plan');
+      expect(json.instruction).toContain('openspec-continue-change');
     });
 
     it('allows apply when execution-plan.md exists for brainstorm-root workflow', async () => {

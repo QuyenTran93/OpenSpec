@@ -7,17 +7,81 @@ artifacts:
     description: Discovery and scoping notes created before implementation planning
     template: brainstorm.md
     instruction: |
-      Create a brainstorm document that clarifies intent and scope before implementation.
+      PRECHECK — required skill availability:
+      Before invoking, confirm `superpowers:brainstorming` appears in
+      your available skills list. If missing, STOP and inform the user
+      that the Superpowers plugin must be installed (or that they can
+      explicitly opt to write brainstorm.md manually using the template
+      below). Do NOT silently fall back.
 
-      Include:
-      - Problem statement and why this change matters now
-      - In-scope and out-of-scope boundaries
-      - Success criteria that can be validated
-      - Constraints, risks, and assumptions
-      - Chosen approach and alternatives considered
+      Use the Skill tool to invoke **superpowers:brainstorming**.
 
-      Keep it concise and decision-oriented. This artifact is the root context for specs.
+      IMPORTANT output redirection:
+      - Do NOT write to `docs/superpowers/specs/`. Persist results under
+        this change directory. **Always** capture the agreed outcome in
+        `brainstorm.md`.
+      - **OPTIONAL `design.md`:** create or update it only when the
+        brainstorm produces a substantive standalone technical-design
+        write-up. If `brainstorm.md` alone is enough, leave `design.md`
+        absent; do not create it just to scaffold the change.
+
+      OpenSpec overrides (critical):
+      - Ignore the superpowers `brainstorming` skill's downstream steps that
+        write commits under `docs/superpowers/specs/`, run spec self-review
+        gates, or invoke **`writing-plans`**. Those do not belong in this step.
+      - After the user-approved content is reflected in `brainstorm.md`,
+        hand off to **propose / continue** until the schema's later
+        artifacts are ready — not straight to **`writing-plans`** or **`apply`**.
+
+      Interactive brainstorming flow (**mandatory** — see also the
+      `brainstorm.md` artifact in generated skills/commands for the concrete
+      `openspec/changes/<name>/…` wording):
+      1. Explore project context
+      2. Ask clarifying questions (one at a time)
+      3. Propose 2-3 approaches with trade-offs
+      4. Present design sections for approval
+      5. Summarize the agreed outcome in `brainstorm.md` using this
+         artifact's template structure
+
+      Guardrail — no silent scaffolding:
+      - Do NOT create or select a change and immediately dump empty templates
+        into `brainstorm.md` or `design.md` without completing the interactive
+        flow above via **superpowers:brainstorming** (unless the user
+        explicitly chooses manual authoring).
     requires: []
+
+  - id: design
+    generates: design.md
+    optional: true
+    description: >-
+      OPTIONAL — technical design doc when brainstorm.md alone is insufficient
+      (non-trivial architecture, migrations, trade-offs).
+    template: design.md
+    instruction: |
+      OPTIONAL artifact. Skip unless the change needs HOW-to-build detail beyond
+      `brainstorm.md` (aligned with openspec conventions: design.md is optional).
+
+      Create the design document explaining HOW to implement the change — only when needed.
+
+      Check if brainstorming already produced a design.md file.
+      If design.md already exists with content from brainstorming,
+      review and refine it rather than starting from scratch.
+
+      If design.md is empty or doesn't exist, create it from
+      the brainstorm.md output.
+
+      Sections:
+      - **Context**: Background, current state, constraints, stakeholders
+      - **Goals / Non-Goals**: What this design achieves and explicitly excludes
+      - **Decisions**: Key technical choices with rationale (why X over Y?). Include alternatives considered.
+      - **Risks / Trade-offs**: Known limitations, things that could go wrong. Format: [Risk] → Mitigation
+      - **Migration Plan**: Steps to deploy, rollback strategy (if applicable)
+      - **Open Questions**: Outstanding decisions or unknowns to resolve
+
+      Focus on architecture and approach, not line-by-line implementation.
+      Good design docs explain the "why" behind technical decisions.
+    requires:
+      - brainstorm
 
   - id: specs
     generates: "specs/**/*.md"
@@ -26,12 +90,24 @@ artifacts:
     instruction: |
       Create specification files that define WHAT the system should do.
 
-      Create one spec file per capability identified in brainstorm.md.
-      Use normative requirements and scenario-based behavior:
-      - `### Requirement: <name>`
-      - `#### Scenario: <name>` with WHEN/THEN bullets
+      Create one spec file per capability listed in the proposal's Capabilities section.
+      - New capabilities: use the exact kebab-case name from the proposal (specs/<capability>/spec.md).
+      - Modified capabilities: use the existing spec folder name from openspec/specs/<capability>/ when creating the delta spec at specs/<capability>/spec.md.
 
-      Specs should be testable and scoped to the brainstorm decisions.
+      Delta operations (use ## headers):
+      - **ADDED Requirements**: New capabilities
+      - **MODIFIED Requirements**: Changed behavior - MUST include full updated content
+      - **REMOVED Requirements**: Deprecated features - MUST include **Reason** and **Migration**
+      - **RENAMED Requirements**: Name changes only - use FROM:/TO: format
+
+      Format requirements:
+      - Each requirement: `### Requirement: <name>` followed by description
+      - Use SHALL/MUST for normative requirements (avoid should/may)
+      - Each scenario: `#### Scenario: <name>` with WHEN/THEN format
+      - **CRITICAL**: Scenarios MUST use exactly 4 hashtags (`####`). Using 3 hashtags or bullets will fail silently.
+      - Every requirement MUST have at least one scenario.
+
+      Specs should be testable - each scenario is a potential test case.
     requires:
       - brainstorm
 
@@ -40,23 +116,105 @@ artifacts:
     description: Trackable implementation checklist
     template: tasks.md
     instruction: |
-      Create an implementation checklist from specs.
+      Create the task list that breaks down the implementation work.
 
-      Requirements:
-      - Use numbered sections
-      - Use checkbox tasks in `- [ ] X.Y Description` format
-      - Keep tasks ordered by dependency
-      - Ensure each task is verifiable
+      **IMPORTANT: Follow the template below exactly.** The apply phase parses
+      checkbox format to track progress. Tasks not using `- [ ]` won't be tracked.
 
-      This file is the source of completion tracking during apply.
+      Guidelines:
+      - Group related tasks under ## numbered headings
+      - Each task MUST be a checkbox: `- [ ] X.Y Task description`
+      - Tasks should be small enough to complete in one session
+      - Order tasks by dependency (what must be done first?)
+
+      Reference specs for what needs to be built. If design.md exists,
+      reference it for how to build it — but design is optional (see
+      openspec-conventions: design.md is only for changes that need to
+      explain non-trivial technical decisions)
     requires:
       - specs
 
+  - id: plan
+    generates: execution-plan.md
+    description: Execution plan for implementation
+    template: execution-plan.md
+    instruction: |
+      PRECHECK — required skill availability:
+      Before invoking, confirm `superpowers:writing-plans` appears in
+      your available skills list. If missing, STOP and inform the user
+      that the Superpowers plugin must be installed (or that they can
+      explicitly opt to write execution-plan.md manually using the template
+      below). Do NOT silently fall back.
+
+      Use the Skill tool to invoke **superpowers:writing-plans**.
+
+      IMPORTANT output redirection:
+      - Do NOT write to `docs/superpowers/plans/`. Instead, write
+        the plan directly to this change's `execution-plan.md`.
+
+      The writing-plans skill will:
+      1. Read the tasks.md, brainstorm.md, and design.md (if exists in the change directory) for context
+      2. Break each task into 2-5 minute micro-steps (TDD style)
+      3. Include exact file paths, code snippets, test commands
+
+      Pass the tasks.md content to the skill as the input for
+      decomposition. The plan should reference the specs and
+      design artifacts in this change directory (design.md if exists).
+    requires:
+      - tasks
+
 apply:
-  requires: [tasks]
+  requires: [plan]
   tracks: tasks.md
   executionPlan: execution-plan.md
   instruction: |
-    Read context files and implement pending tasks from tasks.md.
-    Mark completed checklist items as you go.
-    Pause on blockers or unclear requirements.
+    Before implementing, set up an isolated workspace and executor:
+
+    0. **Pre-flight — verify required Superpowers skills**:
+
+       This schema's apply phase requires the following skills.
+       Confirm each appears in your available skills list before
+       proceeding:
+
+       - superpowers:subagent-driven-development
+         (transitively: superpowers:test-driven-development,
+                        superpowers:requesting-code-review)
+
+       If any required skill is missing, STOP and inform the user —
+       do NOT proceed and do NOT silently fall back to manual
+       implementation. The user can install the Superpowers plugin,
+       or explicitly opt into the manual fallback path described at
+       the end of this instruction.
+
+    1. **Executor — subagent-driven-development**:
+
+       Use the Skill tool to invoke
+       **superpowers:subagent-driven-development** to execute
+       the execution-plan.md micro-tasks with fresh subagents per task.
+
+       Tell the executor:
+       - Read execution-plan.md in this change directory for micro-tasks
+       - Update tasks.md checkboxes as coarse tasks complete
+       - Do NOT run git commit while executing this flow unless the user
+         explicitly asks for a commit; track progress with tasks.md
+         checkboxes and working-tree changes only.
+
+       IMPORTANT — transitive skill activation:
+       subagent-driven-development internally enforces the
+       following skills, so you do NOT need to invoke them
+       manually:
+       - **superpowers:test-driven-development** — every task
+         follows RED-GREEN-REFACTOR. Implementation code written
+         before a failing test is deleted.
+       - **superpowers:requesting-code-review** — after each
+         task, a code-reviewer subagent is dispatched to catch
+         spec compliance and code quality issues. A final review
+         runs for the entire implementation before apply
+         concludes.
+
+       This schema does NOT support `superpowers:executing-plans`
+       as a fallback for non-subagent platforms. Per its SKILL.md,
+       executing-plans does not transitively activate TDD or
+       code-review — defeating the rigor that Superpowers brings.
+       If your platform lacks subagent support, use the built-in
+       `spec-driven` schema instead of this one.

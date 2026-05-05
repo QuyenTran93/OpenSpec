@@ -8,7 +8,12 @@ export function getBrainstormRootBrainstormSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-brainstorm',
     description: 'Run brainstorm-first design flow and produce brainstorm.md under the active OpenSpec change.',
-    instructions: `Run the superpowers \`brainstorming\` skill and follow it end-to-end through user-approved design in \`brainstorm.md\`, then hand off to propose — not to \`writing-plans\` or apply until propose/continue has finished the schema artifacts.
+    instructions: `PRECHECK — required skill availability:
+Before invoking, confirm \`superpowers:brainstorming\` appears in your available skills list. If missing, STOP and inform the user that the Superpowers plugin must be installed (or that they can explicitly opt to write \`brainstorm.md\` manually using the template below). Do NOT silently fall back.
+
+Use the Skill tool to invoke **superpowers:brainstorming**.
+
+Follow the skill’s interactive phases (see the numbered list under **Superpowers → OpenSpec** below). Per OpenSpec brainstorm-root, **do not** invoke \`writing-plans\` inside this skill; persist to this change’s \`brainstorm.md\`, add \`design.md\` only when optional per that body. After approval, hand off to **propose / continue**, not apply, until propose/continue has produced the upstream schema artifacts.
 
 ---
 
@@ -29,7 +34,12 @@ export function getOpsxBrainstormRootBrainstormCommandTemplate(): CommandTemplat
     description: 'Run brainstorm-first design workflow and write brainstorm.md for a change',
     category: 'Workflow',
     tags: ['workflow', 'brainstorm', 'design'],
-    content: `Use the superpowers \`brainstorming\` skill through user-approved design in \`brainstorm.md\`, then hand off to \`/opsx:propose\` or \`/opsx:continue\` — not to \`/opsx:writing-plans\` or \`/opsx:apply\` until schema artifacts are complete.
+    content: `PRECHECK — required skill availability:
+Before invoking, confirm \`superpowers:brainstorming\` appears in your available skills list. If missing, STOP and inform the user that the Superpowers plugin must be installed (or that they can explicitly opt to write \`brainstorm.md\` manually using the template below). Do NOT silently fall back.
+
+Use the Skill tool to invoke **superpowers:brainstorming**.
+
+Follow the interactive phases (numbered list under **Superpowers → OpenSpec** below). **Do not** run \`/opsx:writing-plans\` or \`/opsx:apply\` from this command; persist to \`brainstorm.md\`, add optional \`design.md\` only when warranted. Hand off to \`/opsx:propose\` or \`/opsx:continue\` after approval until upstream schema artifacts are complete.
 
 ---
 

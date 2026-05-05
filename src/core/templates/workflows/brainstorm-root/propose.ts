@@ -5,8 +5,10 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
-import { BRAINSTORM_GATE_POLICY_BLOCK } from './brainstorm-gate-policy.js';
-import { BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK } from './superpowers-openspec-mapping.js';
+import {
+  BRAINSTORM_ROOT_GATE_POLICY_BLOCK,
+  BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK,
+} from './superpowers-openspec-mapping.js';
 
 export function getBrainstormRootProposeSkillTemplate(): SkillTemplate {
   return {
@@ -25,7 +27,7 @@ After all required artifacts for this schema are done (check \`openspec status -
 
 ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
-${BRAINSTORM_GATE_POLICY_BLOCK}
+${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
 
 ---
 
@@ -142,7 +144,7 @@ After all required artifacts for this schema are done (check \`openspec status -
 
 ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
-${BRAINSTORM_GATE_POLICY_BLOCK}
+${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
 
 ---
 

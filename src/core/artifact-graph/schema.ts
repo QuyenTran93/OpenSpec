@@ -37,6 +37,7 @@ export function parseSchema(yamlContent: string): SchemaYaml {
 
   // Check that all requires references are valid
   validateRequiresReferences(schema.artifacts);
+  validateOptionalArtifactsNotRequiredByOthers(schema.artifacts);
   validateApplyRequiresReferences(schema.artifacts, schema.apply?.requires);
 
   // Check for cycles
@@ -69,6 +70,26 @@ function validateRequiresReferences(artifacts: Artifact[]): void {
       if (!validIds.has(req)) {
         throw new SchemaValidationError(
           `Invalid dependency reference in artifact '${artifact.id}': '${req}' does not exist`
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Optional artifacts may be skipped; they must not be hard dependencies of other artifacts.
+ */
+function validateOptionalArtifactsNotRequiredByOthers(artifacts: Artifact[]): void {
+  const optionalIds = new Set(artifacts.filter(a => a.optional === true).map(a => a.id));
+  if (optionalIds.size === 0) {
+    return;
+  }
+
+  for (const artifact of artifacts) {
+    for (const req of artifact.requires) {
+      if (optionalIds.has(req)) {
+        throw new SchemaValidationError(
+          `Optional artifact '${req}' cannot appear in requires of '${artifact.id}' (optional outputs must not gate other artifacts)`
         );
       }
     }

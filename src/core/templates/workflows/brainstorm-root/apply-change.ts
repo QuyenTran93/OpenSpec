@@ -9,7 +9,9 @@ import { BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK } from './superpowers-openspec-
 
 const APPLY_EXECUTION_PLAN_GATE_STEP = (
   rerunInstruction: string
-): string => `6. **Gate on execution plan before implementation loop**
+): string => `6. **Gate on execution plan before implementation loop** (brainstorm-root)
+
+   **Canonical apply policy:** When \`schemaName\` is \`brainstorm-root\`, follow \`schemas/brainstorm-root/schema.yaml\` → \`apply\` → \`instruction\` in lockstep with the CLI output from \`openspec instructions apply --change "<name>" --json\`. The bullets below restate that block so agents do not skip pre-flight, executor choice, or transitive skill rules.
 
    Before implementation starts, check for:
    - \`openspec/changes/<name>/execution-plan.md\`
@@ -17,13 +19,36 @@ const APPLY_EXECUTION_PLAN_GATE_STEP = (
    If missing, pause and ask the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`) and save \`execution-plan.md\` at that path, then rerun ${rerunInstruction}.
 
    Clarify execution mode:
-   - \`execution-plan.md\` guides the micro-step implementation order
-   - \`tasks.md\` remains the checkbox progress tracker (\`- [ ]\` -> \`- [x]\`)
+   - \`execution-plan.md\` is the source of truth for implementation step order (not \`plan.md\` or \`docs/superpowers/plans/\`)
+   - Mark task checkboxes in \`tasks.md\` (\`- [ ]\` -> \`- [x]\`)
 
-   Implementation guidance:
-   - **Small, narrowly scoped work:** continue inline in this session.
-   - **Broader work, multi-step plans, or work that splits cleanly across parallel lanes:** if Task/subagent capabilities are **available**, read and follow \`superpowers:subagent-driven-development\`; **otherwise** read and follow \`superpowers:executing-plans\`, treating \`execution-plan.md\` as the authoritative step ordering.
-   - **Do not** default to \`using-git-worktrees\` for OpenSpec apply flows unless the user **explicitly** asks for isolated git worktrees.`;
+   **0. Pre-flight — verify required Superpowers skills** (same as schema \`apply.instruction\`):
+
+   This schema's apply phase requires the following skills. Confirm each appears in your available skills list before proceeding:
+
+   - \`superpowers:subagent-driven-development\` (transitively: \`superpowers:test-driven-development\`, \`superpowers:requesting-code-review\`)
+
+   If any required skill is missing, STOP and inform the user — do NOT proceed and do NOT silently fall back to manual implementation. The user can install the Superpowers plugin, or explicitly opt into the manual fallback path described at the end of the dynamic apply instruction from the CLI (when present).
+
+   **1. Executor — subagent-driven-development** (same as schema \`apply.instruction\`):
+
+   Use the Skill tool to invoke **superpowers:subagent-driven-development** to execute the \`execution-plan.md\` micro-tasks with fresh subagents per task.
+
+   Tell the executor:
+   - Read \`execution-plan.md\` in this change directory for micro-tasks
+   - Update \`tasks.md\` checkboxes as coarse tasks complete
+   - Do **not** run \`git commit\` while executing \`superpowers:subagent-driven-development\` for this brainstorm-root apply flow unless the user explicitly asks for a commit; track progress with \`tasks.md\` checkboxes and working-tree changes only.
+
+   **IMPORTANT — transitive skill activation:** \`subagent-driven-development\` internally enforces the following skills, so you do NOT need to invoke them manually:
+   - **superpowers:test-driven-development** — every task follows RED-GREEN-REFACTOR. Implementation code written before a failing test is deleted.
+   - **superpowers:requesting-code-review** — after each task, a code-reviewer subagent is dispatched to catch spec compliance and code quality issues. A final review runs for the entire implementation before apply concludes.
+
+   This schema does NOT support \`superpowers:executing-plans\` as a fallback for non-subagent platforms. Per its SKILL.md, \`executing-plans\` does not transitively activate TDD or code-review — defeating the rigor that Superpowers brings. If your platform lacks subagent support, use the built-in \`spec-driven\` schema instead of this one.
+
+   Implementation scale:
+   - **Small, narrowly scoped work:** continue inline in this session while still honoring \`execution-plan.md\` ordering and checkbox updates.
+
+   **Do not** default to \`using-git-worktrees\` for OpenSpec apply flows unless the user **explicitly** asks for isolated git worktrees.`;
 
 export function getBrainstormRootApplyChangeSkillTemplate(): SkillTemplate {
   return {

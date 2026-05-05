@@ -5,7 +5,7 @@ import {
   getCommandContents,
   generateSkillContent,
 } from '../../../src/core/shared/skill-generation.js';
-import { BRAINSTORM_GATE_POLICY_BLOCK } from '../../../src/core/templates/workflows/brainstorm-root/brainstorm-gate-policy.js';
+import { BRAINSTORM_ROOT_GATE_POLICY_BLOCK } from '../../../src/core/templates/workflows/brainstorm-root/superpowers-openspec-mapping.js';
 
 describe('skill-generation', () => {
   describe('getSkillTemplates', () => {
@@ -115,7 +115,7 @@ describe('skill-generation', () => {
       const entries = getSkillTemplates(['propose', 'new'], 'brainstorm');
 
       for (const entry of entries) {
-        expect(entry.template.instructions).toContain(BRAINSTORM_GATE_POLICY_BLOCK);
+        expect(entry.template.instructions).toContain(BRAINSTORM_ROOT_GATE_POLICY_BLOCK);
         expect(entry.template.instructions).toContain(
           'If ambiguous/conflicting, do not pass gate automatically; ask one explicit confirmation question'
         );
@@ -126,7 +126,7 @@ describe('skill-generation', () => {
       const coreEntries = getSkillTemplates(['propose', 'new'], 'core');
 
       for (const entry of coreEntries) {
-        expect(entry.template.instructions).not.toContain(BRAINSTORM_GATE_POLICY_BLOCK);
+        expect(entry.template.instructions).not.toContain(BRAINSTORM_ROOT_GATE_POLICY_BLOCK);
       }
     });
   });
@@ -250,11 +250,11 @@ describe('skill-generation', () => {
       const coreEntries = getCommandContents(['propose', 'new'], 'core');
 
       for (const entry of brainstormEntries) {
-        expect(entry.body).toContain(BRAINSTORM_GATE_POLICY_BLOCK);
+        expect(entry.body).toContain(BRAINSTORM_ROOT_GATE_POLICY_BLOCK);
       }
 
       for (const entry of coreEntries) {
-        expect(entry.body).not.toContain(BRAINSTORM_GATE_POLICY_BLOCK);
+        expect(entry.body).not.toContain(BRAINSTORM_ROOT_GATE_POLICY_BLOCK);
       }
     });
   });

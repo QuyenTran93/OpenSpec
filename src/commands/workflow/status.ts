@@ -85,18 +85,22 @@ export async function statusCommand(options: StatusOptions): Promise<void> {
 }
 
 export function printStatusText(status: ChangeStatus): void {
-  const doneCount = status.artifacts.filter((a) => a.status === 'done').length;
-  const total = status.artifacts.length;
+  const required = status.artifacts.filter((a) => !a.optional);
+  const doneCount = required.filter((a) => a.status === 'done').length;
+  const total = required.length;
 
   console.log(`Change: ${status.changeName}`);
   console.log(`Schema: ${status.schemaName}`);
-  console.log(`Progress: ${doneCount}/${total} artifacts complete`);
+  console.log(`Progress: ${doneCount}/${total} required artifacts complete`);
   console.log();
 
   for (const artifact of status.artifacts) {
     const indicator = getStatusIndicator(artifact.status);
     const color = getStatusColor(artifact.status);
     let line = `${indicator} ${artifact.id}`;
+    if (artifact.optional) {
+      line += ' (optional)';
+    }
 
     if (artifact.status === 'blocked' && artifact.missingDeps && artifact.missingDeps.length > 0) {
       line += color(` (blocked by: ${artifact.missingDeps.join(', ')})`);
@@ -107,6 +111,6 @@ export function printStatusText(status: ChangeStatus): void {
 
   if (status.isComplete) {
     console.log();
-    console.log(chalk.green('All artifacts complete!'));
+    console.log(chalk.green('All required artifacts complete!'));
   }
 }

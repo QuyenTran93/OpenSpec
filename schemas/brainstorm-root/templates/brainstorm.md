@@ -1,27 +1,39 @@
-## Problem
+## Design Summary
 
-<!-- Describe the problem or opportunity -->
+<!-- Validated design from brainstorming session -->
 
-## Scope
+## Alternatives Considered
 
-### In Scope
-<!-- What this change will address -->
+<!--
+Per the brainstorm rule in openspec/config.yaml: include 2-3 alternative options and explain the trade-offs.
 
-### Out of Scope
-<!-- What this change will not address -->
+### Option A: <Name>
+- **Method**: <one paragraph description>
+- **Pros**: <bullet points>
+- **Cons**: <bullet points>
+- **Why not chosen**: <gap compared with Agreed Approach>
 
-## Success Criteria
+### Option B: <Name>
+- **Method**:
+- **Pros**:
+- **Cons**:
+- **Why not chosen**:
 
-<!-- Measurable success criteria -->
+### Option C: <Name> (optional)
+- **Method**:
+- **Pros**:
+- **Cons**:
+- **Why not chosen**:
+-->
 
-## Constraints
+## Agreed Approach
 
-<!-- Technical, business, security, or operational constraints -->
+<!-- The chosen approach and rationale — reference one option above and explain why it won -->
 
-## Risks and Assumptions
+## Key Decisions
 
-<!-- Key risks and assumptions -->
+<!-- Decisions made during brainstorming -->
 
-## Approach
+## Open Questions
 
-<!-- Chosen approach and alternatives considered -->
+<!-- Any remaining questions to resolve -->

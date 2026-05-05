@@ -94,6 +94,8 @@ export interface ArtifactStatus {
   id: string;
   /** Output path pattern */
   outputPath: string;
+  /** True when skipping this artifact still allows `isComplete` */
+  optional?: boolean;
   /** Status: done, ready, or blocked */
   status: 'done' | 'ready' | 'blocked';
   /** Missing dependencies (only for blocked) */
@@ -329,10 +331,14 @@ export function formatChangeStatus(context: ChangeContext): ChangeStatus {
   const blocked = context.graph.getBlocked(context.completed);
 
   const artifactStatuses: ArtifactStatus[] = artifacts.map(artifact => {
+    const optional = artifact.optional === true;
+    const optionalField = optional ? ({ optional: true } as const) : {};
+
     if (context.completed.has(artifact.id)) {
       return {
         id: artifact.id,
         outputPath: artifact.generates,
+        ...optionalField,
         status: 'done' as const,
       };
     }
@@ -341,6 +347,7 @@ export function formatChangeStatus(context: ChangeContext): ChangeStatus {
       return {
         id: artifact.id,
         outputPath: artifact.generates,
+        ...optionalField,
         status: 'ready' as const,
       };
     }
@@ -348,6 +355,7 @@ export function formatChangeStatus(context: ChangeContext): ChangeStatus {
     return {
       id: artifact.id,
       outputPath: artifact.generates,
+      ...optionalField,
       status: 'blocked' as const,
       missingDeps: blocked[artifact.id] ?? [],
     };

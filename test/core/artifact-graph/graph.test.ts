@@ -209,6 +209,25 @@ artifacts:
       expect(graph.isComplete(new Set(['A']))).toBe(false);
       expect(graph.isComplete(new Set())).toBe(false);
     });
+
+    it('should ignore optional artifacts when incomplete', () => {
+      const schema = createSchema([
+        { id: 'A', generates: 'a.md', description: 'A', template: 't.md', requires: [] },
+        {
+          id: 'B',
+          generates: 'b.md',
+          description: 'B',
+          template: 't.md',
+          requires: ['A'],
+          optional: true,
+        },
+        { id: 'C', generates: 'c.md', description: 'C', template: 't.md', requires: ['A'] },
+      ]);
+      const graph = ArtifactGraph.fromSchema(schema);
+
+      expect(graph.isComplete(new Set(['A', 'C']))).toBe(true);
+      expect(graph.isComplete(new Set(['A']))).toBe(false);
+    });
   });
 
   describe('getBlocked', () => {

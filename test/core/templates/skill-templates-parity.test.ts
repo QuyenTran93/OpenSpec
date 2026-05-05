@@ -70,20 +70,20 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
 };
 
 const EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES: Record<string, string> = {
-  getBrainstormRootBrainstormSkillTemplate: '3a4db5caf36ce3b1f891b95b12131337710cb8a1d566bdad125a593600d83e81',
-  getBrainstormRootProposeSkillTemplate: '7382bca149a832ce92e9877704bca1aba449a013fdd7c68f0f73b20a623038a8',
-  getBrainstormRootWritingPlansSkillTemplate: '2a3416af95db2aa995d426de1792aa395015b0b688eebaa114431fc8e07c26d1',
-  getBrainstormRootContinueChangeSkillTemplate: 'eed671e37f0fdf123fd91639061c7960e3fbd0ceee79d5882c991ced9d43e24d',
-  getBrainstormRootApplyChangeSkillTemplate: '4581a8df3d6e18d312d66f102f28d5863b3cd230111d6d2827fd9b015592f9aa',
-  getBrainstormRootNewChangeSkillTemplate: '3cbc751981c433ea46a3cef77eaaff3411eb562312a00b1d0d984c4d2a4c30de',
-  getBrainstormRootArchiveChangeSkillTemplate: 'd10ee527cde025fd35373a3abc8771a4959c97ffa424e12c80a3ab4a15c0344a',
-  getOpsxBrainstormRootBrainstormCommandTemplate: '3e3f416ed6ec89dd69790344362c9514efa6706d6db73f023ca7ac8f5ce7fb90',
-  getOpsxBrainstormRootProposeCommandTemplate: '2889df7d7707ae63d8b94e8844ee788ad18573c46445222e3134fdb8ba0ac5bc',
-  getOpsxBrainstormRootWritingPlansCommandTemplate: '11b210e739c59c4f45e460d7e835c03128d220faec5ea7cfa5b14431ddc0f061',
-  getOpsxBrainstormRootContinueCommandTemplate: 'badb54a8f2c3e4897ad33897aaecfe87ffbeb532f5343d742b2353a8106a6a2f',
-  getOpsxBrainstormRootApplyCommandTemplate: 'd576b5ebeafb62cc2b8a6b669788db42bb52d871656d4e5bab029ace45507b4a',
-  getOpsxBrainstormRootNewCommandTemplate: 'a1e3371d0a236e1cfb339646e228a7ebfc12fcb38ae2a326434bb3371e8c4873',
-  getOpsxBrainstormRootArchiveCommandTemplate: 'e2e6eca531ee06adf4c833808743d0b4469aee9bc03f280f836927e4632418ae',
+  getBrainstormRootBrainstormSkillTemplate: 'f050fe38fab7bda7fe090cf1316112e8c343e88bf66935c3d2f458b7c3cffea9',
+  getBrainstormRootProposeSkillTemplate: 'f741b1c586bd508e7f21ee0f7ec872ab268208756b4f2f40acedc85d11e8bca6',
+  getBrainstormRootWritingPlansSkillTemplate: 'fb9cbf10528c1b482c4e91f0cb49f43a517223bb6989ff24d4fed92e8e2c47ae',
+  getBrainstormRootContinueChangeSkillTemplate: 'c23efd7744de209d3827c7be83a95548547c4b3d7c993d45087fd75488d79a98',
+  getBrainstormRootApplyChangeSkillTemplate: 'e5cce60659f0972e121da2f71dd21ae1d78b33192ee1084c68b447069e52d676',
+  getBrainstormRootNewChangeSkillTemplate: 'ac88422add4886da717ba24cf07b9812854291e6d9350d3fa38894b502b30646',
+  getBrainstormRootArchiveChangeSkillTemplate: '0a9c3766c345178202f6a08f348b2463295f7805fe8390f78521d58656e549b3',
+  getOpsxBrainstormRootBrainstormCommandTemplate: 'fd2f9dc7b301f36df861a58dcf5ec190ffaa59cd2f40a24269b1ac599560d1ec',
+  getOpsxBrainstormRootProposeCommandTemplate: '8dff8262a7a2b5e6b959249d9a501c05116d4e7a08bac836b09447316876623b',
+  getOpsxBrainstormRootWritingPlansCommandTemplate: 'a6350f621df1de786804865f9458898e87ee98a399b3708078790e2c50617d98',
+  getOpsxBrainstormRootContinueCommandTemplate: 'c38897534a3e126fb5a830916af4d086a10e0bd582d8fe22f42f92ce045a7e0b',
+  getOpsxBrainstormRootApplyCommandTemplate: '5ef8e6b7fd55974ef4a27af8c5af08b04f33451302919fa07817bb03a5639992',
+  getOpsxBrainstormRootNewCommandTemplate: '3bbaa9679faedfb4d7c727d83703ba670a2829dd3d3c85ac20156d93512ac6bf',
+  getOpsxBrainstormRootArchiveCommandTemplate: '0da2d35fcb6e7ea5a48afaa75e32a65f91f735aeddec5d974e62c0430a8e1996',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
@@ -231,18 +231,22 @@ describe('skill templates split parity', () => {
     const applySkill = getBrainstormRootApplyChangeSkillTemplate();
     const applyCommand = getOpsxBrainstormRootApplyCommandTemplate();
 
+    expect(applySkill.instructions).toContain('schemas/brainstorm-root/schema.yaml');
+    expect(applySkill.instructions).toContain('git commit');
     expect(applySkill.instructions).toContain('execution-plan.md');
     expect(applySkill.instructions).toContain('writing-plans');
     expect(applySkill.instructions).toContain('superpowers:subagent-driven-development');
     expect(applySkill.instructions).toContain('superpowers:executing-plans');
-    expect(applySkill.instructions).toContain('if Task/subagent capabilities are **available**');
+    expect(applySkill.instructions).toContain('Use the Skill tool to invoke **superpowers:subagent-driven-development**');
     expect(applySkill.instructions).toContain('using-git-worktrees');
 
+    expect(applyCommand.content).toContain('schemas/brainstorm-root/schema.yaml');
+    expect(applyCommand.content).toContain('git commit');
     expect(applyCommand.content).toContain('execution-plan.md');
     expect(applyCommand.content).toContain('writing-plans');
     expect(applyCommand.content).toContain('superpowers:subagent-driven-development');
     expect(applyCommand.content).toContain('superpowers:executing-plans');
-    expect(applyCommand.content).toContain('if Task/subagent capabilities are **available**');
+    expect(applyCommand.content).toContain('Use the Skill tool to invoke **superpowers:subagent-driven-development**');
     expect(applyCommand.content).toContain('using-git-worktrees');
   });
 

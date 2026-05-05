@@ -225,5 +225,56 @@ artifacts:
       const schema = parseSchema(yaml);
       expect(schema.artifacts[0].requires).toEqual([]);
     });
+
+    it('should parse optional artifacts', () => {
+      const yaml = `
+name: test
+version: 1
+artifacts:
+  - id: root
+    generates: root.md
+    description: Root
+    template: templates/root.md
+    requires: []
+  - id: opt
+    generates: opt.md
+    description: Optional
+    template: templates/opt.md
+    optional: true
+    requires:
+      - root
+`;
+      const schema = parseSchema(yaml);
+      expect(schema.artifacts.find(a => a.id === 'opt')?.optional).toBe(true);
+      expect(schema.artifacts.find(a => a.id === 'root')?.optional).toBeUndefined();
+    });
+
+    it('should reject optional artifact as dependency of another artifact', () => {
+      const yaml = `
+name: test
+version: 1
+artifacts:
+  - id: root
+    generates: root.md
+    description: Root
+    template: templates/root.md
+    requires: []
+  - id: opt
+    generates: opt.md
+    description: Optional
+    template: templates/opt.md
+    optional: true
+    requires:
+      - root
+  - id: tasks
+    generates: tasks.md
+    description: Tasks
+    template: templates/tasks.md
+    requires:
+      - opt
+`;
+      expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
+      expect(() => parseSchema(yaml)).toThrow(/optional outputs must not gate/);
+    });
   });
 });

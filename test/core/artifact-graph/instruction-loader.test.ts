@@ -605,5 +605,23 @@ rules:
       expect(proposalIdx).toBeLessThan(specsIdx);
       expect(specsIdx).toBeLessThan(tasksIdx);
     });
+
+    it('should not require optional artifacts for isComplete (brainstorm-root)', () => {
+      const changeDir = path.join(tempDir, 'openspec', 'changes', 'brainstorm-opt');
+      fs.mkdirSync(path.join(changeDir, 'specs', 'feat'), { recursive: true });
+      fs.writeFileSync(path.join(changeDir, '.openspec.yaml'), 'schema: brainstorm-root\n');
+      fs.writeFileSync(path.join(changeDir, 'brainstorm.md'), '# B');
+      fs.writeFileSync(path.join(changeDir, 'specs', 'feat', 'spec.md'), '# S');
+      fs.writeFileSync(path.join(changeDir, 'tasks.md'), '# T');
+      fs.writeFileSync(path.join(changeDir, 'execution-plan.md'), '# P');
+
+      const context = loadChangeContext(tempDir, 'brainstorm-opt');
+      const status = formatChangeStatus(context);
+
+      expect(status.isComplete).toBe(true);
+      const design = status.artifacts.find(a => a.id === 'design');
+      expect(design?.optional).toBe(true);
+      expect(design?.status).toBe('ready');
+    });
   });
 });
