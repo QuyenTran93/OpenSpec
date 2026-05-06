@@ -113,7 +113,7 @@ describe('migration', () => {
     expect(config.workflows).toBeUndefined();
   });
 
-  it('normalizes project config schema when explicit profile is brainstorm', async () => {
+  it('does not mutate project config.yaml when explicit profile is brainstorm', async () => {
     saveGlobalConfig({
       featureFlags: {},
       profile: 'brainstorm',
@@ -121,12 +121,30 @@ describe('migration', () => {
     });
     const projectConfigPath = path.join(projectDir, 'openspec', 'config.yaml');
     await fsp.mkdir(path.dirname(projectConfigPath), { recursive: true });
-    await fsp.writeFile(projectConfigPath, 'schema: spec-driven\n', 'utf-8');
+    await fsp.writeFile(projectConfigPath, 'schema: spec-driven\ncontext: keep-me\n', 'utf-8');
 
     migrateIfNeeded(projectDir, [ensureClaudeTool()]);
 
     const content = fs.readFileSync(projectConfigPath, 'utf-8');
-    expect(content).toContain('schema: brainstorm-root');
+    expect(content).toBe('schema: spec-driven\ncontext: keep-me\n');
+  });
+
+  it('does not create config.yaml when config.yml already exists during migration', async () => {
+    saveGlobalConfig({
+      featureFlags: {},
+      profile: 'brainstorm',
+      delivery: 'both',
+    });
+    const openspecDir = path.join(projectDir, 'openspec');
+    const projectConfigYmlPath = path.join(openspecDir, 'config.yml');
+    await fsp.mkdir(openspecDir, { recursive: true });
+    await fsp.writeFile(projectConfigYmlPath, 'schema: custom\ncontext: keep-me\n', 'utf-8');
+
+    migrateIfNeeded(projectDir, [ensureClaudeTool()]);
+
+    const content = fs.readFileSync(projectConfigYmlPath, 'utf-8');
+    expect(content).toBe('schema: custom\ncontext: keep-me\n');
+    expect(fs.existsSync(path.join(openspecDir, 'config.yaml'))).toBe(false);
   });
 
   it('preserves explicit delivery value during migration', async () => {

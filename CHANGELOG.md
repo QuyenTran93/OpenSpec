@@ -1,5 +1,13 @@
 # @fission-ai/openspec
 
+## Unreleased
+
+### Changed
+
+- Config bootstrap now follows create-if-missing semantics:
+  - `init`, `update`, and `migration` no longer normalize or rewrite schema in existing `openspec/config.yaml|yml`.
+  - When config is missing, OpenSpec creates `openspec/config.yaml` with minimal `schema` content derived from active workflows.
+
 ## 1.3.1
 
 ### Patch Changes
