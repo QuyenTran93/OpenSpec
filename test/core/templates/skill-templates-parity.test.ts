@@ -70,20 +70,20 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
 };
 
 const EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES: Record<string, string> = {
-  getBrainstormRootBrainstormSkillTemplate: 'f050fe38fab7bda7fe090cf1316112e8c343e88bf66935c3d2f458b7c3cffea9',
-  getBrainstormRootProposeSkillTemplate: 'f741b1c586bd508e7f21ee0f7ec872ab268208756b4f2f40acedc85d11e8bca6',
-  getBrainstormRootWritingPlansSkillTemplate: 'fb9cbf10528c1b482c4e91f0cb49f43a517223bb6989ff24d4fed92e8e2c47ae',
-  getBrainstormRootContinueChangeSkillTemplate: 'c23efd7744de209d3827c7be83a95548547c4b3d7c993d45087fd75488d79a98',
-  getBrainstormRootApplyChangeSkillTemplate: 'e5cce60659f0972e121da2f71dd21ae1d78b33192ee1084c68b447069e52d676',
-  getBrainstormRootNewChangeSkillTemplate: 'ac88422add4886da717ba24cf07b9812854291e6d9350d3fa38894b502b30646',
-  getBrainstormRootArchiveChangeSkillTemplate: '0a9c3766c345178202f6a08f348b2463295f7805fe8390f78521d58656e549b3',
-  getOpsxBrainstormRootBrainstormCommandTemplate: 'fd2f9dc7b301f36df861a58dcf5ec190ffaa59cd2f40a24269b1ac599560d1ec',
-  getOpsxBrainstormRootProposeCommandTemplate: '8dff8262a7a2b5e6b959249d9a501c05116d4e7a08bac836b09447316876623b',
-  getOpsxBrainstormRootWritingPlansCommandTemplate: 'a6350f621df1de786804865f9458898e87ee98a399b3708078790e2c50617d98',
-  getOpsxBrainstormRootContinueCommandTemplate: 'c38897534a3e126fb5a830916af4d086a10e0bd582d8fe22f42f92ce045a7e0b',
-  getOpsxBrainstormRootApplyCommandTemplate: '5ef8e6b7fd55974ef4a27af8c5af08b04f33451302919fa07817bb03a5639992',
-  getOpsxBrainstormRootNewCommandTemplate: '3bbaa9679faedfb4d7c727d83703ba670a2829dd3d3c85ac20156d93512ac6bf',
-  getOpsxBrainstormRootArchiveCommandTemplate: '0da2d35fcb6e7ea5a48afaa75e32a65f91f735aeddec5d974e62c0430a8e1996',
+  getBrainstormRootBrainstormSkillTemplate: 'd44a8abd1c21de64f6a19f232d518710aad0b299dcdee1d0c4b364d20d98663d',
+  getBrainstormRootProposeSkillTemplate: 'c16c40b8a35e4b5538a330f96dcea8ced1f3d5371700397aed44851c230598a1',
+  getBrainstormRootWritingPlansSkillTemplate: 'd68bdd23529d62f3cc1410b9b6251ef3ce4f4cfc5bbaf397e7307baf320be4e9',
+  getBrainstormRootContinueChangeSkillTemplate: 'c4c8b97d645aed5ae084dd4196f57b1bbd44b01693d0bd90317781142ad3e730',
+  getBrainstormRootApplyChangeSkillTemplate: '62dc3ce3edca7974882b8727c0acc7c5f36c30f05dbdb4decf6a98c67b15f634',
+  getBrainstormRootNewChangeSkillTemplate: 'f7b416c2cc9e4d4ce0cf9f72fae6fa36749c56afee44fb41b967dc0b43c77121',
+  getBrainstormRootArchiveChangeSkillTemplate: '5452620976e282f193702e9ec4b14c521d0d1c7341b6a425022e8db11baefaa9',
+  getOpsxBrainstormRootBrainstormCommandTemplate: 'b0167737de4608aa5245107f9efeb62fe65ae948a46d3e5b519e5eabf5c1a091',
+  getOpsxBrainstormRootProposeCommandTemplate: '231c7d99d854112dd201f04decfd99cffed11f86eb4a616d6ff1f2bff47067a2',
+  getOpsxBrainstormRootWritingPlansCommandTemplate: 'b816f46f5dd2b90b5482a51b4cdbb62d00169dc42971e6eaa6cc990fc986230e',
+  getOpsxBrainstormRootContinueCommandTemplate: 'ae4323df32ea4986f5630c6d4756f367e05b300f46f45bafe63c06805de0aa48',
+  getOpsxBrainstormRootApplyCommandTemplate: 'c20a73a59450d9ca50ffd470480a3f323b15799406a410ed7f16ab8fa811ba1e',
+  getOpsxBrainstormRootNewCommandTemplate: '7c001ac2863b60c37eea70626a35de6f98f486bd9f78874acc38775982416dfd',
+  getOpsxBrainstormRootArchiveCommandTemplate: 'efee07a27454acfc9be70c830fcf5f63f278708b4cd1cec36c9d14cc8e614524',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
@@ -261,6 +261,39 @@ describe('skill templates split parity', () => {
     expect(proposeCommand.content).toContain('writing-plans');
     expect(proposeCommand.content).toContain('openspec/changes/<name>/execution-plan.md');
     expect(proposeCommand.content).toContain('/opsx:apply');
+  });
+
+  it('prevents proposal-first regressions in brainstorm-root propose/continue templates', () => {
+    const proposeSkill = getBrainstormRootProposeSkillTemplate();
+    const proposeCommand = getOpsxBrainstormRootProposeCommandTemplate();
+    const continueSkill = getBrainstormRootContinueChangeSkillTemplate();
+    const continueCommand = getOpsxBrainstormRootContinueCommandTemplate();
+
+    expect(proposeSkill.instructions).not.toContain('proposal.md (what & why)');
+    expect(proposeCommand.content).not.toContain('proposal.md (what & why)');
+    expect(continueSkill.instructions).toContain('Do not imply or require `proposal.md` for brainstorm-root.');
+    expect(continueCommand.content).toContain('Do not imply or require `proposal.md` for brainstorm-root.');
+
+    expect(proposeSkill.instructions).toContain('Derive the next artifact from `openspec status --change "<name>" --json`');
+    expect(proposeSkill.instructions).toContain('applyRequires');
+    expect(proposeCommand.content).toContain('Derive the next artifact from `openspec status --change "<name>" --json`');
+    expect(proposeCommand.content).toContain('applyRequires');
+
+    expect(continueSkill.instructions).toContain('Always select the next artifact from status JSON (`status: "ready"`) and `applyRequires`.');
+    expect(continueCommand.content).toContain('Always select the next artifact from status JSON (`status: "ready"`) and `applyRequires`.');
+  });
+
+  it('requires explicit brainstorm-root schema flag in propose templates', () => {
+    const proposeSkill = getBrainstormRootProposeSkillTemplate();
+    const proposeCommand = getOpsxBrainstormRootProposeCommandTemplate();
+
+    expect(proposeSkill.instructions).toContain('openspec status --change "<name>" --schema brainstorm-root --json');
+    expect(proposeSkill.instructions).toContain('openspec instructions <artifact-id> --change "<name>" --schema brainstorm-root --json');
+    expect(proposeSkill.instructions).toContain('`--schema brainstorm-root` is missing');
+
+    expect(proposeCommand.content).toContain('openspec status --change "<name>" --schema brainstorm-root --json');
+    expect(proposeCommand.content).toContain('openspec instructions <artifact-id> --change "<name>" --schema brainstorm-root --json');
+    expect(proposeCommand.content).toContain('`--schema brainstorm-root` is missing');
   });
 
   describe('workflow schema grouping', () => {

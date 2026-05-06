@@ -3,12 +3,14 @@ export const BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK = `
 **Workflow sequence (brainstorm-root):** Use when the user starts mid-conversation or asks what to do next.
 
 1. \`openspec-brainstorm\` / \`/opsx:brainstorm\` — run **superpowers:brainstorming** interactively (see shared body); capture **user-approved** outcome in \`openspec/changes/<change-name>/brainstorm.md\`; add \`design.md\` **only when optional** per that body.
-2. \`openspec-propose\` / \`/opsx:propose\` **or** \`openspec-continue-change\` / \`/opsx:continue\` — create/update schema artifacts until \`openspec status --change "<name>" --json\` shows every artifact in \`applyRequires\` as done.
+2. \`openspec-propose\` / \`/opsx:propose\` **or** \`openspec-continue-change\` / \`/opsx:continue\` — create/update schema artifacts except \`plan\`; stop and hand off once all non-plan requirements are done.
 3. \`openspec-writing-plans\` / \`/opsx:writing-plans\` — write \`openspec/changes/<change-name>/execution-plan.md\` (required before apply on this schema).
-4. \`openspec-apply-change\` / \`/opsx:apply\` — implement with \`execution-plan.md\` as the source of truth for step order, and mark task checkboxes in \`tasks.md\`.
+4. \`openspec-apply-change\` / \`/opsx:apply\` — **default:** invoke **superpowers:subagent-driven-development** so execution follows \`execution-plan.md\` and coarse progress is tracked in \`tasks.md\` checkboxes. **Inline** implementation in the primary session is allowed **only** if the user **explicitly** requests it (for example \`apply inline\`, \`inline mode\`).
 5. \`openspec-archive-change\` / \`/opsx:archive\` — when the change is finished.
 
 Infer the **single** next step from \`schemaName\`, \`brainstorm.md\`, artifact statuses, and whether \`execution-plan.md\` exists; recommend exactly one slash command. Do not skip **propose/continue** after an approved brainstorm while artifacts are still missing; do not skip **writing-plans** before apply.
+Guardrail: for \`schemaName: "brainstorm-root"\`, do not infer proposal-first sequencing or require \`proposal.md\`; drive progression from current artifact status + \`applyRequires\` + \`execution-plan.md\` presence.
+Guardrail: for brainstorm-root propose flow, run schema-sensitive commands with explicit \`--schema brainstorm-root\`.
 `.trim();
 
 export const BRAINSTORM_ROOT_GATE_POLICY_BLOCK = `Gate: Brainstorm approval required for brainstorm-root
@@ -25,10 +27,10 @@ export const BRAINSTORM_ROOT_GATE_POLICY_BLOCK = `Gate: Brainstorm approval requ
 /** Identical body for openspec-brainstorm skill instructions and OPSX: Brainstorm command content (after each file’s intro + Input). */
 export const BRAINSTORM_ROOT_BRAINSTORM_SHARED_BODY = `Superpowers → OpenSpec (artifact mapping):
 - IMPORTANT output redirection:
-  - Do NOT write to \`docs/superpowers/specs/\`. Persist to \`openspec/changes/<change-name>/brainstorm.md\`.
-  - OPTIONAL \`design.md\`: add or update **only when** brainstorming produces a substantive standalone technical-design write-up. If \`brainstorm.md\` alone is sufficient, omit \`design.md\`; do not create empty files “to scaffold” the change.
-- OpenSpec overrides: ignore superpowers \`brainstorming\` steps that commit under \`docs/superpowers/specs/\`, require the superpowers spec file review loop there, or invoke \`writing-plans\`; those belong to later OPSX steps, not brainstorm.
-- After the user-approved outcome is reflected in \`brainstorm.md\`, hand off to **propose / continue**. Do **not** jump straight to \`writing-plans\` or \`apply\` from brainstorm alone.
+  - Write to \`openspec/changes/<change-name>/brainstorm.md\` (never \`docs/superpowers/specs/\`).
+  - OPTIONAL \`design.md\`: create/update only when a standalone technical design is truly needed.
+- OpenSpec overrides: skip downstream superpowers steps that write/commit under \`docs/superpowers/specs/\`, enforce that folder's review loop, or invoke \`writing-plans\`.
+- After approved brainstorm content is captured, hand off to **propose / continue** (not directly to \`writing-plans\` or \`apply\`).
 - Keep \`brainstorm.md\` updated as dialogue progresses.
 
 Interactive brainstorming (**mandatory** — do NOT skip ahead by dumping templates without dialogue unless the user explicitly authors manually):
@@ -60,8 +62,9 @@ Guardrails:
 /** Identical body for openspec-writing-plans skill instructions and OPSX: Writing Plans command content (after each file’s intro + Input). */
 export const BRAINSTORM_ROOT_WRITING_PLANS_SHARED_BODY = `Superpowers → OpenSpec (artifact mapping):
 - IMPORTANT output redirection:
-  - Do NOT write to \`docs/superpowers/plans/\`. Save the plan directly to \`openspec/changes/<change-name>/execution-plan.md\` with the same plan structure, required header, bite-sized tasks, self-review, and "no placeholders" rules from the skill; only the destination path changes.
-- When the skill’s execution handoff mentions \`docs/superpowers/plans/\` or moving on to implementation, use the \`execution-plan.md\` path above and hand off to \`openspec-apply-change\` / \`/opsx:apply\`. Do not present execution-mode alternatives in this writing-plans step; keep those options inside apply.
+  - Write plan to \`openspec/changes/<change-name>/execution-plan.md\` (never \`docs/superpowers/plans/\`).
+  - Keep the writing-plans structure/quality bars unchanged; only the destination path changes.
+- Handoff from writing-plans goes to \`openspec-apply-change\` / \`/opsx:apply\`. Do not present execution-mode alternatives here; keep them in apply.
 
 Mandatory output artifact:
 - Create or update \`openspec/changes/<change-name>/execution-plan.md\`

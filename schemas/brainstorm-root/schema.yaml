@@ -218,3 +218,16 @@ apply:
        code-review — defeating the rigor that Superpowers brings.
        If your platform lacks subagent support, use the built-in
        `spec-driven` schema instead of this one.
+
+    2. **Default vs inline apply (explicit opt-in only)**
+
+       Follow the executor in section 1 by default: drive implementation
+       by invoking **superpowers:subagent-driven-development** from the
+       primary agent.
+
+       Do **not** implement tasks inline in the primary agent session
+       unless the user **explicitly** requests inline apply (for example:
+       phrases like ``apply inline``, ``inline mode``, or ``implement
+       inline in this session``). Treat scope size, speed, or
+       convenience as irrelevant — silent fallback to inline is
+       forbidden.

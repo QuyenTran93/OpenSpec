@@ -56,7 +56,9 @@ ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
    ---
 
    **If artifacts are ready to create** (status shows artifacts with \`status: "ready"\`):
-   - Pick the FIRST artifact with \`status: "ready"\` from the status output
+   - For brainstorm-root, never auto-create \`plan\` (\`execution-plan.md\`) in continue.
+   - Pick the FIRST artifact with \`status: "ready"\` from the status output, excluding \`plan\`
+   - If only \`plan\` is ready, STOP and ask the user to run \`/opsx:writing-plans\`
    - Get its instructions:
      \`\`\`bash
      openspec instructions <artifact-id> --change "<name>" --json
@@ -98,18 +100,14 @@ After each invocation, show:
 
 **Artifact Creation Guidelines**
 
-The artifact types and their purpose depend on the schema. Use the \`instruction\` field from the instructions output to understand what to create.
-
-Common artifact patterns:
-
-**spec-driven schema** (proposal → specs → design → tasks):
-- **proposal.md**: Ask user about the change if not clear. Fill in Why, What Changes, Capabilities, Impact.
-  - The Capabilities section is critical - each capability listed will need a spec file.
-- **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
-- **design.md**: Document technical decisions, architecture, and implementation approach.
-- **tasks.md**: Break down implementation into checkboxed tasks.
-
-For other schemas, follow the \`instruction\` field from the CLI output.
+- Follow \`openspec instructions <artifact-id> --change "<name>" --json\` as source-of-truth for artifact content and output path.
+- Keep baseline parity with spec-driven behavior: read dependencies, apply \`context\` + \`rules\` as constraints, and write only artifact content.
+- Brainstorm-root deltas:
+  - Do not imply or require \`proposal.md\` for brainstorm-root.
+  - Select the next artifact from status (\`status: "ready"\`) and dependencies.
+  - Always select the next artifact from status JSON (\`status: "ready"\`) and \`applyRequires\`.
+  - Never auto-create \`plan\`; hand off to \`/opsx:writing-plans\` for \`execution-plan.md\`.
+- For non-brainstorm-root schemas, follow the schema instruction from CLI output.
 
 **Guardrails**
 - Create ONE artifact per invocation
@@ -178,7 +176,9 @@ ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
    ---
 
    **If artifacts are ready to create** (status shows artifacts with \`status: "ready"\`):
-   - Pick the FIRST artifact with \`status: "ready"\` from the status output
+   - For brainstorm-root, never auto-create \`plan\` (\`execution-plan.md\`) in continue.
+   - Pick the FIRST artifact with \`status: "ready"\` from the status output, excluding \`plan\`
+   - If only \`plan\` is ready, STOP and ask the user to run \`/opsx:writing-plans\`
    - Get its instructions:
      \`\`\`bash
      openspec instructions <artifact-id> --change "<name>" --json
@@ -220,18 +220,14 @@ After each invocation, show:
 
 **Artifact Creation Guidelines**
 
-The artifact types and their purpose depend on the schema. Use the \`instruction\` field from the instructions output to understand what to create.
-
-Common artifact patterns:
-
-**spec-driven schema** (proposal → specs → design → tasks):
-- **proposal.md**: Ask user about the change if not clear. Fill in Why, What Changes, Capabilities, Impact.
-  - The Capabilities section is critical - each capability listed will need a spec file.
-- **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
-- **design.md**: Document technical decisions, architecture, and implementation approach.
-- **tasks.md**: Break down implementation into checkboxed tasks.
-
-For other schemas, follow the \`instruction\` field from the CLI output.
+- Follow \`openspec instructions <artifact-id> --change "<name>" --json\` as source-of-truth for artifact content and output path.
+- Keep baseline parity with spec-driven behavior: read dependencies, apply \`context\` + \`rules\` as constraints, and write only artifact content.
+- Brainstorm-root deltas:
+  - Do not imply or require \`proposal.md\` for brainstorm-root.
+  - Select the next artifact from status (\`status: "ready"\`) and dependencies.
+  - Always select the next artifact from status JSON (\`status: "ready"\`) and \`applyRequires\`.
+  - Never auto-create \`plan\`; hand off to \`/opsx:writing-plans\` for \`execution-plan.md\`.
+- For non-brainstorm-root schemas, follow the schema instruction from CLI output.
 
 **Guardrails**
 - Create ONE artifact per invocation

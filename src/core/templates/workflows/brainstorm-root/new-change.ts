@@ -35,13 +35,9 @@ ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
 2. **Determine the workflow schema**
 
-   Use the default schema (omit \`--schema\`) unless the user explicitly requests a different workflow.
-
-   **Use a different schema only if the user mentions:**
-   - A specific schema name → use \`--schema <name>\`
-   - "show workflows" or "what workflows" → run \`openspec schemas --json\` and let them choose
-
-   **Otherwise**: Omit \`--schema\` to use the default.
+   Default: omit \`--schema\` and use repository default workflow.
+   Use \`--schema <name>\` only if the user explicitly requests a specific schema.
+   If user asks available workflows, run \`openspec schemas --json\` and let them choose.
 
 3. **Create the change directory**
    \`\`\`bash
@@ -57,7 +53,7 @@ ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
    This shows which artifacts need to be created and which are ready (dependencies satisfied).
 
 5. **Get instructions for the first artifact**
-   The first artifact depends on the schema (e.g., \`proposal\` for spec-driven).
+   The first artifact depends on the selected schema.
    Check the status output to find the first artifact with status "ready".
    \`\`\`bash
    openspec instructions <first-artifact-id> --change "<name>"
@@ -114,13 +110,9 @@ ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
 2. **Determine the workflow schema**
 
-   Use the default schema (omit \`--schema\`) unless the user explicitly requests a different workflow.
-
-   **Use a different schema only if the user mentions:**
-   - A specific schema name → use \`--schema <name>\`
-   - "show workflows" or "what workflows" → run \`openspec schemas --json\` and let them choose
-
-   **Otherwise**: Omit \`--schema\` to use the default.
+   Default: omit \`--schema\` and use repository default workflow.
+   Use \`--schema <name>\` only if the user explicitly requests a specific schema.
+   If user asks available workflows, run \`openspec schemas --json\` and let them choose.
 
 3. **Create the change directory**
    \`\`\`bash

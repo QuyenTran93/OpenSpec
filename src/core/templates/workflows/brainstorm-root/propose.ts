@@ -16,14 +16,15 @@ export function getBrainstormRootProposeSkillTemplate(): SkillTemplate {
     description: 'Propose a new change with all artifacts generated in one step. Use when the user wants to quickly describe what they want to build and get a complete proposal with design, specs, and tasks ready for implementation.',
     instructions: `Propose a new change - create the change and generate all artifacts in one step.
 
-I'll create a change with artifacts:
-- proposal.md (what & why)
-- design.md (how)
-- tasks.md (implementation steps)
+Generate artifacts from current schema status:
+- For brainstorm-root, start with \`brainstorm.md\`; include \`design.md\` only when needed.
+- Do not assume proposal-first sequencing. Derive the next artifact from \`openspec status --change "<name>" --json\`, artifact dependencies, and \`applyRequires\`.
+- Never create \`plan\` (\`execution-plan.md\`) in propose; hand off to \`/opsx:writing-plans\`.
+- In brainstorm-root propose flow, use \`--schema brainstorm-root\` on schema-sensitive CLI calls.
 
-After all required artifacts for this schema are done (check \`openspec status --change "<name>" --json\`):
-- For **brainstorm-root**, prompt the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`) so \`openspec/changes/<name>/execution-plan.md\` exists, then \`/opsx:apply\`.
-- For other schemas, infer the next step from status output as usual.
+When all non-plan requirements are done:
+- Brainstorm-root: prompt \`/opsx:writing-plans\` (or \`openspec-writing-plans\`) before \`/opsx:apply\`.
+- Other schemas: follow status output for next step.
 
 ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
@@ -50,24 +51,26 @@ ${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
    \`\`\`
    This creates a scaffolded change at \`openspec/changes/<name>/\` with \`.openspec.yaml\`.
 
-3. **Get the artifact build order**
+3. **Get schema-aware artifact build order**
    \`\`\`bash
-   openspec status --change "<name>" --json
+   openspec status --change "<name>" --schema brainstorm-root --json
    \`\`\`
    Parse the JSON to get:
    - \`applyRequires\`: array of artifact IDs needed before implementation (e.g., \`["tasks"]\`)
    - \`artifacts\`: list of all artifacts with their status and dependencies
 
-4. **Create artifacts in sequence until apply-ready**
+4. **Create artifacts in sequence until writing-plans handoff**
 
    Use the **TodoWrite tool** to track progress through the artifacts.
 
-   Loop through artifacts in dependency order (artifacts with no pending dependencies first):
+   Loop through artifacts using status JSON:
+   - Prioritize artifacts with \`status: "ready"\` (dependencies satisfied)
+   - Never infer fixed filenames from another schema; use \`artifact.id\`, \`instruction\`, and \`outputPath\`
 
    a. **For each artifact that is \`ready\` (dependencies satisfied)**:
       - Get instructions:
         \`\`\`bash
-        openspec instructions <artifact-id> --change "<name>" --json
+        openspec instructions <artifact-id> --change "<name>" --schema brainstorm-root --json
         \`\`\`
       - The instructions JSON includes:
         - \`context\`: Project background (constraints for you - do NOT include in output)
@@ -81,10 +84,11 @@ ${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
       - Apply \`context\` and \`rules\` as constraints - but do NOT copy them into the file
       - Show brief progress: "Created <artifact-id>"
 
-   b. **Continue until all \`applyRequires\` artifacts are complete**
+   b. **Continue until all non-plan \`applyRequires\` artifacts are complete**
       - After creating each artifact, re-run \`openspec status --change "<name>" --json\`
-      - Check if every artifact ID in \`applyRequires\` has \`status: "done"\` in the artifacts array
-      - Stop when all \`applyRequires\` artifacts are done
+   - Build a target set from \`applyRequires\`, excluding \`plan\`
+   - Check if every artifact ID in that target set has \`status: "done"\` in the artifacts array
+   - Stop when all target artifacts are done; do NOT create \`plan\` here
 
    c. **If an artifact requires user input** (unclear context):
       - Use **AskUserQuestion tool** to clarify
@@ -105,19 +109,17 @@ After completing all artifacts, summarize:
 
 **Artifact Creation Guidelines**
 
-- Follow the \`instruction\` field from \`openspec instructions\` for each artifact type
-- The schema defines what each artifact should contain - follow it
-- Read dependency artifacts for context before creating new ones
-- Use \`template\` as the structure for your output file - fill in its sections
-- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
-  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
-  - These guide what you write, but should never appear in the output
+- Treat \`openspec instructions ... --json\` as source-of-truth for each artifact.
+- Read dependencies first; use \`template\` to structure output.
+- Apply \`context\` and \`rules\` as constraints only (never copy them into the artifact file).
 
 **Guardrails**
-- Create ALL artifacts needed for implementation (as defined by schema's \`apply.requires\`)
+- Create artifacts needed before writing-plans; for brainstorm-root, never auto-create \`plan\` in this flow
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
 - If a change with that name already exists, ask if user wants to continue it or create a new one
+- If operating in brainstorm-root and \`--schema brainstorm-root\` is missing on schema-sensitive commands, STOP and rerun with the explicit schema flag.
+- If \`plan\` is the only remaining required artifact, STOP and instruct the user to run \`/opsx:writing-plans\`.
 - Verify each artifact file exists after writing before proceeding to next`,
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
@@ -133,14 +135,15 @@ export function getOpsxBrainstormRootProposeCommandTemplate(): CommandTemplate {
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `Propose a new change - create the change and generate all artifacts in one step.
 
-I'll create a change with artifacts:
-- proposal.md (what & why)
-- design.md (how)
-- tasks.md (implementation steps)
+Generate artifacts from current schema status:
+- For brainstorm-root, start with \`brainstorm.md\`; include \`design.md\` only when needed.
+- Do not assume proposal-first sequencing. Derive the next artifact from \`openspec status --change "<name>" --json\`, artifact dependencies, and \`applyRequires\`.
+- Never create \`plan\` (\`execution-plan.md\`) in propose; hand off to \`/opsx:writing-plans\`.
+- In brainstorm-root propose flow, use \`--schema brainstorm-root\` on schema-sensitive CLI calls.
 
-After all required artifacts for this schema are done (check \`openspec status --change "<name>" --json\`):
-- For **brainstorm-root**, prompt the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`) so \`openspec/changes/<name>/execution-plan.md\` exists, then \`/opsx:apply\`.
-- For other schemas, infer the next step from status output as usual.
+When all non-plan requirements are done:
+- Brainstorm-root: prompt \`/opsx:writing-plans\` (or \`openspec-writing-plans\`) before \`/opsx:apply\`.
+- Other schemas: follow status output for next step.
 
 ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
@@ -167,24 +170,26 @@ ${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
    \`\`\`
    This creates a scaffolded change at \`openspec/changes/<name>/\` with \`.openspec.yaml\`.
 
-3. **Get the artifact build order**
+3. **Get schema-aware artifact build order**
    \`\`\`bash
-   openspec status --change "<name>" --json
+   openspec status --change "<name>" --schema brainstorm-root --json
    \`\`\`
    Parse the JSON to get:
    - \`applyRequires\`: array of artifact IDs needed before implementation (e.g., \`["tasks"]\`)
    - \`artifacts\`: list of all artifacts with their status and dependencies
 
-4. **Create artifacts in sequence until apply-ready**
+4. **Create artifacts in sequence until writing-plans handoff**
 
    Use the **TodoWrite tool** to track progress through the artifacts.
 
-   Loop through artifacts in dependency order (artifacts with no pending dependencies first):
+   Loop through artifacts using status JSON:
+   - Prioritize artifacts with \`status: "ready"\` (dependencies satisfied)
+   - Never infer fixed filenames from another schema; use \`artifact.id\`, \`instruction\`, and \`outputPath\`
 
    a. **For each artifact that is \`ready\` (dependencies satisfied)**:
       - Get instructions:
         \`\`\`bash
-        openspec instructions <artifact-id> --change "<name>" --json
+        openspec instructions <artifact-id> --change "<name>" --schema brainstorm-root --json
         \`\`\`
       - The instructions JSON includes:
         - \`context\`: Project background (constraints for you - do NOT include in output)
@@ -198,10 +203,11 @@ ${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
       - Apply \`context\` and \`rules\` as constraints - but do NOT copy them into the file
       - Show brief progress: "Created <artifact-id>"
 
-   b. **Continue until all \`applyRequires\` artifacts are complete**
+   b. **Continue until all non-plan \`applyRequires\` artifacts are complete**
       - After creating each artifact, re-run \`openspec status --change "<name>" --json\`
-      - Check if every artifact ID in \`applyRequires\` has \`status: "done"\` in the artifacts array
-      - Stop when all \`applyRequires\` artifacts are done
+   - Build a target set from \`applyRequires\`, excluding \`plan\`
+   - Check if every artifact ID in that target set has \`status: "done"\` in the artifacts array
+   - Stop when all target artifacts are done; do NOT create \`plan\` here
 
    c. **If an artifact requires user input** (unclear context):
       - Use **AskUserQuestion tool** to clarify
@@ -222,19 +228,17 @@ After completing all artifacts, summarize:
 
 **Artifact Creation Guidelines**
 
-- Follow the \`instruction\` field from \`openspec instructions\` for each artifact type
-- The schema defines what each artifact should contain - follow it
-- Read dependency artifacts for context before creating new ones
-- Use \`template\` as the structure for your output file - fill in its sections
-- **IMPORTANT**: \`context\` and \`rules\` are constraints for YOU, not content for the file
-  - Do NOT copy \`<context>\`, \`<rules>\`, \`<project_context>\` blocks into the artifact
-  - These guide what you write, but should never appear in the output
+- Treat \`openspec instructions ... --json\` as source-of-truth for each artifact.
+- Read dependencies first; use \`template\` to structure output.
+- Apply \`context\` and \`rules\` as constraints only (never copy them into the artifact file).
 
 **Guardrails**
-- Create ALL artifacts needed for implementation (as defined by schema's \`apply.requires\`)
+- Create artifacts needed before writing-plans; for brainstorm-root, never auto-create \`plan\` in this flow
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
 - If a change with that name already exists, ask if user wants to continue it or create a new one
+- If operating in brainstorm-root and \`--schema brainstorm-root\` is missing on schema-sensitive commands, STOP and rerun with the explicit schema flag.
+- If \`plan\` is the only remaining required artifact, STOP and instruct the user to run \`/opsx:writing-plans\`.
 - Verify each artifact file exists after writing before proceeding to next`
   };
 }
