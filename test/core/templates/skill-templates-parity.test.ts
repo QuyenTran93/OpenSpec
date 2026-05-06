@@ -71,20 +71,20 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
 };
 
 const EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES: Record<string, string> = {
-  getBrainstormRootBrainstormSkillTemplate: '419e8a3063473f38ebc5960eabe28d9742cb4f73798156ddc19ad16d2bdd56c1',
-  getBrainstormRootProposeSkillTemplate: 'c16c40b8a35e4b5538a330f96dcea8ced1f3d5371700397aed44851c230598a1',
-  getBrainstormRootWritingPlansSkillTemplate: 'd68bdd23529d62f3cc1410b9b6251ef3ce4f4cfc5bbaf397e7307baf320be4e9',
-  getBrainstormRootContinueChangeSkillTemplate: 'c4c8b97d645aed5ae084dd4196f57b1bbd44b01693d0bd90317781142ad3e730',
-  getBrainstormRootApplyChangeSkillTemplate: '90f861c79377c52f9d230a9a65fe4c9b22846d8faab99b6f9a3474a8b4aa16ea',
-  getBrainstormRootNewChangeSkillTemplate: 'f7b416c2cc9e4d4ce0cf9f72fae6fa36749c56afee44fb41b967dc0b43c77121',
-  getBrainstormRootArchiveChangeSkillTemplate: '5452620976e282f193702e9ec4b14c521d0d1c7341b6a425022e8db11baefaa9',
-  getOpsxBrainstormRootBrainstormCommandTemplate: '63dad39dcc7603c9b40f050a0133a7727d055bf38b47851261ff66b23fa62d95',
-  getOpsxBrainstormRootProposeCommandTemplate: '231c7d99d854112dd201f04decfd99cffed11f86eb4a616d6ff1f2bff47067a2',
-  getOpsxBrainstormRootWritingPlansCommandTemplate: 'b816f46f5dd2b90b5482a51b4cdbb62d00169dc42971e6eaa6cc990fc986230e',
-  getOpsxBrainstormRootContinueCommandTemplate: 'ae4323df32ea4986f5630c6d4756f367e05b300f46f45bafe63c06805de0aa48',
-  getOpsxBrainstormRootApplyCommandTemplate: '7c92f7919f71f09e4b1903b76ed1405e78ab59facd56cba776ea28b6e553fe6d',
-  getOpsxBrainstormRootNewCommandTemplate: '7c001ac2863b60c37eea70626a35de6f98f486bd9f78874acc38775982416dfd',
-  getOpsxBrainstormRootArchiveCommandTemplate: 'efee07a27454acfc9be70c830fcf5f63f278708b4cd1cec36c9d14cc8e614524',
+  getBrainstormRootBrainstormSkillTemplate: '680950c8f925402b1fa4bdbb698b0a2456f843f17898c6fa299e3dd39a20a062',
+  getBrainstormRootProposeSkillTemplate: '90b97ba5e9bf1a1d98334b2bf47b61bf0723a2f54ba4f2c338b5abdfa48009c0',
+  getBrainstormRootWritingPlansSkillTemplate: '6671b787027f8a749a3931ee12837d149b9417d6d781f90c6004552b64683897',
+  getBrainstormRootContinueChangeSkillTemplate: '92809c493f4740409c0f876e17508ae22ba70be3359e26ed59deb27fbed85cd2',
+  getBrainstormRootApplyChangeSkillTemplate: '1018666aa3af6fc20771905d8a7a7e14c610b0df83b5b72d51a5dc4cc65b4c89',
+  getBrainstormRootNewChangeSkillTemplate: 'f3eb31447929064c6fce5711a183e5075df3715bdabef6bfdcdb6b2824bd2a36',
+  getBrainstormRootArchiveChangeSkillTemplate: '8324edf5e4403723002e54167272f2440024fdc73a30e89455ec0f9e6692d569',
+  getOpsxBrainstormRootBrainstormCommandTemplate: '5ecca4c128c6d076cfad72a7c2f537ed58237bc5aefe867a26a3eb061a95391b',
+  getOpsxBrainstormRootProposeCommandTemplate: 'b0192849b578c9b0228a5c8794583bc6e3477323b7396b5549b2bcb511f4ecf5',
+  getOpsxBrainstormRootWritingPlansCommandTemplate: '248e1729390e899bca36ae83c308a47decc7bde9a0985322a91a560064302ff0',
+  getOpsxBrainstormRootContinueCommandTemplate: '94bcc742c567e60bee94129e19e4d88df88f1ec2ccef6858c46aea77fad4496d',
+  getOpsxBrainstormRootApplyCommandTemplate: '71f2e2271c0bf03aca5fb55710dae9e0cec70084ec20f593d383e63d9ec4d575',
+  getOpsxBrainstormRootNewCommandTemplate: 'e0eb6800fe0ab3a243761c8e186bf83f05a8489ffb421bd9a8da081cb1efce88',
+  getOpsxBrainstormRootArchiveCommandTemplate: '342591df0961eb161351ee39d71841c5ae8839eb702c070c656b146412d1a9d3',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
@@ -295,6 +295,16 @@ describe('skill templates split parity', () => {
     expect(proposeCommand.content).toContain('openspec status --change "<name>" --schema brainstorm-root --json');
     expect(proposeCommand.content).toContain('openspec instructions <artifact-id> --change "<name>" --schema brainstorm-root --json');
     expect(proposeCommand.content).toContain('`--schema brainstorm-root` is missing');
+  });
+
+  it('requires global brainstorm-root schema-sensitive CLI guardrail wording in shared sequence block', () => {
+    const proposeSkill = getBrainstormRootProposeSkillTemplate();
+    const proposeCommand = getOpsxBrainstormRootProposeCommandTemplate();
+
+    const marker =
+      'Guardrail: for brainstorm-root, run schema-sensitive CLI calls with explicit `--schema brainstorm-root`.';
+    expect(proposeSkill.instructions).toContain(marker);
+    expect(proposeCommand.content).toContain(marker);
   });
 
   it('requires cross-schema sandbox fallback policy markers in apply templates', () => {

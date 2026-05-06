@@ -18,8 +18,8 @@ artifacts:
 
       IMPORTANT output redirection:
       - Do NOT write to `docs/superpowers/specs/`. Persist results under
-        this change directory. **Always** capture the agreed outcome in
-        `brainstorm.md`.
+        this change directory. Capture only the final approved outcome in
+        `brainstorm.md` after readiness conditions are satisfied.
       - **OPTIONAL `design.md`:** create or update it only when the
         brainstorm produces a substantive standalone technical-design
         write-up. If `brainstorm.md` alone is enough, leave `design.md`
@@ -40,8 +40,15 @@ artifacts:
       2. Ask clarifying questions (one at a time)
       3. Propose 2-3 approaches with trade-offs
       4. Present design sections for approval
-      5. Summarize the agreed outcome in `brainstorm.md` using this
+      5. Spec self-review
+      6. Summarize the final approved outcome in `brainstorm.md` using this
          artifact's template structure
+
+      Readiness gate before writing `brainstorm.md`:
+      - `all_questions_resolved = true` (no unresolved clarifying questions)
+      - `design_approved = true` (explicit positive approval for design)
+      - If either condition is false, continue the interactive flow and do
+        not summarize partial outcomes into `brainstorm.md`.
 
       Guardrail — no silent scaffolding:
       - Do NOT create or select a change and immediately dump empty templates

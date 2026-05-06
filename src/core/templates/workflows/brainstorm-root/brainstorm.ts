@@ -13,7 +13,7 @@ Before invoking, confirm \`superpowers:brainstorming\` appears in your available
 
 Use the Skill tool to invoke **superpowers:brainstorming**.
 
-Follow the skill’s interactive phases (see the numbered list under **Superpowers → OpenSpec** below). Per OpenSpec brainstorm-root, **do not** invoke \`writing-plans\` inside this skill; persist to this change’s \`brainstorm.md\`, add \`design.md\` only when optional per that body. After approval, hand off to **propose / continue**, not apply, until propose/continue has produced the upstream schema artifacts.
+Follow the skill’s interactive phases (see the numbered list under **Superpowers → OpenSpec** below). Per OpenSpec brainstorm-root, **do not** invoke \`writing-plans\` inside this skill; persist to this change’s \`brainstorm.md\` only after readiness gate conditions are met (all clarifying questions resolved and design explicitly approved), add \`design.md\` only when optional per that body. Do not summarize partial outcomes into \`brainstorm.md\`. After approval, hand off to **propose / continue**, not apply, until propose/continue has produced the upstream schema artifacts.
 
 ---
 
@@ -39,7 +39,7 @@ Before invoking, confirm \`superpowers:brainstorming\` appears in your available
 
 Use the Skill tool to invoke **superpowers:brainstorming**.
 
-Follow the interactive phases (numbered list under **Superpowers → OpenSpec** below). **Do not** run \`/opsx:writing-plans\` or \`/opsx:apply\` from this command; persist to \`brainstorm.md\`, add optional \`design.md\` only when warranted. Hand off to \`/opsx:propose\` or \`/opsx:continue\` after approval until upstream schema artifacts are complete.
+Follow the interactive phases (numbered list under **Superpowers → OpenSpec** below). **Do not** run \`/opsx:writing-plans\` or \`/opsx:apply\` from this command; persist to \`brainstorm.md\` only after readiness gate conditions are met (all clarifying questions resolved and design explicitly approved), add optional \`design.md\` only when warranted. Do not summarize partial outcomes into \`brainstorm.md\`. Hand off to \`/opsx:propose\` or \`/opsx:continue\` after approval until upstream schema artifacts are complete.
 
 ---
 

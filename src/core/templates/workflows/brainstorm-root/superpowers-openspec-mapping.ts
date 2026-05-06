@@ -2,7 +2,7 @@
 export const BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK = `
 **Workflow sequence (brainstorm-root):** Use when the user starts mid-conversation or asks what to do next.
 
-1. \`openspec-brainstorm\` / \`/opsx:brainstorm\` — run **superpowers:brainstorming** interactively (see shared body); capture **user-approved** outcome in \`openspec/changes/<change-name>/brainstorm.md\`; add \`design.md\` **only when optional** per that body.
+1. \`openspec-brainstorm\` / \`/opsx:brainstorm\` — run **superpowers:brainstorming** interactively (see shared body); capture the **final user-approved** outcome in \`openspec/changes/<change-name>/brainstorm.md\` only after readiness gate conditions are met; add \`design.md\` **only when optional** per that body.
 2. \`openspec-propose\` / \`/opsx:propose\` **or** \`openspec-continue-change\` / \`/opsx:continue\` — create/update schema artifacts except \`plan\`; stop and hand off once all non-plan requirements are done.
 3. \`openspec-writing-plans\` / \`/opsx:writing-plans\` — write \`openspec/changes/<change-name>/execution-plan.md\` (required before apply on this schema).
 4. \`openspec-apply-change\` / \`/opsx:apply\` — **default:** invoke **superpowers:subagent-driven-development** so execution follows \`execution-plan.md\` and coarse progress is tracked in \`tasks.md\` checkboxes. **Inline** implementation in the primary session is allowed **only** if the user **explicitly** requests it (for example \`apply inline\`, \`inline mode\`).
@@ -10,7 +10,7 @@ export const BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK = `
 
 Infer the **single** next step from \`schemaName\`, \`brainstorm.md\`, artifact statuses, and whether \`execution-plan.md\` exists; recommend exactly one slash command. Do not skip **propose/continue** after an approved brainstorm while artifacts are still missing; do not skip **writing-plans** before apply.
 Guardrail: for \`schemaName: "brainstorm-root"\`, do not infer proposal-first sequencing or require \`proposal.md\`; drive progression from current artifact status + \`applyRequires\` + \`execution-plan.md\` presence.
-Guardrail: for brainstorm-root propose flow, run schema-sensitive commands with explicit \`--schema brainstorm-root\`.
+Guardrail: for brainstorm-root, run schema-sensitive CLI calls with explicit \`--schema brainstorm-root\`.
 `.trim();
 
 export const BRAINSTORM_ROOT_GATE_POLICY_BLOCK = `Gate: Brainstorm approval required for brainstorm-root
@@ -31,7 +31,7 @@ export const BRAINSTORM_ROOT_BRAINSTORM_SHARED_BODY = `Superpowers → OpenSpec 
   - OPTIONAL \`design.md\`: create/update only when a standalone technical design is truly needed.
 - OpenSpec overrides: skip downstream superpowers steps that write/commit under \`docs/superpowers/specs/\`, enforce that folder's review loop, or invoke \`writing-plans\`.
 - After approved brainstorm content is captured, hand off to **propose / continue** (not directly to \`writing-plans\` or \`apply\`).
-- Keep \`brainstorm.md\` updated as dialogue progresses.
+- Do not write partial dialogue notes to \`brainstorm.md\`.
 
 Interactive brainstorming (**mandatory** — do NOT skip ahead by dumping templates without dialogue unless the user explicitly authors manually):
   1. Explore project context (files, docs, recent commits as appropriate).
@@ -39,7 +39,12 @@ Interactive brainstorming (**mandatory** — do NOT skip ahead by dumping templa
   3. Propose 2–3 approaches with trade-offs.
   4. Present design sections for incremental approval.
   5. Spec self-review
-  5. Summarize the agreed outcome in \`brainstorm.md\` using the brainstorm template structure.
+  6. Summarize the final approved outcome in \`brainstorm.md\` using the brainstorm template structure.
+
+Readiness gate before writing \`brainstorm.md\`:
+  - \`all_questions_resolved = true\` (no unresolved clarifying questions remain).
+  - \`design_approved = true\` (design sections have explicit positive approval).
+  - If either condition is false, continue the interactive flow; do not summarize partial outcomes into \`brainstorm.md\`.
 
 Guardrail — no silent scaffolding:
   - Forbidden: creating or selecting a change, then immediately writing placeholder \`brainstorm.md\` / \`design.md\` without running the interactive flow via **superpowers:brainstorming** (manual opt-in excluded).

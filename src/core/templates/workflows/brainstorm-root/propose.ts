@@ -47,7 +47,7 @@ ${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
 
 2. **Create the change directory**
    \`\`\`bash
-   openspec new change "<name>"
+   openspec new change "<name>" --schema brainstorm-root
    \`\`\`
    This creates a scaffolded change at \`openspec/changes/<name>/\` with \`.openspec.yaml\`.
 
@@ -166,7 +166,7 @@ ${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
 
 2. **Create the change directory**
    \`\`\`bash
-   openspec new change "<name>"
+   openspec new change "<name>" --schema brainstorm-root
    \`\`\`
    This creates a scaffolded change at \`openspec/changes/<name>/\` with \`.openspec.yaml\`.
 
