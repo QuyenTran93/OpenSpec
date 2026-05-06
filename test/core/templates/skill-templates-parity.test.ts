@@ -48,14 +48,14 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getExploreSkillTemplate: '3f73b4d7ab189ef6367fccc9d99308bee35c6a89dae4c8044582a01cb01b335b',
   getNewChangeSkillTemplate: '5989672758eccf54e3bb554ab97f2c129a192b12bbb7688cc1ffcf6bccb1ae9d',
   getContinueChangeSkillTemplate: 'f2e413f0333dfd6641cc2bd1a189273fdea5c399eecdde98ef528b5216f097b3',
-  getApplyChangeSkillTemplate: 'a3fdb11eb88ab93ff49b857cc622e14145e0a77c802fbc3cd91ea03344fcd90f',
+  getApplyChangeSkillTemplate: '511875ac23c055072c75f34943b4b74122fb83e6f9cf4ce2d8e8a8a34216f581',
   getFfChangeSkillTemplate: 'a7332fb14c8dc3f9dec71f5d332790b4a8488191e7db4ab6132ccbefecf9ded9',
   getSyncSpecsSkillTemplate: 'bded184e4c345619148de2c0ad80a5b527d4ffe45c87cc785889b9329e0f465b',
   getOnboardSkillTemplate: 'c9e719a02d2ae7f74a0e978f9ad4e767c1921248a9e3724c3321c58a15c38ba9',
   getOpsxExploreCommandTemplate: 'b421b88c7a532385f7b1404736d7893eb35a05573b4a04a96f72379ac1bbf148',
   getOpsxNewCommandTemplate: '62eee32d6d81a376e7be845d0891e28e6262ad07482f9bfe6af12a9f0366c364',
   getOpsxContinueCommandTemplate: '8bbaedcc95287f9e822572608137df4f49ad54cedfb08d3342d0d1c4e9716caa',
-  getOpsxApplyCommandTemplate: 'ffdd01446225c7a216d490a4449c021b5a75610967e5726626921bfae2c4311b',
+  getOpsxApplyCommandTemplate: 'afea04159a887e3c4208483c78369257b5328f61964f409b45c852c1a62995b3',
   getOpsxFfCommandTemplate: 'cdebe872cc8e0fcc25c8864b98ffd66a93484c0657db94bd1285b8113092702a',
   getArchiveChangeSkillTemplate: '6f8ca383fdb5a4eb9872aca81e07bf0ba7f25e4de8617d7a047ca914ca7f14b9',
   getBulkArchiveChangeSkillTemplate: '8049897ce1ddb2ff6c0d4b72e22636f9ecfd083b5f2c2a30cf3bb1cb828a2f93',
@@ -75,14 +75,14 @@ const EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES: Record<string, string> = {
   getBrainstormRootProposeSkillTemplate: '90b97ba5e9bf1a1d98334b2bf47b61bf0723a2f54ba4f2c338b5abdfa48009c0',
   getBrainstormRootWritingPlansSkillTemplate: '6671b787027f8a749a3931ee12837d149b9417d6d781f90c6004552b64683897',
   getBrainstormRootContinueChangeSkillTemplate: '92809c493f4740409c0f876e17508ae22ba70be3359e26ed59deb27fbed85cd2',
-  getBrainstormRootApplyChangeSkillTemplate: '1018666aa3af6fc20771905d8a7a7e14c610b0df83b5b72d51a5dc4cc65b4c89',
+  getBrainstormRootApplyChangeSkillTemplate: 'c1e997fc3c47ba8fad7910c1e503dc04d59e259e730b7923231f54872cdbd38d',
   getBrainstormRootNewChangeSkillTemplate: 'f3eb31447929064c6fce5711a183e5075df3715bdabef6bfdcdb6b2824bd2a36',
   getBrainstormRootArchiveChangeSkillTemplate: '8324edf5e4403723002e54167272f2440024fdc73a30e89455ec0f9e6692d569',
   getOpsxBrainstormRootBrainstormCommandTemplate: '5ecca4c128c6d076cfad72a7c2f537ed58237bc5aefe867a26a3eb061a95391b',
   getOpsxBrainstormRootProposeCommandTemplate: 'b0192849b578c9b0228a5c8794583bc6e3477323b7396b5549b2bcb511f4ecf5',
   getOpsxBrainstormRootWritingPlansCommandTemplate: '248e1729390e899bca36ae83c308a47decc7bde9a0985322a91a560064302ff0',
   getOpsxBrainstormRootContinueCommandTemplate: '94bcc742c567e60bee94129e19e4d88df88f1ec2ccef6858c46aea77fad4496d',
-  getOpsxBrainstormRootApplyCommandTemplate: '71f2e2271c0bf03aca5fb55710dae9e0cec70084ec20f593d383e63d9ec4d575',
+  getOpsxBrainstormRootApplyCommandTemplate: '189186bce71742201c909c9bf1372208bc11cb8d5a8a5f0cc255c57326afe3d3',
   getOpsxBrainstormRootNewCommandTemplate: 'e0eb6800fe0ab3a243761c8e186bf83f05a8489ffb421bd9a8da081cb1efce88',
   getOpsxBrainstormRootArchiveCommandTemplate: '342591df0961eb161351ee39d71841c5ae8839eb702c070c656b146412d1a9d3',
 };
@@ -91,7 +91,7 @@ const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
   'openspec-explore': '08e1ec9958eb04653707dd3e198c3fd69cf1b3acd3cf95a1022693cca83c60fc',
   'openspec-new-change': 'c324a7ace1f244aa3f534ac8e3370a2c11190d6d1b85a315f26a211398310f0f',
   'openspec-continue-change': '463cf0b980ec9c3c24774414ef2a3e48e9faa8577bc8748990f45ab3d5efe960',
-  'openspec-apply-change': 'a930091d92fadd3eccccd23ca1b4b2f0fa7c3d9ff06cc1de9f097bade5d562af',
+  'openspec-apply-change': 'cd46f5c1bb74bacb615f2d1cce82549d09236aa05d9117fd2e2ae9766c99fca8',
   'openspec-ff-change': '672c3a5b8df152d959b15bd7ae2be7a75ab7b8eaa2ec1e0daa15c02479b27937',
   'openspec-sync-specs': 'b8859cf454379a19ca35dbf59eedca67306607f44a355327f9dc851114e50bde',
   'openspec-archive-change': 'f83c85452bd47de0dee6b8efbcea6a62534f8a175480e9044f3043f887cebf0f',
@@ -315,6 +315,8 @@ describe('skill templates split parity', () => {
 
     const requiredMarkers = [
       'Tests MUST run outside sandbox',
+      'Lint MUST run outside sandbox',
+      'Build MUST run outside sandbox',
       'Retry outside sandbox only when the failure clearly indicates sandbox/environment restrictions',
       'Retry outside sandbox at most once',
     ] as const;
@@ -335,6 +337,8 @@ describe('skill templates split parity', () => {
   it('exports shared execution environment policy markers', () => {
     const requiredMarkers = [
       'Tests MUST run outside sandbox',
+      'Lint MUST run outside sandbox',
+      'Build MUST run outside sandbox',
       'Retry outside sandbox only when the failure clearly indicates sandbox/environment restrictions',
       'Retry outside sandbox at most once',
     ] as const;
