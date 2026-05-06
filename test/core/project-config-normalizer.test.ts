@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import path from 'node:path';
 import os from 'node:os';
 import { promises as fs } from 'node:fs';
@@ -62,6 +62,26 @@ describe('project-config-normalizer', () => {
     await expect(fs.access(path.join(projectDir, 'openspec', 'config.yaml'))).rejects.toThrow();
   });
 
+  it('treats EEXIST from async create-if-missing write as success', async () => {
+    const openspecDir = path.join(projectDir, 'openspec');
+    const configPath = path.join(openspecDir, 'config.yaml');
+    await fs.mkdir(openspecDir, { recursive: true });
+
+    const writeSpy = vi.spyOn(fs, 'writeFile').mockImplementationOnce(async (...args) => {
+      await fs.writeFile(configPath, 'schema: external\ncontext: keep-me\n', 'utf-8');
+      const error = new Error('EEXIST: file already exists') as NodeJS.ErrnoException;
+      error.code = 'EEXIST';
+      throw error;
+    });
+
+    await expect(
+      ensureProjectConfigExistsForWorkflows(projectDir, ['brainstorm'])
+    ).resolves.toBeUndefined();
+
+    expect(await fs.readFile(configPath, 'utf-8')).toBe('schema: external\ncontext: keep-me\n');
+    writeSpy.mockRestore();
+  });
+
   it('sync creates config.yaml with brainstorm-root when missing and workflows include brainstorm', async () => {
     ensureProjectConfigExistsForWorkflowsSync(projectDir, [...BRAINSTORM_WORKFLOWS]);
     const parsed = await readConfigYaml(projectDir);
@@ -86,4 +106,5 @@ describe('project-config-normalizer', () => {
 
     await expect(fs.access(path.join(projectDir, 'openspec', 'config.yaml'))).rejects.toThrow();
   });
+
 });

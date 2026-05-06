@@ -56,7 +56,15 @@ export async function ensureProjectConfigExistsForWorkflows(
 
   await fs.mkdir(openspecDir, { recursive: true });
   const schema = resolveInitialSchemaForWorkflows(effectiveWorkflows);
-  await fs.writeFile(configYamlPath, serializeConfig({ schema }), 'utf-8');
+  try {
+    await fs.writeFile(configYamlPath, serializeConfig({ schema }), { encoding: 'utf-8', flag: 'wx' });
+  } catch (error) {
+    const errno = error as NodeJS.ErrnoException;
+    if (errno.code === 'EEXIST') {
+      return;
+    }
+    throw error;
+  }
 }
 
 export function ensureProjectConfigExistsForWorkflowsSync(
@@ -73,7 +81,15 @@ export function ensureProjectConfigExistsForWorkflowsSync(
 
   fsSync.mkdirSync(openspecDir, { recursive: true });
   const schema = resolveInitialSchemaForWorkflows(effectiveWorkflows);
-  fsSync.writeFileSync(configYamlPath, serializeConfig({ schema }), 'utf-8');
+  try {
+    fsSync.writeFileSync(configYamlPath, serializeConfig({ schema }), { encoding: 'utf-8', flag: 'wx' });
+  } catch (error) {
+    const errno = error as NodeJS.ErrnoException;
+    if (errno.code === 'EEXIST') {
+      return;
+    }
+    throw error;
+  }
 }
 
 export async function ensureProjectSchemaForWorkflows(projectPath: string, effectiveWorkflows: readonly string[]): Promise<void> {
