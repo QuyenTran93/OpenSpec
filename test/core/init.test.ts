@@ -250,6 +250,21 @@ describe('InitCommand', () => {
       expect(content).toBe(existingContent);
     });
 
+  it('should not create config.yaml when config.yml already exists', async () => {
+    const openspecDir = path.join(testDir, 'openspec');
+    await fs.mkdir(openspecDir, { recursive: true });
+    const configYmlPath = path.join(openspecDir, 'config.yml');
+    const existingContent = 'schema: custom-schema\ncontext: keep-me\n';
+    await fs.writeFile(configYmlPath, existingContent);
+
+    const initCommand = new InitCommand({ tools: 'claude', force: true, profile: 'brainstorm' });
+    await initCommand.execute(testDir);
+
+    const content = await fs.readFile(configYmlPath, 'utf-8');
+    expect(content).toBe(existingContent);
+    expect(await fileExists(path.join(openspecDir, 'config.yaml'))).toBe(false);
+  });
+
     it('should handle non-existent target directory', async () => {
       const newDir = path.join(testDir, 'new-project');
       const initCommand = new InitCommand({ tools: 'claude', force: true });

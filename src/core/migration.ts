@@ -12,7 +12,7 @@ import { WORKFLOW_TO_SKILL_DIR } from './profile-sync-drift.js';
 import { ALL_WORKFLOWS, BRAINSTORM_WORKFLOWS } from './profiles.js';
 import path from 'path';
 import * as fs from 'fs';
-import { ensureProjectSchemaForWorkflowsSync } from './project-config-normalizer.js';
+import { ensureProjectConfigExistsForWorkflowsSync } from './project-config-normalizer.js';
 
 interface InstalledWorkflowArtifacts {
   workflows: string[];
@@ -108,7 +108,7 @@ export function migrateIfNeeded(projectPath: string, tools: AIToolOption[]): voi
   // If profile is already explicitly set, no migration needed
   if (rawConfig.profile !== undefined) {
     if (rawConfig.profile === 'brainstorm') {
-      ensureProjectSchemaForWorkflowsSync(projectPath, [...BRAINSTORM_WORKFLOWS]);
+      ensureProjectConfigExistsForWorkflowsSync(projectPath, [...BRAINSTORM_WORKFLOWS]);
     }
     return;
   }
@@ -130,7 +130,7 @@ export function migrateIfNeeded(projectPath: string, tools: AIToolOption[]): voi
   }
   saveGlobalConfig(config);
 
-  ensureProjectSchemaForWorkflowsSync(projectPath, installedWorkflows);
+  ensureProjectConfigExistsForWorkflowsSync(projectPath, installedWorkflows);
 
   console.log(`Migrated: custom profile with ${installedWorkflows.length} workflows`);
   console.log("New in this version: /opsx:propose. Try 'openspec config profile core' for the streamlined experience.");

@@ -45,7 +45,7 @@ import { getGlobalConfig, type Delivery, type Profile } from './global-config.js
 import { getProfileWorkflows, ALL_WORKFLOWS } from './profiles.js';
 import { getAvailableTools } from './available-tools.js';
 import { migrateIfNeeded } from './migration.js';
-import { ensureProjectSchemaForWorkflows, BRAINSTORM_PROJECT_SCHEMA } from './project-config-normalizer.js';
+import { ensureProjectConfigExistsForWorkflows, BRAINSTORM_PROJECT_SCHEMA } from './project-config-normalizer.js';
 
 const require = createRequire(import.meta.url);
 const { version: OPENSPEC_VERSION } = require('../../package.json');
@@ -517,7 +517,7 @@ export class InitCommand {
     const profile: Profile = this.resolveProfileOverride() ?? globalConfig.profile ?? 'core';
     const delivery: Delivery = globalConfig.delivery ?? 'both';
     const workflows = getProfileWorkflows(profile, globalConfig.workflows);
-    await ensureProjectSchemaForWorkflows(projectPath, workflows);
+    await ensureProjectConfigExistsForWorkflows(projectPath, workflows);
 
     // Get skill and command templates filtered by profile workflows
     const shouldGenerateSkills = delivery !== 'commands';

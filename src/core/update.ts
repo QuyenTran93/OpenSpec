@@ -47,7 +47,7 @@ import {
   scanInstalledWorkflows as scanInstalledWorkflowsShared,
   migrateIfNeeded as migrateIfNeededShared,
 } from './migration.js';
-import { ensureProjectSchemaForWorkflows } from './project-config-normalizer.js';
+import { ensureProjectConfigExistsForWorkflows } from './project-config-normalizer.js';
 
 const require = createRequire(import.meta.url);
 const { version: OPENSPEC_VERSION } = require('../../package.json');
@@ -102,7 +102,7 @@ export class UpdateCommand {
     const desiredWorkflows = profileWorkflows.filter((workflow): workflow is (typeof ALL_WORKFLOWS)[number] =>
       (ALL_WORKFLOWS as readonly string[]).includes(workflow)
     );
-    await ensureProjectSchemaForWorkflows(resolvedProjectPath, desiredWorkflows);
+    await ensureProjectConfigExistsForWorkflows(resolvedProjectPath, desiredWorkflows);
     const shouldGenerateSkills = delivery !== 'commands';
     const shouldGenerateCommands = delivery !== 'skills';
 
