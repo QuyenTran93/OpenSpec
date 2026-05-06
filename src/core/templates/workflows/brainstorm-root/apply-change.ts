@@ -6,6 +6,7 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import { BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK } from './superpowers-openspec-mapping.js';
+import { APPLY_EXECUTION_ENVIRONMENT_POLICY_BLOCK } from '../shared/execution-environment-policy.js';
 
 const APPLY_EXECUTION_PLAN_GATE_STEP = (
   rerunInstruction: string
@@ -95,7 +96,11 @@ ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
 ${APPLY_EXECUTION_PLAN_GATE_STEP('apply')}
 
-7. **Implement tasks (loop until done or blocked)**
+7. **Apply execution environment policy**
+
+${APPLY_EXECUTION_ENVIRONMENT_POLICY_BLOCK}
+
+8. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
@@ -110,7 +115,7 @@ ${APPLY_EXECUTION_PLAN_GATE_STEP('apply')}
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-8. **On completion or pause, show status**
+9. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session
@@ -256,7 +261,11 @@ ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
 
 ${APPLY_EXECUTION_PLAN_GATE_STEP('`/opsx:apply`')}
 
-7. **Implement tasks (loop until done or blocked)**
+7. **Apply execution environment policy**
+
+${APPLY_EXECUTION_ENVIRONMENT_POLICY_BLOCK}
+
+8. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
@@ -271,7 +280,7 @@ ${APPLY_EXECUTION_PLAN_GATE_STEP('`/opsx:apply`')}
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-8. **On completion or pause, show status**
+9. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session

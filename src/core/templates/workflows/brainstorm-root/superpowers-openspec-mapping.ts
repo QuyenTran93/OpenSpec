@@ -38,6 +38,7 @@ Interactive brainstorming (**mandatory** — do NOT skip ahead by dumping templa
   2. Clarifying questions — one message, one question.
   3. Propose 2–3 approaches with trade-offs.
   4. Present design sections for incremental approval.
+  5. Spec self-review
   5. Summarize the agreed outcome in \`brainstorm.md\` using the brainstorm template structure.
 
 Guardrail — no silent scaffolding:

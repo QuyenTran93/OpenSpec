@@ -8,16 +8,16 @@ import {
 } from '../../../../src/core/templates/skill-templates.js';
 
 function expectPlanGatePrecedesImplementationLoop(template: string): void {
-  const step6To7 = template.match(
-    /6\.\s\*\*Gate on execution plan before implementation loop\*\*\s*(?:\([^)]*\))?\s*\n([\s\S]*?)7\.\s\*\*Implement tasks \(loop until done or blocked\)\*\*/
+  const step6ToImplement = template.match(
+    /6\.\s\*\*Gate on execution plan before implementation loop\*\*\s*(?:\([^)]*\))?\s*\n([\s\S]*?)(?:7\.\s\*\*(?:Apply execution environment policy|Execution environment policy)\*\*\s*[\s\S]*?)?\d+\.\s\*\*Implement tasks \(loop until done or blocked\)\*\*/
   );
-  expect(step6To7).not.toBeNull();
-  expect(step6To7?.[1]).toContain('schemas/brainstorm-root/schema.yaml');
-  expect(step6To7?.[1]).toContain('git commit');
-  expect(step6To7?.[1]).toContain('execution-plan.md');
-  expect(step6To7?.[1]).toContain('writing-plans');
-  expect(step6To7?.[1]).toContain('superpowers:subagent-driven-development');
-  expect(step6To7?.[1]).toContain('using-git-worktrees');
+  expect(step6ToImplement).not.toBeNull();
+  expect(step6ToImplement?.[1]).toContain('schemas/brainstorm-root/schema.yaml');
+  expect(step6ToImplement?.[1]).toContain('git commit');
+  expect(step6ToImplement?.[1]).toContain('execution-plan.md');
+  expect(step6ToImplement?.[1]).toContain('writing-plans');
+  expect(step6ToImplement?.[1]).toContain('superpowers:subagent-driven-development');
+  expect(step6ToImplement?.[1]).toContain('using-git-worktrees');
 }
 
 describe('apply change template plan gate', () => {

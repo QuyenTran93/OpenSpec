@@ -42,19 +42,20 @@ import {
   getVerifyChangeSkillTemplate,
 } from '../../../src/core/templates/skill-templates.js';
 import { generateSkillContent } from '../../../src/core/shared/skill-generation.js';
+import { APPLY_EXECUTION_ENVIRONMENT_POLICY_BLOCK } from '../../../src/core/templates/workflows/shared/execution-environment-policy.js';
 
 const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
   getExploreSkillTemplate: '3f73b4d7ab189ef6367fccc9d99308bee35c6a89dae4c8044582a01cb01b335b',
   getNewChangeSkillTemplate: '5989672758eccf54e3bb554ab97f2c129a192b12bbb7688cc1ffcf6bccb1ae9d',
   getContinueChangeSkillTemplate: 'f2e413f0333dfd6641cc2bd1a189273fdea5c399eecdde98ef528b5216f097b3',
-  getApplyChangeSkillTemplate: '6238712ba8cd2fd099c4f3bac13436f758fc6ac776fb8be19547f2b195240bfd',
+  getApplyChangeSkillTemplate: 'a3fdb11eb88ab93ff49b857cc622e14145e0a77c802fbc3cd91ea03344fcd90f',
   getFfChangeSkillTemplate: 'a7332fb14c8dc3f9dec71f5d332790b4a8488191e7db4ab6132ccbefecf9ded9',
   getSyncSpecsSkillTemplate: 'bded184e4c345619148de2c0ad80a5b527d4ffe45c87cc785889b9329e0f465b',
   getOnboardSkillTemplate: 'c9e719a02d2ae7f74a0e978f9ad4e767c1921248a9e3724c3321c58a15c38ba9',
   getOpsxExploreCommandTemplate: 'b421b88c7a532385f7b1404736d7893eb35a05573b4a04a96f72379ac1bbf148',
   getOpsxNewCommandTemplate: '62eee32d6d81a376e7be845d0891e28e6262ad07482f9bfe6af12a9f0366c364',
   getOpsxContinueCommandTemplate: '8bbaedcc95287f9e822572608137df4f49ad54cedfb08d3342d0d1c4e9716caa',
-  getOpsxApplyCommandTemplate: 'f59cfe9482a1b29f64b9cd7396397991a2f00a5cb1abde4ab8b4757acf1678b9',
+  getOpsxApplyCommandTemplate: 'ffdd01446225c7a216d490a4449c021b5a75610967e5726626921bfae2c4311b',
   getOpsxFfCommandTemplate: 'cdebe872cc8e0fcc25c8864b98ffd66a93484c0657db94bd1285b8113092702a',
   getArchiveChangeSkillTemplate: '6f8ca383fdb5a4eb9872aca81e07bf0ba7f25e4de8617d7a047ca914ca7f14b9',
   getBulkArchiveChangeSkillTemplate: '8049897ce1ddb2ff6c0d4b72e22636f9ecfd083b5f2c2a30cf3bb1cb828a2f93',
@@ -70,18 +71,18 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
 };
 
 const EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES: Record<string, string> = {
-  getBrainstormRootBrainstormSkillTemplate: 'd44a8abd1c21de64f6a19f232d518710aad0b299dcdee1d0c4b364d20d98663d',
+  getBrainstormRootBrainstormSkillTemplate: '419e8a3063473f38ebc5960eabe28d9742cb4f73798156ddc19ad16d2bdd56c1',
   getBrainstormRootProposeSkillTemplate: 'c16c40b8a35e4b5538a330f96dcea8ced1f3d5371700397aed44851c230598a1',
   getBrainstormRootWritingPlansSkillTemplate: 'd68bdd23529d62f3cc1410b9b6251ef3ce4f4cfc5bbaf397e7307baf320be4e9',
   getBrainstormRootContinueChangeSkillTemplate: 'c4c8b97d645aed5ae084dd4196f57b1bbd44b01693d0bd90317781142ad3e730',
-  getBrainstormRootApplyChangeSkillTemplate: '62dc3ce3edca7974882b8727c0acc7c5f36c30f05dbdb4decf6a98c67b15f634',
+  getBrainstormRootApplyChangeSkillTemplate: '90f861c79377c52f9d230a9a65fe4c9b22846d8faab99b6f9a3474a8b4aa16ea',
   getBrainstormRootNewChangeSkillTemplate: 'f7b416c2cc9e4d4ce0cf9f72fae6fa36749c56afee44fb41b967dc0b43c77121',
   getBrainstormRootArchiveChangeSkillTemplate: '5452620976e282f193702e9ec4b14c521d0d1c7341b6a425022e8db11baefaa9',
-  getOpsxBrainstormRootBrainstormCommandTemplate: 'b0167737de4608aa5245107f9efeb62fe65ae948a46d3e5b519e5eabf5c1a091',
+  getOpsxBrainstormRootBrainstormCommandTemplate: '63dad39dcc7603c9b40f050a0133a7727d055bf38b47851261ff66b23fa62d95',
   getOpsxBrainstormRootProposeCommandTemplate: '231c7d99d854112dd201f04decfd99cffed11f86eb4a616d6ff1f2bff47067a2',
   getOpsxBrainstormRootWritingPlansCommandTemplate: 'b816f46f5dd2b90b5482a51b4cdbb62d00169dc42971e6eaa6cc990fc986230e',
   getOpsxBrainstormRootContinueCommandTemplate: 'ae4323df32ea4986f5630c6d4756f367e05b300f46f45bafe63c06805de0aa48',
-  getOpsxBrainstormRootApplyCommandTemplate: 'c20a73a59450d9ca50ffd470480a3f323b15799406a410ed7f16ab8fa811ba1e',
+  getOpsxBrainstormRootApplyCommandTemplate: '7c92f7919f71f09e4b1903b76ed1405e78ab59facd56cba776ea28b6e553fe6d',
   getOpsxBrainstormRootNewCommandTemplate: '7c001ac2863b60c37eea70626a35de6f98f486bd9f78874acc38775982416dfd',
   getOpsxBrainstormRootArchiveCommandTemplate: 'efee07a27454acfc9be70c830fcf5f63f278708b4cd1cec36c9d14cc8e614524',
 };
@@ -90,7 +91,7 @@ const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
   'openspec-explore': '08e1ec9958eb04653707dd3e198c3fd69cf1b3acd3cf95a1022693cca83c60fc',
   'openspec-new-change': 'c324a7ace1f244aa3f534ac8e3370a2c11190d6d1b85a315f26a211398310f0f',
   'openspec-continue-change': '463cf0b980ec9c3c24774414ef2a3e48e9faa8577bc8748990f45ab3d5efe960',
-  'openspec-apply-change': '38ad2cb645827eda555f20e1ac9d483e1d75bae4c817c0669474aaa8c12c0421',
+  'openspec-apply-change': 'a930091d92fadd3eccccd23ca1b4b2f0fa7c3d9ff06cc1de9f097bade5d562af',
   'openspec-ff-change': '672c3a5b8df152d959b15bd7ae2be7a75ab7b8eaa2ec1e0daa15c02479b27937',
   'openspec-sync-specs': 'b8859cf454379a19ca35dbf59eedca67306607f44a355327f9dc851114e50bde',
   'openspec-archive-change': 'f83c85452bd47de0dee6b8efbcea6a62534f8a175480e9044f3043f887cebf0f',
@@ -294,6 +295,43 @@ describe('skill templates split parity', () => {
     expect(proposeCommand.content).toContain('openspec status --change "<name>" --schema brainstorm-root --json');
     expect(proposeCommand.content).toContain('openspec instructions <artifact-id> --change "<name>" --schema brainstorm-root --json');
     expect(proposeCommand.content).toContain('`--schema brainstorm-root` is missing');
+  });
+
+  it('requires cross-schema sandbox fallback policy markers in apply templates', () => {
+    const applySkill = getApplyChangeSkillTemplate();
+    const applyCommand = getOpsxApplyCommandTemplate();
+    const brainstormApplySkill = getBrainstormRootApplyChangeSkillTemplate();
+    const brainstormApplyCommand = getOpsxBrainstormRootApplyCommandTemplate();
+
+    const requiredMarkers = [
+      'Tests MUST run outside sandbox',
+      'Retry outside sandbox only when the failure clearly indicates sandbox/environment restrictions',
+      'Retry outside sandbox at most once',
+    ] as const;
+
+    for (const marker of requiredMarkers) {
+      expect(applySkill.instructions).toContain(marker);
+      expect(applyCommand.content).toContain(marker);
+      expect(brainstormApplySkill.instructions).toContain(marker);
+      expect(brainstormApplyCommand.content).toContain(marker);
+    }
+  });
+
+  it('prevents default outside-sandbox execution wording in apply skill template', () => {
+    const applySkill = getApplyChangeSkillTemplate();
+    expect(applySkill.instructions).not.toContain('Run all commands outside sandbox by default');
+  });
+
+  it('exports shared execution environment policy markers', () => {
+    const requiredMarkers = [
+      'Tests MUST run outside sandbox',
+      'Retry outside sandbox only when the failure clearly indicates sandbox/environment restrictions',
+      'Retry outside sandbox at most once',
+    ] as const;
+
+    for (const marker of requiredMarkers) {
+      expect(APPLY_EXECUTION_ENVIRONMENT_POLICY_BLOCK).toContain(marker);
+    }
   });
 
   describe('workflow schema grouping', () => {
