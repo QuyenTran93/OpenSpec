@@ -36,6 +36,46 @@ function resolveTargetWorkflowSchema(currentSchema: unknown, effectiveWorkflows:
   return undefined;
 }
 
+export function resolveInitialSchemaForWorkflows(effectiveWorkflows: readonly string[]): string {
+  return effectiveWorkflows.includes('brainstorm')
+    ? BRAINSTORM_PROJECT_SCHEMA
+    : SPEC_DRIVEN_WORKFLOW_SCHEMA;
+}
+
+export async function ensureProjectConfigExistsForWorkflows(
+  projectPath: string,
+  effectiveWorkflows: readonly string[]
+): Promise<void> {
+  const openspecDir = path.join(projectPath, 'openspec');
+  const configYamlPath = path.join(openspecDir, 'config.yaml');
+  const configYmlPath = path.join(openspecDir, 'config.yml');
+
+  if ((await fileExists(configYamlPath)) || (await fileExists(configYmlPath))) {
+    return;
+  }
+
+  await fs.mkdir(openspecDir, { recursive: true });
+  const schema = resolveInitialSchemaForWorkflows(effectiveWorkflows);
+  await fs.writeFile(configYamlPath, serializeConfig({ schema }), 'utf-8');
+}
+
+export function ensureProjectConfigExistsForWorkflowsSync(
+  projectPath: string,
+  effectiveWorkflows: readonly string[]
+): void {
+  const openspecDir = path.join(projectPath, 'openspec');
+  const configYamlPath = path.join(openspecDir, 'config.yaml');
+  const configYmlPath = path.join(openspecDir, 'config.yml');
+
+  if (fileExistsSync(configYamlPath) || fileExistsSync(configYmlPath)) {
+    return;
+  }
+
+  fsSync.mkdirSync(openspecDir, { recursive: true });
+  const schema = resolveInitialSchemaForWorkflows(effectiveWorkflows);
+  fsSync.writeFileSync(configYamlPath, serializeConfig({ schema }), 'utf-8');
+}
+
 export async function ensureProjectSchemaForWorkflows(projectPath: string, effectiveWorkflows: readonly string[]): Promise<void> {
   const openspecDir = path.join(projectPath, 'openspec');
   const configYamlPath = path.join(openspecDir, 'config.yaml');

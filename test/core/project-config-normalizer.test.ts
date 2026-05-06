@@ -2,10 +2,12 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import path from 'node:path';
 import os from 'node:os';
 import { promises as fs } from 'node:fs';
+import { parse as parseYaml } from 'yaml';
 import {
   BRAINSTORM_PROJECT_SCHEMA,
   SPEC_DRIVEN_WORKFLOW_SCHEMA,
-  ensureProjectSchemaForWorkflows,
+  ensureProjectConfigExistsForWorkflows,
+  ensureProjectConfigExistsForWorkflowsSync,
 } from '../../src/core/project-config-normalizer.js';
 import { BRAINSTORM_WORKFLOWS } from '../../src/core/profiles.js';
 
@@ -21,41 +23,67 @@ describe('project-config-normalizer', () => {
     await fs.rm(projectDir, { recursive: true, force: true });
   });
 
-  it('writes openspec/config.yaml with brainstorm-root when file is missing and workflows include brainstorm', async () => {
-    await ensureProjectSchemaForWorkflows(projectDir, [...BRAINSTORM_WORKFLOWS]);
-    const content = await fs.readFile(path.join(projectDir, 'openspec', 'config.yaml'), 'utf-8');
-    expect(content).toContain(`schema: ${BRAINSTORM_PROJECT_SCHEMA}`);
+  async function readConfigYaml(projectPath: string): Promise<Record<string, unknown>> {
+    const content = await fs.readFile(path.join(projectPath, 'openspec', 'config.yaml'), 'utf-8');
+    const parsed = parseYaml(content);
+    expect(parsed).toBeTypeOf('object');
+    expect(parsed).not.toBeNull();
+    return parsed as Record<string, unknown>;
+  }
+
+  it('creates config.yaml with brainstorm-root when missing and workflows include brainstorm', async () => {
+    await ensureProjectConfigExistsForWorkflows(projectDir, [...BRAINSTORM_WORKFLOWS]);
+    const parsed = await readConfigYaml(projectDir);
+    expect(parsed.schema).toBe(BRAINSTORM_PROJECT_SCHEMA);
   });
 
-  it('rewrites schema to brainstorm-root when workflows include brainstorm', async () => {
+  it('creates config.yaml with spec-driven when missing and workflows do not include brainstorm', async () => {
+    await ensureProjectConfigExistsForWorkflows(projectDir, ['propose', 'apply']);
+    const parsed = await readConfigYaml(projectDir);
+    expect(parsed.schema).toBe(SPEC_DRIVEN_WORKFLOW_SCHEMA);
+  });
+
+  it('does not mutate existing config.yaml content', async () => {
     const configPath = path.join(projectDir, 'openspec', 'config.yaml');
     await fs.mkdir(path.dirname(configPath), { recursive: true });
-    await fs.writeFile(configPath, `schema: ${SPEC_DRIVEN_WORKFLOW_SCHEMA}\n`, 'utf-8');
-    await ensureProjectSchemaForWorkflows(projectDir, ['brainstorm']);
+    const originalContent = 'schema: custom\ncontext: keep-me\n';
+    await fs.writeFile(configPath, originalContent, 'utf-8');
+    await ensureProjectConfigExistsForWorkflows(projectDir, ['brainstorm']);
     const content = await fs.readFile(configPath, 'utf-8');
-    expect(content).toContain(`schema: ${BRAINSTORM_PROJECT_SCHEMA}`);
+    expect(content).toBe(originalContent);
   });
 
-  it('does not create config when brainstorm is absent and file is missing', async () => {
-    await ensureProjectSchemaForWorkflows(projectDir, ['propose', 'apply']);
+  it('does not create config.yaml when config.yml already exists', async () => {
+    const configYmlPath = path.join(projectDir, 'openspec', 'config.yml');
+    await fs.mkdir(path.dirname(configYmlPath), { recursive: true });
+    await fs.writeFile(configYmlPath, 'schema: custom\n', 'utf-8');
+    await ensureProjectConfigExistsForWorkflows(projectDir, ['brainstorm']);
+
     await expect(fs.access(path.join(projectDir, 'openspec', 'config.yaml'))).rejects.toThrow();
   });
 
-  it('downgrades brainstorm-root to spec-driven when workflows no longer include brainstorm', async () => {
-    const configPath = path.join(projectDir, 'openspec', 'config.yaml');
-    await fs.mkdir(path.dirname(configPath), { recursive: true });
-    await fs.writeFile(configPath, `schema: ${BRAINSTORM_PROJECT_SCHEMA}\n`, 'utf-8');
-    await ensureProjectSchemaForWorkflows(projectDir, ['propose', 'apply']);
-    const content = await fs.readFile(configPath, 'utf-8');
-    expect(content).toContain(`schema: ${SPEC_DRIVEN_WORKFLOW_SCHEMA}`);
+  it('sync creates config.yaml with brainstorm-root when missing and workflows include brainstorm', async () => {
+    ensureProjectConfigExistsForWorkflowsSync(projectDir, [...BRAINSTORM_WORKFLOWS]);
+    const parsed = await readConfigYaml(projectDir);
+    expect(parsed.schema).toBe(BRAINSTORM_PROJECT_SCHEMA);
   });
 
-  it('does not overwrite schema spec-driven when workflows lack brainstorm', async () => {
+  it('sync does not mutate existing config.yaml content', async () => {
     const configPath = path.join(projectDir, 'openspec', 'config.yaml');
     await fs.mkdir(path.dirname(configPath), { recursive: true });
-    await fs.writeFile(configPath, `schema: ${SPEC_DRIVEN_WORKFLOW_SCHEMA}\n`, 'utf-8');
-    await ensureProjectSchemaForWorkflows(projectDir, ['propose', 'apply']);
+    const originalContent = 'schema: custom\ncontext: keep-me\n';
+    await fs.writeFile(configPath, originalContent, 'utf-8');
+    ensureProjectConfigExistsForWorkflowsSync(projectDir, ['brainstorm']);
     const content = await fs.readFile(configPath, 'utf-8');
-    expect(content).toContain(`schema: ${SPEC_DRIVEN_WORKFLOW_SCHEMA}`);
+    expect(content).toBe(originalContent);
+  });
+
+  it('sync does not create config.yaml when config.yml already exists', async () => {
+    const configYmlPath = path.join(projectDir, 'openspec', 'config.yml');
+    await fs.mkdir(path.dirname(configYmlPath), { recursive: true });
+    await fs.writeFile(configYmlPath, 'schema: custom\n', 'utf-8');
+    ensureProjectConfigExistsForWorkflowsSync(projectDir, ['brainstorm']);
+
+    await expect(fs.access(path.join(projectDir, 'openspec', 'config.yaml'))).rejects.toThrow();
   });
 });
