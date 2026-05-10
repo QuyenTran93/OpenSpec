@@ -195,9 +195,7 @@ apply:
 
     1. **Executor — subagent-driven-development**:
 
-       Use the Skill tool to invoke
-       **superpowers:subagent-driven-development** to execute
-       the execution-plan.md micro-tasks with fresh subagents per task.
+       Use the Skill tool to invoke **superpowers:subagent-driven-development** to execute the execution-plan.md micro-tasks with fresh subagents per task.
 
        Tell the executor:
        - Read execution-plan.md in this change directory for micro-tasks
@@ -205,6 +203,8 @@ apply:
        - Do NOT run git commit while executing this flow unless the user
          explicitly asks for a commit; track progress with tasks.md
          checkboxes and working-tree changes only.
+       - Do **not** default to `using-git-worktrees` unless the user
+         explicitly asks for isolated worktrees.
 
        IMPORTANT — transitive skill activation:
        subagent-driven-development internally enforces the
