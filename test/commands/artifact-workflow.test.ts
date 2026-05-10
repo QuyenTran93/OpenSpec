@@ -287,8 +287,8 @@ describe('artifact-workflow CLI commands', () => {
       });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain("Artifact 'unknown-artifact' not found");
-      expect(output).toContain('Valid artifacts');
+      expect(output).toContain("Artifact or phase 'unknown-artifact' not found");
+      expect(output).toContain('Valid ids');
     });
   });
 
@@ -403,12 +403,11 @@ describe('artifact-workflow CLI commands', () => {
       expect(result.stdout).toContain('Missing artifacts: tasks');
     });
 
-    it('blocks apply when brainstorm-root plan artifact is missing', async () => {
+    it('blocks apply when brainstorm-root plan phase output is missing', async () => {
       const changeDir = path.join(changesDir, 'brainstorm-apply-no-plan');
-      await fs.mkdir(path.join(changeDir, 'specs', 'capability'), { recursive: true });
+      await fs.mkdir(changeDir, { recursive: true });
       await fs.writeFile(path.join(changeDir, '.openspec.yaml'), 'schema: brainstorm-root\n');
       await fs.writeFile(path.join(changeDir, 'brainstorm.md'), '# Brainstorm');
-      await fs.writeFile(path.join(changeDir, 'specs', 'capability', 'spec.md'), '## Purpose\nSpec');
       await fs.writeFile(path.join(changeDir, 'tasks.md'), '## Tasks\n- [ ] Task 1');
 
       const result = await runCLI(
@@ -420,21 +419,17 @@ describe('artifact-workflow CLI commands', () => {
       const json = JSON.parse(result.stdout);
       expect(json.schemaName).toBe('brainstorm-root');
       expect(json.state).toBe('blocked');
-      expect(json.instruction).toContain('Missing artifacts: plan');
-      expect(json.instruction).toContain('openspec-continue-change');
+      // brainstorm-root v2 reports phase ids in missingArtifacts
+      expect(json.missingArtifacts ?? []).toContain('plan');
     });
 
-    it('allows apply when execution-plan.md exists for brainstorm-root workflow', async () => {
+    it('allows apply when plan.md exists for brainstorm-root v2 workflow', async () => {
       const changeDir = path.join(changesDir, 'brainstorm-apply-with-plan');
-      await fs.mkdir(path.join(changeDir, 'specs', 'capability'), { recursive: true });
+      await fs.mkdir(changeDir, { recursive: true });
       await fs.writeFile(path.join(changeDir, '.openspec.yaml'), 'schema: brainstorm-root\n');
       await fs.writeFile(path.join(changeDir, 'brainstorm.md'), '# Brainstorm');
-      await fs.writeFile(
-        path.join(changeDir, 'specs', 'capability', 'spec.md'),
-        '## ADDED Requirements\n\n### Requirement: Capability\nThe system SHALL support it.\n\n#### Scenario: Works\n- **WHEN** enabled\n- **THEN** it works\n'
-      );
       await fs.writeFile(path.join(changeDir, 'tasks.md'), '- [ ] 1.1 Implement capability');
-      await fs.writeFile(path.join(changeDir, 'execution-plan.md'), '# Execution plan');
+      await fs.writeFile(path.join(changeDir, 'plan.md'), '# Plan');
 
       const result = await runCLI(
         ['instructions', 'apply', '--change', 'brainstorm-apply-with-plan', '--json'],
