@@ -62,19 +62,19 @@ export async function instructionsCommand(
 
     if (!artifactId) {
       spinner?.stop();
-      const validIds = context.graph.getAllArtifacts().map((a) => a.id);
+      const validIds = context.graph.getAllNodes().map((n) => n.id);
       throw new Error(
-        `Missing required argument <artifact>. Valid artifacts:\n  ${validIds.join('\n  ')}`
+        `Missing required argument <artifact>. Valid artifacts/phases:\n  ${validIds.join('\n  ')}`
       );
     }
 
-    const artifact = context.graph.getArtifact(artifactId);
+    const node = context.graph.getNode(artifactId);
 
-    if (!artifact) {
+    if (!node) {
       spinner?.stop();
-      const validIds = context.graph.getAllArtifacts().map((a) => a.id);
+      const validIds = context.graph.getAllNodes().map((n) => n.id);
       throw new Error(
-        `Artifact '${artifactId}' not found in schema '${context.schemaName}'. Valid artifacts:\n  ${validIds.join('\n  ')}`
+        `Artifact or phase '${artifactId}' not found in schema '${context.schemaName}'. Valid ids:\n  ${validIds.join('\n  ')}`
       );
     }
 
@@ -97,6 +97,7 @@ export async function instructionsCommand(
 
 export function printInstructionsText(instructions: ArtifactInstructions, isBlocked: boolean): void {
   const {
+    kind,
     artifactId,
     changeName,
     schemaName,
@@ -111,8 +112,10 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
     unlocks,
   } = instructions;
 
+  const tag = kind === 'phase' ? 'phase' : 'artifact';
+
   // Opening tag
-  console.log(`<artifact id="${artifactId}" change="${changeName}" schema="${schemaName}">`);
+  console.log(`<${tag} id="${artifactId}" change="${changeName}" schema="${schemaName}">`);
   console.log();
 
   // Warning for blocked artifacts
@@ -205,7 +208,7 @@ export function printInstructionsText(instructions: ArtifactInstructions, isBloc
   }
 
   // Closing tag
-  console.log('</artifact>');
+  console.log(`</${tag}>`);
 }
 
 // -----------------------------------------------------------------------------
@@ -268,13 +271,31 @@ export async function generateApplyInstructions(
   const tracksFile = applyConfig?.tracks ?? null;
   const schemaInstruction = applyConfig?.instruction ?? null;
 
-  // Check which required artifacts are missing
+  // Check which required artifacts/phases are missing.
+  // apply.requires may reference artifact IDs (in artifacts[]) or phase IDs
+  // (top-level brainstorm/plan). Resolve each against artifacts first,
+  // then phases, and check the corresponding output file.
   const missingArtifacts: string[] = [];
-  for (const artifactId of requiredArtifactIds) {
-    const artifact = schema.artifacts.find((a) => a.id === artifactId);
-    if (artifact && resolveArtifactOutputs(changeDir, artifact.generates).length === 0) {
-      missingArtifacts.push(artifactId);
+  for (const reqId of requiredArtifactIds) {
+    const artifact = schema.artifacts.find((a) => a.id === reqId);
+    if (artifact) {
+      if (resolveArtifactOutputs(changeDir, artifact.generates).length === 0) {
+        missingArtifacts.push(reqId);
+      }
+      continue;
     }
+    const phase =
+      reqId === 'brainstorm'
+        ? schema.brainstorm
+        : reqId === 'plan'
+          ? schema.plan
+          : undefined;
+    if (phase) {
+      if (resolveArtifactOutputs(changeDir, phase.generates).length === 0) {
+        missingArtifacts.push(reqId);
+      }
+    }
+    // Unknown id: schema validation should have caught this; ignore defensively.
   }
 
   // Build context files from all existing artifacts in schema
