@@ -12,26 +12,15 @@ const APPLY_EXECUTION_PLAN_GATE_STEP = (
   rerunInstruction: string
 ): string => `6. **Gate on execution plan before implementation loop** (brainstorm-root)
 
-   **Canonical policy:** For \`schemaName: "brainstorm-root"\`, follow \`schemas/brainstorm-root/schema.yaml\` \`apply.instruction\` and the dynamic CLI output from \`openspec instructions apply --change "<name>" --json\`.
+   Step 3 has run \`openspec instructions apply --change "<name>" --json\`. The \`instruction\` field in the JSON is canonical per \`schemas/brainstorm-root/schema.yaml\` \`apply.instruction\`.
 
-   Required pre-checks before implementation:
-   - \`openspec/changes/<name>/execution-plan.md\` exists
-   - \`superpowers:subagent-driven-development\` is available (transitively: \`superpowers:test-driven-development\`, \`superpowers:requesting-code-review\`)
+   Required pre-checks (from CLI output):
+   - \`openspec/changes/<name>/execution-plan.md\` exists. If missing, STOP and ask the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`), then rerun ${rerunInstruction}.
+   - \`superpowers:subagent-driven-development\` is available (transitive: \`superpowers:test-driven-development\`, \`superpowers:requesting-code-review\`).
 
-   If \`execution-plan.md\` is missing, STOP and ask the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`), then rerun ${rerunInstruction}.
-   If required skills are missing, STOP and inform the user; do NOT silently fall back.
+   Follow CLI \`instruction\` for: default executor (subagent-driven-development), inline opt-in policy, \`git commit\` defaults, \`using-git-worktrees\` defaults, no \`superpowers:executing-plans\` fallback.
 
-   Execution rules:
-   - \`execution-plan.md\` is the source of truth for step order (not \`plan.md\` / \`docs/superpowers/plans/\`)
-   - Default executor is **superpowers:subagent-driven-development**
-   - Use the Skill tool to invoke **superpowers:subagent-driven-development** for default execution
-   - Inline implementation in this primary session is allowed **only if the user explicitly requests inline mode**
-   - Update \`tasks.md\` checkboxes (\`- [ ]\` -> \`- [x]\`) as coarse tasks complete
-   - Do **not** run \`git commit\` in this apply flow unless the user explicitly asks for a commit
-   - Do **not** default to \`using-git-worktrees\` unless the user explicitly asks for isolated worktrees
-
-   Platform note:
-   - Do not use \`superpowers:executing-plans\` as a fallback for this schema. If subagents are unavailable, prefer \`spec-driven\` schema.`;
+   STOP if any prerequisite is missing; do NOT silently fall back.`;
 
 export function getBrainstormRootApplyChangeSkillTemplate(): SkillTemplate {
   return {
@@ -192,7 +181,7 @@ This skill supports the "actions on a change" model:
 - **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly`,
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
-    metadata: { author: 'openspec', version: '1.0' },
+    metadata: { author: 'openspec', version: '1.1' },
   };
 }
 

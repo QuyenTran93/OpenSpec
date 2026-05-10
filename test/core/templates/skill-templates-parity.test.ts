@@ -75,14 +75,14 @@ const EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES: Record<string, string> = {
   getBrainstormRootProposeSkillTemplate: '90b97ba5e9bf1a1d98334b2bf47b61bf0723a2f54ba4f2c338b5abdfa48009c0',
   getBrainstormRootWritingPlansSkillTemplate: '6671b787027f8a749a3931ee12837d149b9417d6d781f90c6004552b64683897',
   getBrainstormRootContinueChangeSkillTemplate: '92809c493f4740409c0f876e17508ae22ba70be3359e26ed59deb27fbed85cd2',
-  getBrainstormRootApplyChangeSkillTemplate: 'c1e997fc3c47ba8fad7910c1e503dc04d59e259e730b7923231f54872cdbd38d',
+  getBrainstormRootApplyChangeSkillTemplate: '34429b2072d6f5d4946e12a0068c5d7a6b69580946fb7ddc4525a8df67976e0e',
   getBrainstormRootNewChangeSkillTemplate: 'f3eb31447929064c6fce5711a183e5075df3715bdabef6bfdcdb6b2824bd2a36',
   getBrainstormRootArchiveChangeSkillTemplate: '8324edf5e4403723002e54167272f2440024fdc73a30e89455ec0f9e6692d569',
   getOpsxBrainstormRootBrainstormCommandTemplate: '6737c7f143c52cc13d39327810f3beb099c9fa55714cb9193be7b987f4ed102e',
   getOpsxBrainstormRootProposeCommandTemplate: 'b0192849b578c9b0228a5c8794583bc6e3477323b7396b5549b2bcb511f4ecf5',
   getOpsxBrainstormRootWritingPlansCommandTemplate: '248e1729390e899bca36ae83c308a47decc7bde9a0985322a91a560064302ff0',
   getOpsxBrainstormRootContinueCommandTemplate: '94bcc742c567e60bee94129e19e4d88df88f1ec2ccef6858c46aea77fad4496d',
-  getOpsxBrainstormRootApplyCommandTemplate: '189186bce71742201c909c9bf1372208bc11cb8d5a8a5f0cc255c57326afe3d3',
+  getOpsxBrainstormRootApplyCommandTemplate: '5c9eb1ebc40586d52e2d10c24c5714005877eee00da785072bc1960fe26551c4',
   getOpsxBrainstormRootNewCommandTemplate: 'e0eb6800fe0ab3a243761c8e186bf83f05a8489ffb421bd9a8da081cb1efce88',
   getOpsxBrainstormRootArchiveCommandTemplate: '342591df0961eb161351ee39d71841c5ae8839eb702c070c656b146412d1a9d3',
 };
@@ -237,7 +237,6 @@ describe('skill templates split parity', () => {
     expect(applySkill.instructions).toContain('writing-plans');
     expect(applySkill.instructions).toContain('superpowers:subagent-driven-development');
     expect(applySkill.instructions).toContain('superpowers:executing-plans');
-    expect(applySkill.instructions).toContain('Use the Skill tool to invoke **superpowers:subagent-driven-development**');
     expect(applySkill.instructions).toContain('using-git-worktrees');
 
     expect(applyCommand.content).toContain('schemas/brainstorm-root/schema.yaml');
@@ -246,7 +245,6 @@ describe('skill templates split parity', () => {
     expect(applyCommand.content).toContain('writing-plans');
     expect(applyCommand.content).toContain('superpowers:subagent-driven-development');
     expect(applyCommand.content).toContain('superpowers:executing-plans');
-    expect(applyCommand.content).toContain('Use the Skill tool to invoke **superpowers:subagent-driven-development**');
     expect(applyCommand.content).toContain('using-git-worktrees');
   });
 
