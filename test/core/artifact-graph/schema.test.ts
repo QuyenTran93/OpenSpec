@@ -277,4 +277,132 @@ artifacts:
       expect(() => parseSchema(yaml)).toThrow(/optional outputs must not gate/);
     });
   });
+
+  describe('phases (brainstorm-root v2)', () => {
+    it('parses optional brainstorm + plan top-level phases', () => {
+      const yaml = `
+name: ts
+version: 2
+artifacts:
+  - id: tasks
+    generates: tasks.md
+    description: Tasks
+    template: tasks.md
+    requires: [brainstorm]
+brainstorm:
+  generates: brainstorm.md
+  template: brainstorm.md
+  requires: []
+plan:
+  generates: plan.md
+  template: plan.md
+  requires: [brainstorm, tasks]
+apply:
+  requires: [tasks, plan]
+  tracks: tasks.md
+  executionPlan: plan.md
+`;
+      const schema = parseSchema(yaml);
+      expect(schema.brainstorm?.generates).toBe('brainstorm.md');
+      expect(schema.plan?.generates).toBe('plan.md');
+      expect(schema.plan?.requires).toEqual(['brainstorm', 'tasks']);
+      expect(schema.apply?.requires).toEqual(['tasks', 'plan']);
+    });
+
+    it('accepts artifact requires referencing a phase id', () => {
+      const yaml = `
+name: ts
+version: 2
+artifacts:
+  - id: tasks
+    generates: tasks.md
+    description: Tasks
+    template: tasks.md
+    requires: [brainstorm]
+brainstorm:
+  generates: brainstorm.md
+  template: brainstorm.md
+  requires: []
+`;
+      expect(() => parseSchema(yaml)).not.toThrow();
+    });
+
+    it('rejects requires referencing an unknown id (artifact or phase)', () => {
+      const yaml = `
+name: ts
+version: 2
+artifacts:
+  - id: tasks
+    generates: tasks.md
+    description: Tasks
+    template: tasks.md
+    requires: [missing]
+`;
+      expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
+      expect(() => parseSchema(yaml)).toThrow(/missing/);
+    });
+
+    it('detects cycles across artifact and phase nodes', () => {
+      const yaml = `
+name: ts
+version: 2
+artifacts:
+  - id: tasks
+    generates: tasks.md
+    description: Tasks
+    template: tasks.md
+    requires: [brainstorm]
+brainstorm:
+  generates: brainstorm.md
+  template: brainstorm.md
+  requires: [tasks]
+`;
+      expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
+      expect(() => parseSchema(yaml)).toThrow(/[Cc]yclic/);
+    });
+
+    it('allows apply.requires to reference both artifact and phase ids', () => {
+      const yaml = `
+name: ts
+version: 2
+artifacts:
+  - id: tasks
+    generates: tasks.md
+    description: Tasks
+    template: tasks.md
+    requires: [brainstorm]
+brainstorm:
+  generates: brainstorm.md
+  template: brainstorm.md
+  requires: []
+plan:
+  generates: plan.md
+  template: plan.md
+  requires: [tasks]
+apply:
+  requires: [tasks, plan]
+  tracks: tasks.md
+  executionPlan: plan.md
+`;
+      expect(() => parseSchema(yaml)).not.toThrow();
+    });
+
+    it('rejects apply.requires referencing unknown id', () => {
+      const yaml = `
+name: ts
+version: 2
+artifacts:
+  - id: tasks
+    generates: tasks.md
+    description: Tasks
+    template: tasks.md
+    requires: []
+apply:
+  requires: [tasks, ghost]
+  tracks: tasks.md
+`;
+      expect(() => parseSchema(yaml)).toThrow(SchemaValidationError);
+      expect(() => parseSchema(yaml)).toThrow(/ghost/);
+    });
+  });
 });
