@@ -118,7 +118,7 @@ All artifacts complete. All tasks complete.
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting`,
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
-    metadata: { author: 'openspec', version: '1.0' },
+    metadata: { author: 'openspec', version: '1.1' },
   };
 }
 

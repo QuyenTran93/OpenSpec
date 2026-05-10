@@ -8,7 +8,6 @@ import {
   getBrainstormRootApplyChangeSkillTemplate,
   getBrainstormRootArchiveChangeSkillTemplate,
   getBrainstormRootBrainstormSkillTemplate,
-  getBrainstormRootContinueChangeSkillTemplate,
   getBrainstormRootNewChangeSkillTemplate,
   getBrainstormRootProposeSkillTemplate,
   getBrainstormRootWritingPlansSkillTemplate,
@@ -24,7 +23,6 @@ import {
   getOpsxBrainstormRootApplyCommandTemplate,
   getOpsxBrainstormRootArchiveCommandTemplate,
   getOpsxBrainstormRootBrainstormCommandTemplate,
-  getOpsxBrainstormRootContinueCommandTemplate,
   getOpsxBrainstormRootNewCommandTemplate,
   getOpsxBrainstormRootProposeCommandTemplate,
   getOpsxBrainstormRootWritingPlansCommandTemplate,
@@ -71,20 +69,18 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
 };
 
 const EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES: Record<string, string> = {
-  getBrainstormRootBrainstormSkillTemplate: 'ea2f91b9b8f05921143155634b64f949d63c2216ac9ebccedd62f3c1e96ed66e',
-  getBrainstormRootProposeSkillTemplate: '90b97ba5e9bf1a1d98334b2bf47b61bf0723a2f54ba4f2c338b5abdfa48009c0',
-  getBrainstormRootWritingPlansSkillTemplate: '6671b787027f8a749a3931ee12837d149b9417d6d781f90c6004552b64683897',
-  getBrainstormRootContinueChangeSkillTemplate: '92809c493f4740409c0f876e17508ae22ba70be3359e26ed59deb27fbed85cd2',
-  getBrainstormRootApplyChangeSkillTemplate: '34429b2072d6f5d4946e12a0068c5d7a6b69580946fb7ddc4525a8df67976e0e',
-  getBrainstormRootNewChangeSkillTemplate: 'f3eb31447929064c6fce5711a183e5075df3715bdabef6bfdcdb6b2824bd2a36',
-  getBrainstormRootArchiveChangeSkillTemplate: '8324edf5e4403723002e54167272f2440024fdc73a30e89455ec0f9e6692d569',
-  getOpsxBrainstormRootBrainstormCommandTemplate: '6737c7f143c52cc13d39327810f3beb099c9fa55714cb9193be7b987f4ed102e',
-  getOpsxBrainstormRootProposeCommandTemplate: 'b0192849b578c9b0228a5c8794583bc6e3477323b7396b5549b2bcb511f4ecf5',
-  getOpsxBrainstormRootWritingPlansCommandTemplate: '248e1729390e899bca36ae83c308a47decc7bde9a0985322a91a560064302ff0',
-  getOpsxBrainstormRootContinueCommandTemplate: '94bcc742c567e60bee94129e19e4d88df88f1ec2ccef6858c46aea77fad4496d',
-  getOpsxBrainstormRootApplyCommandTemplate: '5c9eb1ebc40586d52e2d10c24c5714005877eee00da785072bc1960fe26551c4',
-  getOpsxBrainstormRootNewCommandTemplate: 'e0eb6800fe0ab3a243761c8e186bf83f05a8489ffb421bd9a8da081cb1efce88',
-  getOpsxBrainstormRootArchiveCommandTemplate: '342591df0961eb161351ee39d71841c5ae8839eb702c070c656b146412d1a9d3',
+  getBrainstormRootBrainstormSkillTemplate: '6b3cba6dacb83e4a87083829c2b51d8d1a18ae50b7c025dafba2a2dad0c61538',
+  getBrainstormRootProposeSkillTemplate: 'cfc7aab8db07d51452f44c32a550f77a1776e98628b785ba3ffb4437e9dc71fa',
+  getBrainstormRootWritingPlansSkillTemplate: 'a920bc45cd7eed7188c75ce37cd2b9f98629dc2ac553bccfa6651b24084e466b',
+  getBrainstormRootApplyChangeSkillTemplate: '853e3a2b658b5841d986b2ba3b3a215272b6fcd2326b865a518104e160e75bc0',
+  getBrainstormRootNewChangeSkillTemplate: 'f664971bce279dbbe5195b6a10b8d9915605a6694e0c0a8878d1e79b503eae68',
+  getBrainstormRootArchiveChangeSkillTemplate: 'bdfd8785ec372fea44e7927f072c9aba9d3cb7dfed4d00a218b0315668364ece',
+  getOpsxBrainstormRootBrainstormCommandTemplate: '05d9179cda21a9947356ec33a6c8356fb0a76861b527608a2a2608d3de8056a7',
+  getOpsxBrainstormRootProposeCommandTemplate: '5908bc2580f19a0f4c927e370273513c044f1bafb380d94413db22acdf02cf88',
+  getOpsxBrainstormRootWritingPlansCommandTemplate: 'f646a36156f0f879483e2d72b334b59b6ff7c88f95f28fdf8e57a053b6a68f3e',
+  getOpsxBrainstormRootApplyCommandTemplate: '819a7c54538bd4efdda4d9b0f12d74ddff078df9c1490ffd951cac6b23602d49',
+  getOpsxBrainstormRootNewCommandTemplate: 'bc9e96a8ba80a0973e8b5cfb7130d9c8802c01f262a0f4144581ca325314e693',
+  getOpsxBrainstormRootArchiveCommandTemplate: '9aaf3037e44999da0401ffa97961ea3a069b0a01f74022b3798c8a2d2b860cdc',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
@@ -161,14 +157,12 @@ describe('skill templates split parity', () => {
       getBrainstormRootBrainstormSkillTemplate,
       getBrainstormRootProposeSkillTemplate,
       getBrainstormRootWritingPlansSkillTemplate,
-      getBrainstormRootContinueChangeSkillTemplate,
       getBrainstormRootApplyChangeSkillTemplate,
       getBrainstormRootNewChangeSkillTemplate,
       getBrainstormRootArchiveChangeSkillTemplate,
       getOpsxBrainstormRootBrainstormCommandTemplate,
       getOpsxBrainstormRootProposeCommandTemplate,
       getOpsxBrainstormRootWritingPlansCommandTemplate,
-      getOpsxBrainstormRootContinueCommandTemplate,
       getOpsxBrainstormRootApplyCommandTemplate,
       getOpsxBrainstormRootNewCommandTemplate,
       getOpsxBrainstormRootArchiveCommandTemplate,
@@ -184,20 +178,19 @@ describe('skill templates split parity', () => {
   it('exposes superpowers path mapping in brainstorm-root writing-plans template', () => {
     const writingSkill = getBrainstormRootWritingPlansSkillTemplate();
 
-    // Note: brainstorm skill body markers ('Superpowers → OpenSpec', 'docs/superpowers/specs/')
-    // moved to schema canonical content. Asserted in test/schemas/brainstorm-root.instruction.test.ts.
+    // Note: brainstorm skill body markers moved to schema canonical content.
+    // Asserted in test/schemas/brainstorm-root.instruction.test.ts.
     expect(writingSkill.instructions).toContain('docs/superpowers/plans/');
-    expect(writingSkill.instructions).toContain('execution-plan.md');
+    expect(writingSkill.instructions).toContain('plan.md');
   });
 
-  it('embeds brainstorm-root workflow sequence in core brainstorm-root templates', () => {
+  it('embeds brainstorm-root v2 workflow sequence in core brainstorm-root templates', () => {
     const proposeSkill = getBrainstormRootProposeSkillTemplate();
     const applySkill = getBrainstormRootApplyChangeSkillTemplate();
-    const marker = 'Workflow sequence (brainstorm-root)';
+    const marker = 'Workflow sequence (brainstorm-root v2)';
     expect(proposeSkill.instructions).toContain(marker);
     expect(applySkill.instructions).toContain(marker);
     expect(getBrainstormRootNewChangeSkillTemplate().instructions).toContain(marker);
-    expect(getBrainstormRootContinueChangeSkillTemplate().instructions).toContain(marker);
   });
 
   it('preserves generated skill file content exactly', () => {
@@ -227,13 +220,14 @@ describe('skill templates split parity', () => {
     expect(actualHashes).toEqual(EXPECTED_GENERATED_SKILL_CONTENT_HASHES);
   });
 
-  it('requires brainstorm-root apply templates to mention execution-plan gate and planning handoff', () => {
+  it('requires brainstorm-root apply templates to mention plan.md gate and planning handoff', () => {
     const applySkill = getBrainstormRootApplyChangeSkillTemplate();
     const applyCommand = getOpsxBrainstormRootApplyCommandTemplate();
 
     expect(applySkill.instructions).toContain('schemas/brainstorm-root/schema.yaml');
     expect(applySkill.instructions).toContain('git commit');
-    expect(applySkill.instructions).toContain('execution-plan.md');
+    expect(applySkill.instructions).toContain('plan.md');
+    expect(applySkill.instructions).not.toContain('execution-plan.md');
     expect(applySkill.instructions).toContain('writing-plans');
     expect(applySkill.instructions).toContain('superpowers:subagent-driven-development');
     expect(applySkill.instructions).toContain('superpowers:executing-plans');
@@ -241,57 +235,39 @@ describe('skill templates split parity', () => {
 
     expect(applyCommand.content).toContain('schemas/brainstorm-root/schema.yaml');
     expect(applyCommand.content).toContain('git commit');
-    expect(applyCommand.content).toContain('execution-plan.md');
+    expect(applyCommand.content).toContain('plan.md');
+    expect(applyCommand.content).not.toContain('execution-plan.md');
     expect(applyCommand.content).toContain('writing-plans');
     expect(applyCommand.content).toContain('superpowers:subagent-driven-development');
     expect(applyCommand.content).toContain('superpowers:executing-plans');
     expect(applyCommand.content).toContain('using-git-worktrees');
   });
 
-  it('requires brainstorm-root propose templates to mention writing-plans handoff before apply', () => {
+  it('requires brainstorm-root propose templates to delegate to schema instruction and write tasks.md', () => {
     const proposeSkill = getBrainstormRootProposeSkillTemplate();
     const proposeCommand = getOpsxBrainstormRootProposeCommandTemplate();
 
-    expect(proposeSkill.instructions).toContain('writing-plans');
-    expect(proposeSkill.instructions).toContain('openspec/changes/<name>/execution-plan.md');
-    expect(proposeSkill.instructions).toContain('/opsx:apply');
+    // propose calls openspec instructions tasks (canonical schema delegation)
+    expect(proposeSkill.instructions).toContain('openspec instructions tasks --change "<name>" --schema brainstorm-root --json');
+    // propose hands off to writing-plans next, not directly to apply
+    expect(proposeSkill.instructions).toContain('/opsx:writing-plans');
+    expect(proposeSkill.instructions).toContain('tasks.md');
+    expect(proposeSkill.instructions).toContain('reconcile');
 
-    expect(proposeCommand.content).toContain('writing-plans');
-    expect(proposeCommand.content).toContain('openspec/changes/<name>/execution-plan.md');
-    expect(proposeCommand.content).toContain('/opsx:apply');
+    expect(proposeCommand.content).toContain('openspec instructions tasks --change "<name>" --schema brainstorm-root --json');
+    expect(proposeCommand.content).toContain('/opsx:writing-plans');
+    expect(proposeCommand.content).toContain('tasks.md');
+    expect(proposeCommand.content).toContain('reconcile');
   });
 
-  it('prevents proposal-first regressions in brainstorm-root propose/continue templates', () => {
-    const proposeSkill = getBrainstormRootProposeSkillTemplate();
-    const proposeCommand = getOpsxBrainstormRootProposeCommandTemplate();
-    const continueSkill = getBrainstormRootContinueChangeSkillTemplate();
-    const continueCommand = getOpsxBrainstormRootContinueCommandTemplate();
-
-    expect(proposeSkill.instructions).not.toContain('proposal.md (what & why)');
-    expect(proposeCommand.content).not.toContain('proposal.md (what & why)');
-    expect(continueSkill.instructions).toContain('Do not imply or require `proposal.md` for brainstorm-root.');
-    expect(continueCommand.content).toContain('Do not imply or require `proposal.md` for brainstorm-root.');
-
-    expect(proposeSkill.instructions).toContain('Derive the next artifact from `openspec status --change "<name>" --json`');
-    expect(proposeSkill.instructions).toContain('applyRequires');
-    expect(proposeCommand.content).toContain('Derive the next artifact from `openspec status --change "<name>" --json`');
-    expect(proposeCommand.content).toContain('applyRequires');
-
-    expect(continueSkill.instructions).toContain('Always select the next artifact from status JSON (`status: "ready"`) and `applyRequires`.');
-    expect(continueCommand.content).toContain('Always select the next artifact from status JSON (`status: "ready"`) and `applyRequires`.');
-  });
-
-  it('requires explicit brainstorm-root schema flag in propose templates', () => {
+  it('requires brainstorm-root propose to gate on brainstorm.md existence', () => {
     const proposeSkill = getBrainstormRootProposeSkillTemplate();
     const proposeCommand = getOpsxBrainstormRootProposeCommandTemplate();
 
-    expect(proposeSkill.instructions).toContain('openspec status --change "<name>" --schema brainstorm-root --json');
-    expect(proposeSkill.instructions).toContain('openspec instructions <artifact-id> --change "<name>" --schema brainstorm-root --json');
-    expect(proposeSkill.instructions).toContain('`--schema brainstorm-root` is missing');
-
-    expect(proposeCommand.content).toContain('openspec status --change "<name>" --schema brainstorm-root --json');
-    expect(proposeCommand.content).toContain('openspec instructions <artifact-id> --change "<name>" --schema brainstorm-root --json');
-    expect(proposeCommand.content).toContain('`--schema brainstorm-root` is missing');
+    expect(proposeSkill.instructions).toContain('phases.brainstorm.status');
+    expect(proposeSkill.instructions).toContain('/opsx:brainstorm');
+    expect(proposeCommand.content).toContain('phases.brainstorm.status');
+    expect(proposeCommand.content).toContain('/opsx:brainstorm');
   });
 
   it('requires global brainstorm-root schema-sensitive CLI guardrail wording in shared sequence block', () => {
@@ -350,7 +326,6 @@ describe('skill templates split parity', () => {
       expect(getBrainstormRootBrainstormSkillTemplate().name).toBe('openspec-brainstorm');
       expect(getBrainstormRootProposeSkillTemplate().name).toBe('openspec-propose');
       expect(getBrainstormRootWritingPlansSkillTemplate().name).toBe('openspec-writing-plans');
-      expect(getBrainstormRootContinueChangeSkillTemplate().name).toBe('openspec-continue-change');
       expect(getBrainstormRootApplyChangeSkillTemplate().name).toBe('openspec-apply-change');
       expect(getBrainstormRootNewChangeSkillTemplate().name).toBe('openspec-new-change');
       expect(getBrainstormRootArchiveChangeSkillTemplate().name).toBe('openspec-archive-change');

@@ -38,8 +38,6 @@ export {
   getOpsxBrainstormRootProposeCommandTemplate,
   getBrainstormRootWritingPlansSkillTemplate,
   getOpsxBrainstormRootWritingPlansCommandTemplate,
-  getBrainstormRootContinueChangeSkillTemplate,
-  getOpsxBrainstormRootContinueCommandTemplate,
   getBrainstormRootApplyChangeSkillTemplate,
   getOpsxBrainstormRootApplyCommandTemplate,
   getBrainstormRootNewChangeSkillTemplate,

@@ -32,14 +32,12 @@ import {
   getBrainstormRootWritingPlansSkillTemplate,
   getBrainstormRootProposeSkillTemplate,
   getBrainstormRootNewChangeSkillTemplate,
-  getBrainstormRootContinueChangeSkillTemplate,
   getBrainstormRootApplyChangeSkillTemplate,
   getBrainstormRootArchiveChangeSkillTemplate,
   getOpsxBrainstormRootBrainstormCommandTemplate,
   getOpsxBrainstormRootWritingPlansCommandTemplate,
   getOpsxBrainstormRootProposeCommandTemplate,
   getOpsxBrainstormRootNewCommandTemplate,
-  getOpsxBrainstormRootContinueCommandTemplate,
   getOpsxBrainstormRootApplyCommandTemplate,
   getOpsxBrainstormRootArchiveCommandTemplate,
   type SkillTemplate,
@@ -85,11 +83,18 @@ export function getSkillTemplates(
       dirName: 'openspec-new-change',
       workflowId: 'new',
     },
-    {
-      template: brainstorm ? getBrainstormRootContinueChangeSkillTemplate() : getContinueChangeSkillTemplate(),
-      dirName: 'openspec-continue-change',
-      workflowId: 'continue',
-    },
+    // brainstorm-root v2 dropped the continue-change command (single-artifact
+    // workflow makes it redundant). For other profiles (e.g., spec-driven),
+    // continue-change is still emitted.
+    ...(brainstorm
+      ? []
+      : [
+          {
+            template: getContinueChangeSkillTemplate(),
+            dirName: 'openspec-continue-change',
+            workflowId: 'continue',
+          },
+        ]),
     {
       template: brainstorm ? getBrainstormRootApplyChangeSkillTemplate() : getApplyChangeSkillTemplate(),
       dirName: 'openspec-apply-change',
@@ -141,10 +146,14 @@ export function getCommandTemplates(
       template: brainstorm ? getOpsxBrainstormRootNewCommandTemplate() : getOpsxNewCommandTemplate(),
       id: 'new',
     },
-    {
-      template: brainstorm ? getOpsxBrainstormRootContinueCommandTemplate() : getOpsxContinueCommandTemplate(),
-      id: 'continue',
-    },
+    ...(brainstorm
+      ? []
+      : [
+          {
+            template: getOpsxContinueCommandTemplate(),
+            id: 'continue',
+          },
+        ]),
     {
       template: brainstorm ? getOpsxBrainstormRootApplyCommandTemplate() : getOpsxApplyCommandTemplate(),
       id: 'apply',

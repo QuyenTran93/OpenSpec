@@ -1,52 +1,61 @@
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
-  BRAINSTORM_ROOT_WRITING_PLANS_SHARED_BODY,
+  BRAINSTORM_ROOT_GATE_POLICY_BLOCK,
   BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK,
+  BRAINSTORM_ROOT_WRITING_PLANS_SHARED_BODY,
 } from './superpowers-openspec-mapping.js';
+
+const WRITING_PLANS_THIN_BODY = (argDescription: string): string => `PRECHECK — required skill availability:
+Before invoking, confirm \`superpowers:writing-plans\` appears in your available skills list. If missing, STOP and inform the user. Do NOT silently fall back.
+
+Use the Skill tool to invoke **superpowers:writing-plans**.
+
+---
+
+**Input**: ${argDescription}
+
+**Steps**
+
+1. Resolve the active change name (existing logic).
+
+2. Get phase instructions from the schema (canonical source-of-truth):
+   \`\`\`bash
+   openspec instructions plan --change "<name>" --schema brainstorm-root --json
+   \`\`\`
+
+3. Follow the returned \`instruction\` field. It directs you to read both \`brainstorm.md\` (architecture/decisions) and \`tasks.md\` (coarse task list), then write \`plan.md\` with TDD micro-steps.
+
+4. Use \`template\` from the JSON as the structure. Apply \`context\` and \`rules\` as constraints — do NOT copy them into the artifact.
+
+5. Write the plan to \`outputPath\` (\`openspec/changes/<name>/plan.md\`).
+
+${BRAINSTORM_ROOT_WRITING_PLANS_SHARED_BODY}
+
+${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
+
+${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}`;
 
 export function getBrainstormRootWritingPlansSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-writing-plans',
-    description: 'Create a concrete execution plan from approved design artifacts.',
-    instructions: `PRECHECK — required skill availability:
-Before invoking, confirm \`superpowers:writing-plans\` appears in your available skills list. If missing, STOP and inform the user that the Superpowers plugin must be installed (or that they can explicitly opt to write \`execution-plan.md\` manually using the template below). Do NOT silently fall back.
-
-Use the Skill tool to invoke **superpowers:writing-plans**.
-
-Run the superpowers \`writing-plans\` skill using the approved design and artifacts for the change (for example \`brainstorm.md\`, \`design.md\` when present, and other completed files under \`openspec/changes/<change-name>/\`). Run this **after** propose/continue has produced all required schema artifacts; it comes **before** \`openspec-apply-change\` / \`/opsx:apply\`.
-
----
-
-**Input**: The user's request may name a change (kebab-case) or rely on session context; resolve the active change before drafting the plan.
-
-${BRAINSTORM_ROOT_WRITING_PLANS_SHARED_BODY}
-
-${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}`,
+    description: 'Create plan.md for a brainstorm-root change using superpowers:writing-plans.',
+    instructions: WRITING_PLANS_THIN_BODY(
+      "The user's request may name a change (kebab-case) or rely on session context; resolve the active change before drafting the plan."
+    ),
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
-    metadata: { author: 'openspec', version: '1.0' },
+    metadata: { author: 'openspec', version: '2.0' },
   };
 }
 
 export function getOpsxBrainstormRootWritingPlansCommandTemplate(): CommandTemplate {
   return {
     name: 'OPSX: Writing Plans',
-    description: 'Generate an execution plan and write execution-plan.md',
+    description: 'Generate plan.md for a brainstorm-root change',
     category: 'Workflow',
-    tags: ['workflow', 'planning', 'execution-plan'],
-    content: `PRECHECK — required skill availability:
-Before invoking, confirm \`superpowers:writing-plans\` appears in your available skills list. If missing, STOP and inform the user that the Superpowers plugin must be installed (or that they can explicitly opt to write \`execution-plan.md\` manually using the template below). Do NOT silently fall back.
-
-Use the Skill tool to invoke **superpowers:writing-plans**.
-
-Use the superpowers \`writing-plans\` skill for the active change. Use **after** \`/opsx:propose\` or \`/opsx:continue\` has completed required artifacts; **before** \`/opsx:apply\`.
-
----
-
-**Input**: The argument after \`/opsx:writing-plans\` is the change name (kebab-case), if provided; otherwise infer from session context.
-
-${BRAINSTORM_ROOT_WRITING_PLANS_SHARED_BODY}
-
-${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}`,
+    tags: ['workflow', 'planning', 'plan'],
+    content: WRITING_PLANS_THIN_BODY(
+      'The argument after `/opsx:writing-plans` is the change name (kebab-case), if provided; otherwise infer from session context.'
+    ),
   };
 }

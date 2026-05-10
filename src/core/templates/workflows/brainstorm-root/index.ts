@@ -11,10 +11,6 @@ export {
   getOpsxBrainstormRootWritingPlansCommandTemplate,
 } from './writing-plans.js';
 export {
-  getBrainstormRootContinueChangeSkillTemplate,
-  getOpsxBrainstormRootContinueCommandTemplate,
-} from './continue-change.js';
-export {
   getBrainstormRootApplyChangeSkillTemplate,
   getOpsxBrainstormRootApplyCommandTemplate,
 } from './apply-change.js';

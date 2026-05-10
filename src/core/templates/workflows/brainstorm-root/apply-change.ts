@@ -15,7 +15,7 @@ const APPLY_EXECUTION_PLAN_GATE_STEP = (
    Step 3 has run \`openspec instructions apply --change "<name>" --json\`. The \`instruction\` field in the JSON is canonical per \`schemas/brainstorm-root/schema.yaml\` \`apply.instruction\`.
 
    Required pre-checks (from CLI output):
-   - \`openspec/changes/<name>/execution-plan.md\` exists. If missing, STOP and ask the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`), then rerun ${rerunInstruction}.
+   - \`openspec/changes/<name>/plan.md\` exists. If missing, STOP and ask the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`), then rerun ${rerunInstruction}.
    - \`superpowers:subagent-driven-development\` is available (transitive: \`superpowers:test-driven-development\`, \`superpowers:requesting-code-review\`).
 
    Follow CLI \`instruction\` for: default executor (subagent-driven-development), inline opt-in policy, \`git commit\` defaults, \`using-git-worktrees\` defaults, no \`superpowers:executing-plans\` fallback.
@@ -64,7 +64,7 @@ ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
    - Dynamic instruction based on current state
 
    **Handle states:**
-   - If \`state: "blocked"\` (missing artifacts): show message; if \`schemaName\` is \`brainstorm-root\`, map the blocker to the next slash step (\`/opsx:brainstorm\`, \`/opsx:continue\`, or \`/opsx:writing-plans\` as appropriate) using the workflow sequence above; otherwise suggest \`/opsx:continue\` or the CLI output.
+   - If \`state: "blocked"\` (missing artifacts): show message; if \`schemaName\` is \`brainstorm-root\`, map the blocker to the next slash step (\`/opsx:brainstorm\`, \`/opsx:propose\`, or \`/opsx:writing-plans\` as appropriate) using the workflow sequence above; otherwise follow the CLI output.
    - If \`state: "all_done"\`: congratulate, suggest archive
    - Otherwise: proceed to implementation
 
@@ -181,7 +181,7 @@ This skill supports the "actions on a change" model:
 - **Allows artifact updates**: If implementation reveals design issues, suggest updating artifacts - not phase-locked, work fluidly`,
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
-    metadata: { author: 'openspec', version: '1.1' },
+    metadata: { author: 'openspec', version: '1.2' },
   };
 }
 
@@ -229,7 +229,7 @@ ${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
    - Dynamic instruction based on current state
 
    **Handle states:**
-   - If \`state: "blocked"\` (missing artifacts): show message; if \`schemaName\` is \`brainstorm-root\`, map the blocker to the next slash step (\`/opsx:brainstorm\`, \`/opsx:continue\`, or \`/opsx:writing-plans\` as appropriate) using the workflow sequence above; otherwise suggest \`/opsx:continue\` or the CLI output.
+   - If \`state: "blocked"\` (missing artifacts): show message; if \`schemaName\` is \`brainstorm-root\`, map the blocker to the next slash step (\`/opsx:brainstorm\`, \`/opsx:propose\`, or \`/opsx:writing-plans\` as appropriate) using the workflow sequence above; otherwise follow the CLI output.
    - If \`state: "all_done"\`: congratulate, suggest archive
    - Otherwise: proceed to implementation
 

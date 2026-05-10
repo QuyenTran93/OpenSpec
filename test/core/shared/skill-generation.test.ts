@@ -108,7 +108,8 @@ describe('skill-generation', () => {
     it('uses brainstorm-root apply when profile is brainstorm', () => {
       const entry = getSkillTemplates(['apply'], 'brainstorm')[0];
       expect(entry.template.instructions).toContain('Gate on execution plan before implementation loop');
-      expect(entry.template.instructions).toContain('execution-plan.md');
+      expect(entry.template.instructions).toContain('plan.md');
+      expect(entry.template.instructions).not.toContain('execution-plan.md');
     });
 
     it('enforces brainstorm gate policy language for brainstorm-root propose/new', () => {
@@ -242,7 +243,8 @@ describe('skill-generation', () => {
       const writingPlans = getCommandContents(['writing-plans'])[0];
 
       expect(brainstorm.body).toContain('brainstorm.md');
-      expect(writingPlans.body).toContain('execution-plan.md');
+      expect(writingPlans.body).toContain('plan.md');
+      expect(writingPlans.body).not.toContain('execution-plan.md');
     });
 
     it('applies brainstorm gate policy only to brainstorm profile propose/new commands', () => {

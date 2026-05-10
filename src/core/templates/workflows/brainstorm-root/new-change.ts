@@ -143,13 +143,13 @@ After completing the steps, summarize:
 - Schema/workflow being used and its artifact sequence
 - Current status (0/N artifacts complete)
 - The template for the first artifact
-- Prompt: "Ready to create the first artifact? Run \`/opsx:continue\` or just describe what this change is about and I'll draft it."
+- Prompt: "Ready to start? Run \`/opsx:brainstorm\` to begin the brainstorm-first design flow (or describe what this change is about and I'll draft brainstorm.md)."
 
 **Guardrails**
 - Do NOT create any artifacts yet - just show the instructions
 - Do NOT advance beyond showing the first artifact template
 - If the name is invalid (not kebab-case), ask for a valid name
-- If a change with that name already exists, suggest using \`/opsx:continue\` instead
+- If a change with that name already exists, suggest using \`/opsx:brainstorm\` to (re)open it
 - Pass --schema if using a non-default workflow`
   };
 }

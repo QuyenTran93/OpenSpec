@@ -23,7 +23,7 @@ Use the Skill tool to invoke **superpowers:brainstorming**.
    openspec new change "<name>" --schema brainstorm-root
    \`\`\`
 
-2. Get artifact instructions from the schema (canonical source-of-truth):
+2. Get phase instructions from the schema (canonical source-of-truth):
    \`\`\`bash
    openspec instructions brainstorm --change "<name>" --schema brainstorm-root --json
    \`\`\`
@@ -31,7 +31,6 @@ Use the Skill tool to invoke **superpowers:brainstorming**.
 3. Follow the returned \`instruction\` field exactly. It contains:
    - PRECHECK and skill-tool invocation directives
    - Output redirection rules (write to \`openspec/changes/<name>/brainstorm.md\`, never \`docs/superpowers/specs/\`)
-   - OpenSpec overrides for the superpowers brainstorming skill
    - Interactive brainstorming flow (steps 1–6)
    - Readiness gate (\`all_questions_resolved\`, \`design_approved\`)
    - Guardrail: no silent scaffolding
@@ -40,7 +39,7 @@ Use the Skill tool to invoke **superpowers:brainstorming**.
 
 5. Write the approved outcome to \`outputPath\` (\`openspec/changes/<name>/brainstorm.md\`). ${invokeNote}
 
-After approved brainstorm content is captured, hand off to \`/opsx:propose\` or \`/opsx:continue\` (not directly to \`/opsx:writing-plans\` or \`/opsx:apply\`).
+After approved brainstorm content is captured, hand off to \`/opsx:propose\` (which generates \`tasks.md\`) — not directly to \`/opsx:writing-plans\` or \`/opsx:apply\`.
 
 ${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
 
@@ -52,11 +51,11 @@ export function getBrainstormRootBrainstormSkillTemplate(): SkillTemplate {
     description: 'Run brainstorm-first design flow and produce brainstorm.md under the active OpenSpec change.',
     instructions: BRAINSTORM_THIN_BODY_TEMPLATE(
       "The user's request may include a change name (kebab-case) or a description of the work; if unclear, resolve the active change.",
-      'Optional `design.md`: create only when the brainstorm produces a substantive standalone technical design.'
+      'Hand off to `/opsx:propose` to generate or reconcile `tasks.md` once brainstorm is captured.'
     ),
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
-    metadata: { author: 'openspec', version: '1.1' },
+    metadata: { author: 'openspec', version: '1.2' },
   };
 }
 
@@ -68,7 +67,7 @@ export function getOpsxBrainstormRootBrainstormCommandTemplate(): CommandTemplat
     tags: ['workflow', 'brainstorm', 'design'],
     content: BRAINSTORM_THIN_BODY_TEMPLATE(
       'The argument after `/opsx:brainstorm` is the change name (kebab-case), if provided; otherwise infer from session context.',
-      'Optional `design.md`: create only when warranted by a non-trivial standalone technical design.'
+      'Hand off to `/opsx:propose` to generate or reconcile `tasks.md` once brainstorm is captured.'
     ),
   };
 }
