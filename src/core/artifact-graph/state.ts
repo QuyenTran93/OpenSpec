@@ -25,6 +25,12 @@ export function detectCompleted(graph: ArtifactGraph, changeDir: string): Comple
     }
   }
 
+  for (const { id, phase } of graph.getAllPhases()) {
+    if (isArtifactComplete(phase.generates, changeDir)) {
+      completed.add(id);
+    }
+  }
+
   return completed;
 }
 

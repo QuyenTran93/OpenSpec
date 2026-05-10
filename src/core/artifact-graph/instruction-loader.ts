@@ -6,7 +6,7 @@ import { detectCompleted } from './state.js';
 import { resolveSchemaForChange } from '../../utils/change-metadata.js';
 import { FileSystemUtils } from '../../utils/file-system.js';
 import { readProjectConfig, validateConfigRules } from '../project-config.js';
-import type { Artifact, CompletedSet } from './types.js';
+import type { CompletedSet } from './types.js';
 
 // Session-level cache for validation warnings (avoid repeating same warnings)
 const shownWarnings = new Set<string>();
@@ -43,12 +43,14 @@ export interface ChangeContext {
 }
 
 /**
- * Enriched instructions for creating an artifact.
+ * Enriched instructions for creating an artifact or phase output.
  */
 export interface ArtifactInstructions {
+  /** Kind of node: 'artifact' (in artifacts[]) or 'phase' (top-level brainstorm/plan/apply). */
+  kind: 'artifact' | 'phase';
   /** Change name */
   changeName: string;
-  /** Artifact ID */
+  /** Artifact or phase ID */
   artifactId: string;
   /** Schema name */
   schemaName: string;
@@ -56,7 +58,7 @@ export interface ArtifactInstructions {
   changeDir: string;
   /** Output path pattern (e.g., "proposal.md") */
   outputPath: string;
-  /** Artifact description */
+  /** Artifact/phase description */
   description: string;
   /** Guidance on how to create this artifact (from schema instruction field) */
   instruction: string | undefined;
@@ -68,21 +70,23 @@ export interface ArtifactInstructions {
   template: string;
   /** Dependencies with completion status and paths */
   dependencies: DependencyInfo[];
-  /** Artifacts that become available after completing this one */
+  /** Artifacts that become available after completing this one (phases have empty unlocks) */
   unlocks: string[];
 }
 
 /**
- * Dependency information including path and description.
+ * Dependency information including path, description, and node kind.
  */
 export interface DependencyInfo {
-  /** Artifact ID */
+  /** Artifact or phase ID */
   id: string;
+  /** Whether this dep is artifact or phase */
+  kind: 'artifact' | 'phase';
   /** Whether the dependency is completed */
   done: boolean;
   /** Relative output path of the dependency (e.g., "proposal.md") */
   path: string;
-  /** Description of the dependency artifact */
+  /** Description of the dependency */
   description: string;
 }
 
@@ -103,6 +107,21 @@ export interface ArtifactStatus {
 }
 
 /**
+ * Status of a top-level phase (brainstorm, plan).
+ * Phases do not gate `isComplete`; their status is informational.
+ */
+export interface PhaseStatus {
+  /** Phase ID */
+  id: string;
+  /** Output path */
+  outputPath: string;
+  /** Status: done (file exists), ready (deps satisfied), or blocked */
+  status: 'done' | 'ready' | 'blocked';
+  /** Missing dependencies (only for blocked) */
+  missingDeps?: string[];
+}
+
+/**
  * Formatted change status.
  */
 export interface ChangeStatus {
@@ -116,6 +135,8 @@ export interface ChangeStatus {
   applyRequires: string[];
   /** Status of each artifact */
   artifacts: ArtifactStatus[];
+  /** Status of each top-level phase (excluding apply, which has its own command) */
+  phases: PhaseStatus[];
 }
 
 /**
@@ -220,38 +241,40 @@ export function generateInstructions(
   artifactId: string,
   projectRoot?: string
 ): ArtifactInstructions {
-  const artifact = context.graph.getArtifact(artifactId);
-  if (!artifact) {
-    throw new Error(`Artifact '${artifactId}' not found in schema '${context.schemaName}'`);
+  const node = context.graph.getNode(artifactId);
+  if (!node) {
+    throw new Error(
+      `Artifact or phase '${artifactId}' not found in schema '${context.schemaName}'`
+    );
   }
 
-  const templateContent = loadTemplate(context.schemaName, artifact.template, context.projectRoot);
-  const dependencies = getDependencyInfo(artifact, context.graph, context.completed);
-  const unlocks = getUnlockedArtifacts(context.graph, artifactId);
+  const isPhase = node.kind === 'phase';
+  const item = node.node;
+  const description = (item as { description?: string }).description ?? '';
 
-  // Use projectRoot from context if not explicitly provided
+  const templateContent = loadTemplate(context.schemaName, item.template, context.projectRoot);
+  const dependencies = getDependencyInfo(item.requires, context.graph, context.completed);
+  const unlocks = isPhase ? [] : getUnlockedArtifacts(context.graph, artifactId);
+
   const effectiveProjectRoot = projectRoot ?? context.projectRoot;
 
-  // Try to read project config for context and rules
   let projectConfig = null;
   if (effectiveProjectRoot) {
     try {
       projectConfig = readProjectConfig(effectiveProjectRoot);
     } catch {
-      // If config read fails, continue without config
+      // ignore config read failures
     }
   }
 
-  // Validate rules artifact IDs if config has rules (only once per session)
   if (projectConfig?.rules) {
-    const validArtifactIds = new Set(context.graph.getAllArtifacts().map((a) => a.id));
+    const validIds = new Set(context.graph.getAllNodes().map((n) => n.id));
     const warnings = validateConfigRules(
       projectConfig.rules,
-      validArtifactIds,
+      validIds,
       context.schemaName
     );
 
-    // Show each unique warning only once per session
     for (const warning of warnings) {
       if (!shownWarnings.has(warning)) {
         console.warn(warning);
@@ -260,19 +283,20 @@ export function generateInstructions(
     }
   }
 
-  // Extract context and rules as separate fields (not prepended to template)
   const configContext = projectConfig?.context?.trim() || undefined;
   const rulesForArtifact = projectConfig?.rules?.[artifactId];
-  const configRules = rulesForArtifact && rulesForArtifact.length > 0 ? rulesForArtifact : undefined;
+  const configRules =
+    rulesForArtifact && rulesForArtifact.length > 0 ? rulesForArtifact : undefined;
 
   return {
+    kind: node.kind,
     changeName: context.changeName,
-    artifactId: artifact.id,
+    artifactId,
     schemaName: context.schemaName,
     changeDir: context.changeDir,
-    outputPath: artifact.generates,
-    description: artifact.description,
-    instruction: artifact.instruction,
+    outputPath: item.generates,
+    description,
+    instruction: item.instruction,
     context: configContext,
     rules: configRules,
     template: templateContent,
@@ -282,20 +306,22 @@ export function generateInstructions(
 }
 
 /**
- * Gets dependency info including paths and descriptions.
+ * Gets dependency info including paths, descriptions, and node kind.
+ * Resolves each requires entry against artifacts first, then phases.
  */
 function getDependencyInfo(
-  artifact: Artifact,
+  requires: string[],
   graph: ArtifactGraph,
   completed: CompletedSet
 ): DependencyInfo[] {
-  return artifact.requires.map(id => {
-    const depArtifact = graph.getArtifact(id);
+  return requires.map((id) => {
+    const dep = graph.getNode(id);
     return {
       id,
+      kind: dep?.kind ?? 'artifact',
       done: completed.has(id),
-      path: depArtifact?.generates ?? id,
-      description: depArtifact?.description ?? '',
+      path: dep?.node.generates ?? id,
+      description: (dep?.node as { description?: string } | undefined)?.description ?? '',
     };
   });
 }
@@ -366,11 +392,29 @@ export function formatChangeStatus(context: ChangeContext): ChangeStatus {
   const orderMap = new Map(buildOrder.map((id, idx) => [id, idx]));
   artifactStatuses.sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
 
+  // Phase statuses (top-level brainstorm/plan only; apply has its own command)
+  const phaseStatuses: PhaseStatus[] = context.graph.getAllPhases().map(({ id, phase }) => {
+    if (context.completed.has(id)) {
+      return { id, outputPath: phase.generates, status: 'done' as const };
+    }
+    const missing = phase.requires.filter((r) => !context.completed.has(r));
+    if (missing.length > 0) {
+      return {
+        id,
+        outputPath: phase.generates,
+        status: 'blocked' as const,
+        missingDeps: missing.sort(),
+      };
+    }
+    return { id, outputPath: phase.generates, status: 'ready' as const };
+  });
+
   return {
     changeName: context.changeName,
     schemaName: context.schemaName,
     isComplete: context.graph.isComplete(context.completed),
     applyRequires,
     artifacts: artifactStatuses,
+    phases: phaseStatuses,
   };
 }
