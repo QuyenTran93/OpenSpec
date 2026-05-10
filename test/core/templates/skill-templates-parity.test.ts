@@ -71,14 +71,14 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
 };
 
 const EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES: Record<string, string> = {
-  getBrainstormRootBrainstormSkillTemplate: '680950c8f925402b1fa4bdbb698b0a2456f843f17898c6fa299e3dd39a20a062',
+  getBrainstormRootBrainstormSkillTemplate: 'ea2f91b9b8f05921143155634b64f949d63c2216ac9ebccedd62f3c1e96ed66e',
   getBrainstormRootProposeSkillTemplate: '90b97ba5e9bf1a1d98334b2bf47b61bf0723a2f54ba4f2c338b5abdfa48009c0',
   getBrainstormRootWritingPlansSkillTemplate: '6671b787027f8a749a3931ee12837d149b9417d6d781f90c6004552b64683897',
   getBrainstormRootContinueChangeSkillTemplate: '92809c493f4740409c0f876e17508ae22ba70be3359e26ed59deb27fbed85cd2',
   getBrainstormRootApplyChangeSkillTemplate: 'c1e997fc3c47ba8fad7910c1e503dc04d59e259e730b7923231f54872cdbd38d',
   getBrainstormRootNewChangeSkillTemplate: 'f3eb31447929064c6fce5711a183e5075df3715bdabef6bfdcdb6b2824bd2a36',
   getBrainstormRootArchiveChangeSkillTemplate: '8324edf5e4403723002e54167272f2440024fdc73a30e89455ec0f9e6692d569',
-  getOpsxBrainstormRootBrainstormCommandTemplate: '5ecca4c128c6d076cfad72a7c2f537ed58237bc5aefe867a26a3eb061a95391b',
+  getOpsxBrainstormRootBrainstormCommandTemplate: '6737c7f143c52cc13d39327810f3beb099c9fa55714cb9193be7b987f4ed102e',
   getOpsxBrainstormRootProposeCommandTemplate: 'b0192849b578c9b0228a5c8794583bc6e3477323b7396b5549b2bcb511f4ecf5',
   getOpsxBrainstormRootWritingPlansCommandTemplate: '248e1729390e899bca36ae83c308a47decc7bde9a0985322a91a560064302ff0',
   getOpsxBrainstormRootContinueCommandTemplate: '94bcc742c567e60bee94129e19e4d88df88f1ec2ccef6858c46aea77fad4496d',
@@ -181,12 +181,11 @@ describe('skill templates split parity', () => {
     expect(actualHashes).toEqual(EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES);
   });
 
-  it('exposes superpowers path mapping in brainstorm-root brainstorm and writing-plans templates', () => {
-    const brainstormSkill = getBrainstormRootBrainstormSkillTemplate();
+  it('exposes superpowers path mapping in brainstorm-root writing-plans template', () => {
     const writingSkill = getBrainstormRootWritingPlansSkillTemplate();
 
-    expect(brainstormSkill.instructions).toContain('Superpowers → OpenSpec');
-    expect(brainstormSkill.instructions).toContain('docs/superpowers/specs/');
+    // Note: brainstorm skill body markers ('Superpowers → OpenSpec', 'docs/superpowers/specs/')
+    // moved to schema canonical content. Asserted in test/schemas/brainstorm-root.instruction.test.ts.
     expect(writingSkill.instructions).toContain('docs/superpowers/plans/');
     expect(writingSkill.instructions).toContain('execution-plan.md');
   });

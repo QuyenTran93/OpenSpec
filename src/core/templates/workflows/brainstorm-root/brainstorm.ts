@@ -1,30 +1,62 @@
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
-  BRAINSTORM_ROOT_BRAINSTORM_SHARED_BODY,
+  BRAINSTORM_ROOT_GATE_POLICY_BLOCK,
   BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK,
 } from './superpowers-openspec-mapping.js';
+
+const BRAINSTORM_THIN_BODY_TEMPLATE = (
+  argDescription: string,
+  invokeNote: string
+): string => `PRECHECK — required skill availability:
+Before invoking, confirm \`superpowers:brainstorming\` appears in your available skills list. If missing, STOP and inform the user that the Superpowers plugin must be installed (or that they can explicitly opt to write \`brainstorm.md\` manually). Do NOT silently fall back.
+
+Use the Skill tool to invoke **superpowers:brainstorming**.
+
+---
+
+**Input**: ${argDescription}
+
+**Steps**
+
+1. Resolve the active change name. If no change exists yet, run:
+   \`\`\`bash
+   openspec new change "<name>" --schema brainstorm-root
+   \`\`\`
+
+2. Get artifact instructions from the schema (canonical source-of-truth):
+   \`\`\`bash
+   openspec instructions brainstorm --change "<name>" --schema brainstorm-root --json
+   \`\`\`
+
+3. Follow the returned \`instruction\` field exactly. It contains:
+   - PRECHECK and skill-tool invocation directives
+   - Output redirection rules (write to \`openspec/changes/<name>/brainstorm.md\`, never \`docs/superpowers/specs/\`)
+   - OpenSpec overrides for the superpowers brainstorming skill
+   - Interactive brainstorming flow (steps 1–6)
+   - Readiness gate (\`all_questions_resolved\`, \`design_approved\`)
+   - Guardrail: no silent scaffolding
+
+4. Use \`template\` from the JSON as the structure for \`brainstorm.md\`. Apply \`context\` and \`rules\` as constraints — do NOT copy them into the artifact.
+
+5. Write the approved outcome to \`outputPath\` (\`openspec/changes/<name>/brainstorm.md\`). ${invokeNote}
+
+After approved brainstorm content is captured, hand off to \`/opsx:propose\` or \`/opsx:continue\` (not directly to \`/opsx:writing-plans\` or \`/opsx:apply\`).
+
+${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
+
+${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}`;
 
 export function getBrainstormRootBrainstormSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-brainstorm',
     description: 'Run brainstorm-first design flow and produce brainstorm.md under the active OpenSpec change.',
-    instructions: `PRECHECK — required skill availability:
-Before invoking, confirm \`superpowers:brainstorming\` appears in your available skills list. If missing, STOP and inform the user that the Superpowers plugin must be installed (or that they can explicitly opt to write \`brainstorm.md\` manually using the template below). Do NOT silently fall back.
-
-Use the Skill tool to invoke **superpowers:brainstorming**.
-
-Follow the skill’s interactive phases (see the numbered list under **Superpowers → OpenSpec** below). Per OpenSpec brainstorm-root, **do not** invoke \`writing-plans\` inside this skill; persist to this change’s \`brainstorm.md\` only after readiness gate conditions are met (all clarifying questions resolved and design explicitly approved), add \`design.md\` only when optional per that body. Do not summarize partial outcomes into \`brainstorm.md\`. After approval, hand off to **propose / continue**, not apply, until propose/continue has produced the upstream schema artifacts.
-
----
-
-**Input**: The user's request may include a change name (kebab-case) or a description of the work; if unclear, resolve the active change using the rules below.
-
-${BRAINSTORM_ROOT_BRAINSTORM_SHARED_BODY}
-
-${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}`,
+    instructions: BRAINSTORM_THIN_BODY_TEMPLATE(
+      "The user's request may include a change name (kebab-case) or a description of the work; if unclear, resolve the active change.",
+      'Optional `design.md`: create only when the brainstorm produces a substantive standalone technical design.'
+    ),
     license: 'MIT',
     compatibility: 'Requires openspec CLI.',
-    metadata: { author: 'openspec', version: '1.0' },
+    metadata: { author: 'openspec', version: '1.1' },
   };
 }
 
@@ -34,19 +66,9 @@ export function getOpsxBrainstormRootBrainstormCommandTemplate(): CommandTemplat
     description: 'Run brainstorm-first design workflow and write brainstorm.md for a change',
     category: 'Workflow',
     tags: ['workflow', 'brainstorm', 'design'],
-    content: `PRECHECK — required skill availability:
-Before invoking, confirm \`superpowers:brainstorming\` appears in your available skills list. If missing, STOP and inform the user that the Superpowers plugin must be installed (or that they can explicitly opt to write \`brainstorm.md\` manually using the template below). Do NOT silently fall back.
-
-Use the Skill tool to invoke **superpowers:brainstorming**.
-
-Follow the interactive phases (numbered list under **Superpowers → OpenSpec** below). **Do not** run \`/opsx:writing-plans\` or \`/opsx:apply\` from this command; persist to \`brainstorm.md\` only after readiness gate conditions are met (all clarifying questions resolved and design explicitly approved), add optional \`design.md\` only when warranted. Do not summarize partial outcomes into \`brainstorm.md\`. Hand off to \`/opsx:propose\` or \`/opsx:continue\` after approval until upstream schema artifacts are complete.
-
----
-
-**Input**: The argument after \`/opsx:brainstorm\` is the change name (kebab-case), if provided; otherwise infer from session context using the rules below.
-
-${BRAINSTORM_ROOT_BRAINSTORM_SHARED_BODY}
-
-${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}`,
+    content: BRAINSTORM_THIN_BODY_TEMPLATE(
+      'The argument after `/opsx:brainstorm` is the change name (kebab-case), if provided; otherwise infer from session context.',
+      'Optional `design.md`: create only when warranted by a non-trivial standalone technical design.'
+    ),
   };
 }
