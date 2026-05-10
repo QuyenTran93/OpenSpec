@@ -7,6 +7,11 @@
 - Config bootstrap now follows create-if-missing semantics:
   - `init`, `update`, and `migration` no longer normalize or rewrite schema in existing `openspec/config.yaml|yml`.
   - When config is missing, OpenSpec creates `openspec/config.yaml` with minimal `schema` content derived from active workflows.
+- `brainstorm-root` schema is now the single-source-of-truth for `/opsx:brainstorm` and `/opsx:apply` artifact creation guidance. Skill/command bodies have been shrunk to thin orchestrators delegating to `openspec instructions <artifact-id> --json`. **Recommended:** rerun `openspec install` to pick up the slimmer bodies (~17% token saving on full brainstorm-root flows). Existing installations continue to work without changes.
+
+### Schema harmonization
+
+- `schemas/brainstorm-root/schema.yaml` `apply.instruction`: combined `Use the Skill tool to invoke **superpowers:subagent-driven-development**` onto a single line, and added `using-git-worktrees` defaulting policy (promoted from skill body to schema as part of single-source-of-truth migration).
 
 ## 1.3.1
 
