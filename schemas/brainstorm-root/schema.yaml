@@ -50,12 +50,26 @@ brainstorm:
     2. Ask clarifying questions (one at a time)
     3. Propose 2-3 approaches with trade-offs
     4. Present design sections for approval
-    5. Spec self-review
-    6. Summarize the approved outcome in `brainstorm.md`
+    5. Write the approved outcome to `openspec/changes/<name>/brainstorm.md`
+       (follow the schema template structure; fill sections — do not leave an empty shell)
+    6. Spec self-review on the written artifact (align with superpowers:brainstorming
+       checklist — review the file as if it were `docs/superpowers/specs/…`, but fix
+       issues in `brainstorm.md`):
+       - Placeholder scan: no TBD/TODO/incomplete sections unless deliberate and listed
+         under Open Questions
+       - Internal consistency: sections do not contradict; architecture matches decisions
+       - Scope check: focused enough for `tasks.md` and one implementation plan
+       - Ambiguity check: requirements explicit; resolve dual interpretations
+       Fix issues inline; re-read after edits.
+    7. User review gate (align with superpowers:brainstorming before implementation):
+       Ask the user to review `brainstorm.md`. If they want changes, update the file
+       and repeat steps 6–7 until they approve or explicitly direct `/opsx:propose`.
 
-    Readiness gate before writing brainstorm.md:
+    Readiness gate before handoff to `/opsx:propose`:
     - all_questions_resolved = true
     - design_approved = true
+    - spec_self_review_passed = true (step 6)
+    - user_acknowledged_brainstorm = true (step 7)
 
     Guardrail — no silent scaffolding:
     Do NOT dump empty templates without completing the interactive flow above

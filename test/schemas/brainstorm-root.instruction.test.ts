@@ -61,6 +61,20 @@ describe('brainstorm-root schema instruction (canonical content, v2)', () => {
       expect(bInstr).toContain('design_approved');
     });
 
+    it('embeds spec self-review checklist aligned with superpowers:brainstorming', () => {
+      expect(bInstr).toContain('Spec self-review');
+      expect(bInstr).toContain('Placeholder scan');
+      expect(bInstr).toContain('Internal consistency');
+      expect(bInstr).toContain('Scope check');
+      expect(bInstr).toContain('Ambiguity check');
+      expect(bInstr).toContain('spec_self_review_passed');
+    });
+
+    it('requires user review of brainstorm.md before propose handoff', () => {
+      expect(bInstr).toContain('User review gate');
+      expect(bInstr).toContain('user_acknowledged_brainstorm');
+    });
+
     it('hands off to /opsx:propose, not writing-plans/apply', () => {
       expect(bInstr).toContain('/opsx:propose');
     });

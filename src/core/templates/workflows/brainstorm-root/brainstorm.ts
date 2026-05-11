@@ -31,8 +31,8 @@ Use the Skill tool to invoke **superpowers:brainstorming**.
 3. Follow the returned \`instruction\` field exactly. It contains:
    - PRECHECK and skill-tool invocation directives
    - Output redirection rules (write to \`openspec/changes/<name>/brainstorm.md\`, never \`docs/superpowers/specs/\`)
-   - Interactive brainstorming flow (steps 1–6)
-   - Readiness gate (\`all_questions_resolved\`, \`design_approved\`)
+   - Interactive brainstorming flow (steps 1–7), including **spec self-review** and **user review** of \`brainstorm.md\` (same quality bar as **superpowers:brainstorming**; see schema for the checklist)
+   - Readiness gate (includes \`spec_self_review_passed\` and \`user_acknowledged_brainstorm\` after steps 6–7)
    - Guardrail: no silent scaffolding
 
 4. Use \`template\` from the JSON as the structure for \`brainstorm.md\`. Apply \`context\` and \`rules\` as constraints — do NOT copy them into the artifact.
