@@ -96,6 +96,24 @@ describe('brainstorm-root schema instruction (canonical content, v2)', () => {
       expect(pInstr).toContain('brainstorm.md');
       expect(pInstr).toContain('tasks.md');
     });
+
+    it('embeds plan self-review aligned with superpowers:writing-plans', () => {
+      expect(pInstr).toContain('Plan self-review');
+      expect(pInstr).toContain('Spec coverage');
+      expect(pInstr).toContain('Placeholder scan');
+      expect(pInstr).toContain('Type / name consistency');
+      expect(pInstr).toContain('plan_self_review_passed');
+    });
+
+    it('requires user review of plan.md before apply handoff', () => {
+      expect(pInstr).toContain('User review gate');
+      expect(pInstr).toContain('user_acknowledged_plan');
+    });
+
+    it('delegates execution mode to apply, not the plan phase', () => {
+      expect(pInstr).toContain('Do **not** choose execution mode');
+      expect(pInstr).toContain('owns that policy');
+    });
   });
 
   describe('apply.instruction (preserved from v1)', () => {

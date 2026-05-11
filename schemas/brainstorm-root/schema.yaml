@@ -87,14 +87,45 @@ plan:
 
     Use the Skill tool to invoke **superpowers:writing-plans**.
 
-    OpenSpec overrides:
+    OpenSpec overrides (non-negotiable):
     - Write the plan to `openspec/changes/<name>/plan.md`
       (NEVER `docs/superpowers/plans/`).
     - Read both `brainstorm.md` (architecture/decisions) and `tasks.md`
-      (coarse task list) as inputs. The plan decomposes each coarse task into
-      2-5 minute TDD micro-steps with exact file paths and test commands.
+      (coarse checklist) before drafting. Decompose each coarse task into
+      2–5 minute TDD micro-steps with exact file paths, concrete commands, and
+      expected outcomes — same quality bar as the skill; only the destination path changes.
 
     Run AFTER `/opsx:propose` has produced `tasks.md`, BEFORE `/opsx:apply`.
+    Do **not** choose execution mode here (inline vs subagent); `/opsx:apply` owns that policy.
+
+    Mandatory planning flow (align with superpowers:writing-plans):
+    1. **Announce** (one line): you are using **writing-plans** to draft the implementation plan.
+    2. **Read inputs**: load `brainstorm.md` and `tasks.md` fully; note scope and dependencies.
+    3. **Scope check**: if work spans multiple independent subsystems, split into separate plans
+       or clearly separated sections — one coherent execution thread per `plan.md` unless
+       `tasks.md` already scoped a single change (see skill *Scope Check*).
+    4. **File / unit map**: before task breakdown, outline files to create or modify and each
+       file’s responsibility (see skill *File Structure* — informs decomposition).
+    5. **Draft `plan.md`**: follow the schema template and the skill’s required plan header,
+       bite-sized steps, and *No Placeholders* rule (no TBD/TODO shell steps, no vague “add
+       validation” without concrete actions — see skill).
+    6. **Plan self-review** (same checklist as superpowers:writing-plans *Self-Review* — fix inline):
+       - **Spec coverage:** each requirement implied by `brainstorm.md` and each coarse
+         `tasks.md` item maps to at least one plan task; add tasks for gaps.
+       - **Placeholder scan:** eliminate patterns forbidden in the skill (TBD, “implement later”,
+         steps without real code/commands where required, etc.).
+       - **Type / name consistency:** types, signatures, and identifiers match across tasks.
+    7. **User review gate**: ask the user to review `plan.md` before `/opsx:apply`. If they want
+       edits, update the file and repeat steps 6–7 until they approve or explicitly direct apply.
+
+    Readiness gate before handoff to `/opsx:apply`:
+    - `plan.md` exists and is materially complete (not an empty template)
+    - plan_self_review_passed = true (step 6)
+    - user_acknowledged_plan = true (step 7)
+
+    Guardrail — no silent scaffolding:
+    Do NOT write an empty `plan.md` without completing the flow above via **superpowers:writing-plans**
+    (unless the user explicitly opts into manual authoring).
 
 apply:
   requires: [tasks, plan]

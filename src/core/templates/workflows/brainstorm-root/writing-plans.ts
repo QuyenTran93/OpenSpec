@@ -23,7 +23,11 @@ Use the Skill tool to invoke **superpowers:writing-plans**.
    openspec instructions plan --change "<name>" --schema brainstorm-root --json
    \`\`\`
 
-3. Follow the returned \`instruction\` field. It directs you to read both \`brainstorm.md\` (architecture/decisions) and \`tasks.md\` (coarse task list), then write \`plan.md\` with TDD micro-steps.
+3. Follow the returned \`instruction\` field. It contains:
+   - PRECHECK and **superpowers:writing-plans** invocation
+   - OpenSpec path overrides (\`plan.md\` only — never \`docs/superpowers/plans/\`)
+   - Mandatory planning flow **steps 1–7** (scope + file map + draft + **plan self-review** + **user review** of \`plan.md\`, matching the skill’s *Self-Review* and *No Placeholders* bars)
+   - Readiness gate (\`plan_self_review_passed\`, \`user_acknowledged_plan\`)
 
 4. Use \`template\` from the JSON as the structure. Apply \`context\` and \`rules\` as constraints — do NOT copy them into the artifact.
 
