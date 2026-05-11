@@ -12,7 +12,9 @@ import type { Profile } from './global-config.js';
  * These provide the streamlined experience for new users.
  */
 export const CORE_WORKFLOWS = ['propose', 'explore', 'apply', 'archive'] as const;
-export const BRAINSTORM_WORKFLOWS = ['propose', 'brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive'] as const;
+// brainstorm-root v2 dropped the `continue` workflow; tasks.md is generated/
+// reconciled by `propose`, plan.md by `writing-plans`.
+export const BRAINSTORM_WORKFLOWS = ['propose', 'brainstorm', 'new', 'writing-plans', 'apply', 'archive'] as const;
 
 /**
  * All available workflows in the system.

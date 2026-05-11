@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### BREAKING
+
+- **`brainstorm-root` schema v2 — slim workflow.** The `brainstorm-root` schema has been re-architected to track a single artifact (`tasks.md`). `brainstorm.md` and `plan.md` are now schema-tracked **phases**, not artifacts, with their canonical instructions sourced from new top-level `brainstorm:` and `plan:` blocks in `schemas/brainstorm-root/schema.yaml`. `design.md` and `specs/**/*.md` artifacts have been removed from the schema, along with the `/opsx:continue` command.
+  - **Migration impact:** in-flight `brainstorm-root` change folders that already contain `design.md`, `specs/**/*.md`, or `execution-plan.md` keep working but those files are no longer schema-tracked. Move any required content into `tasks.md`/`plan.md` before the next archive.
+  - **Renames:** `execution-plan.md` → `plan.md`. `apply.executionPlan` now points to `plan.md`.
+  - **`/opsx:propose` simplification:** the propose command now only generates or reconciles `tasks.md` from `brainstorm.md`, preserving completion status across reruns.
+  - **`/opsx:continue` removed:** the single-artifact workflow makes a separate continue step redundant — `/opsx:propose` is the recovery skill when `tasks.md` is missing.
+  - **Unified dependency graph:** `requires` fields in artifacts and phases now uniformly accept references to either artifact ids or phase ids. Cycle detection spans both node types.
+  - **CLI:** `openspec instructions <id>` now resolves both artifact and phase ids; `openspec status --json` returns a top-level `phases[]` array alongside `artifacts[]` for `brainstorm-root` change folders.
+  - **Action required:** rerun `openspec install` to pick up the new slim skill/command bodies.
+
 ### Changed
 
 - Config bootstrap now follows create-if-missing semantics:

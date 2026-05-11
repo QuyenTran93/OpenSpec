@@ -63,12 +63,12 @@ describe('profiles', () => {
 
     it('should return brainstorm workflows for brainstorm profile', () => {
       const result = getProfileWorkflows('brainstorm');
-      expect(result).toEqual(['propose', 'brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive']);
+      expect(result).toEqual(['propose', 'brainstorm', 'new', 'writing-plans', 'apply', 'archive']);
     });
 
     it('should ignore customWorkflows for brainstorm profile', () => {
       const result = getProfileWorkflows('brainstorm', ['propose']);
-      expect(result).toEqual(['propose', 'brainstorm', 'new', 'continue', 'writing-plans', 'apply', 'archive']);
+      expect(result).toEqual(['propose', 'brainstorm', 'new', 'writing-plans', 'apply', 'archive']);
     });
   });
 });

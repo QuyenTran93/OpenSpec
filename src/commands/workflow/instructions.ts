@@ -328,23 +328,28 @@ export async function generateApplyInstructions(
   let state: ApplyInstructions['state'];
   let instruction: string;
 
+  // Pick the recovery skill name based on the schema. brainstorm-root v2
+  // dropped /opsx:continue, so we direct the user to /opsx:propose for tasks
+  // and /opsx:writing-plans for plan.md instead.
+  const isBrainstormRoot = schema.name === 'brainstorm-root';
+  const recoverySkill = isBrainstormRoot ? '/opsx:propose' : 'openspec-continue-change';
+  const planSkill = isBrainstormRoot ? '/opsx:writing-plans' : 'writing-plans';
+
   if (missingArtifacts.length > 0) {
     state = 'blocked';
-    instruction = `Cannot apply this change yet. Missing artifacts: ${missingArtifacts.join(', ')}.\nUse the openspec-continue-change skill to create the missing artifacts first.`;
+    instruction = `Cannot apply this change yet. Missing artifacts: ${missingArtifacts.join(', ')}.\nUse ${recoverySkill} to create the missing artifacts first.`;
   } else if (requiresExecutionPlan && !hasExecutionPlan) {
     state = 'blocked';
     const missingPlan = configuredExecutionPlan ?? 'execution-plan.md';
-    instruction = `Missing required plan file: ${missingPlan}.\nRun writing-plans and save it to openspec/changes/<name>/${missingPlan} before applying.`;
+    instruction = `Missing required plan file: ${missingPlan}.\nRun ${planSkill} and save it to openspec/changes/<name>/${missingPlan} before applying.`;
   } else if (tracksFile && !tracksFileExists) {
-    // Tracking file configured but doesn't exist yet
     const tracksFilename = path.basename(tracksFile);
     state = 'blocked';
-    instruction = `The ${tracksFilename} file is missing and must be created.\nUse openspec-continue-change to generate the tracking file.`;
+    instruction = `The ${tracksFilename} file is missing and must be created.\nUse ${recoverySkill} to generate the tracking file.`;
   } else if (tracksFile && tracksFileExists && total === 0) {
-    // Tracking file exists but contains no tasks
     const tracksFilename = path.basename(tracksFile);
     state = 'blocked';
-    instruction = `The ${tracksFilename} file exists but contains no tasks.\nAdd tasks to ${tracksFilename} or regenerate it with openspec-continue-change.`;
+    instruction = `The ${tracksFilename} file exists but contains no tasks.\nAdd tasks to ${tracksFilename} or regenerate it with ${recoverySkill}.`;
   } else if (tracksFile && remaining === 0 && total > 0) {
     state = 'all_done';
     instruction = 'All tasks are complete! This change is ready to be archived.\nConsider running tests and reviewing the changes before archiving.';
@@ -408,10 +413,12 @@ export function printApplyInstructionsText(instructions: ApplyInstructions): voi
 
   // Warning for blocked state
   if (state === 'blocked' && missingArtifacts) {
+    const recoverySkill =
+      schemaName === 'brainstorm-root' ? '/opsx:propose' : 'openspec-continue-change';
     console.log('### ⚠️ Blocked');
     console.log();
     console.log(`Missing artifacts: ${missingArtifacts.join(', ')}`);
-    console.log('Use the openspec-continue-change skill to create these first.');
+    console.log(`Use ${recoverySkill} to create these first.`);
     console.log();
   }
 
