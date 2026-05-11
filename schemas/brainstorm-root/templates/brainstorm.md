@@ -1,6 +1,6 @@
 ## Design Summary
 
-<!-- Validated design from brainstorming session -->
+<!-- Validated design; edit sections in place — no separate self-review checklist block. -->
 
 ## Alternatives Considered
 

@@ -7,10 +7,7 @@ import {
 const BRAINSTORM_THIN_BODY_TEMPLATE = (
   argDescription: string,
   invokeNote: string
-): string => `PRECHECK — required skill availability:
-Before invoking, confirm \`superpowers:brainstorming\` appears in your available skills list. If missing, STOP and inform the user that the Superpowers plugin must be installed (or that they can explicitly opt to write \`brainstorm.md\` manually). Do NOT silently fall back.
-
-Use the Skill tool to invoke **superpowers:brainstorming**.
+): string => `PRECHECK: \`superpowers:brainstorming\` must be available; else STOP (plugin or manual \`brainstorm.md\`). Invoke it via the Skill tool.
 
 ---
 
@@ -18,28 +15,19 @@ Use the Skill tool to invoke **superpowers:brainstorming**.
 
 **Steps**
 
-1. Resolve the active change name. If no change exists yet, run:
-   \`\`\`bash
-   openspec new change "<name>" --schema brainstorm-root
-   \`\`\`
+1. Resolve change name; if none: \`openspec new change "<name>" --schema brainstorm-root\`
 
-2. Get phase instructions from the schema (canonical source-of-truth):
+2. Canonical instructions (do not paraphrase — avoids duplicating long schema text in context):
    \`\`\`bash
    openspec instructions brainstorm --change "<name>" --schema brainstorm-root --json
    \`\`\`
+   Follow \`instruction\` exactly (steps 1–7, gates, guardrails). Self-review = edit \`brainstorm.md\` in place; never paste the checklist as artifact prose.
 
-3. Follow the returned \`instruction\` field exactly. It contains:
-   - PRECHECK and skill-tool invocation directives
-   - Output redirection rules (write to \`openspec/changes/<name>/brainstorm.md\`, never \`docs/superpowers/specs/\`)
-   - Interactive brainstorming flow (steps 1–7), including **spec self-review** and **user review** of \`brainstorm.md\` (same quality bar as **superpowers:brainstorming**; see schema for the checklist)
-   - Readiness gate (includes \`spec_self_review_passed\` and \`user_acknowledged_brainstorm\` after steps 6–7)
-   - Guardrail: no silent scaffolding
+3. Use JSON \`template\` for structure; apply \`context\`/\`rules\` — do not copy them into the file.
 
-4. Use \`template\` from the JSON as the structure for \`brainstorm.md\`. Apply \`context\` and \`rules\` as constraints — do NOT copy them into the artifact.
+4. Write to \`outputPath\` (\`openspec/changes/<name>/brainstorm.md\`). ${invokeNote}
 
-5. Write the approved outcome to \`outputPath\` (\`openspec/changes/<name>/brainstorm.md\`). ${invokeNote}
-
-After approved brainstorm content is captured, hand off to \`/opsx:propose\` (which generates \`tasks.md\`) — not directly to \`/opsx:writing-plans\` or \`/opsx:apply\`.
+Then \`/opsx:propose\` → \`tasks.md\` (not writing-plans/apply direct).
 
 ${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
 

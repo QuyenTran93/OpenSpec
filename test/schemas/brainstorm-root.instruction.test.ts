@@ -70,6 +70,12 @@ describe('brainstorm-root schema instruction (canonical content, v2)', () => {
       expect(bInstr).toContain('spec_self_review_passed');
     });
 
+    it('requires executing self-review as edits, not as checklist prose in brainstorm.md', () => {
+      expect(bInstr.toLowerCase()).toContain('execute');
+      expect(bInstr).toContain('Do **not**');
+      expect(bInstr).toContain('substantive edits');
+    });
+
     it('requires user review of brainstorm.md before propose handoff', () => {
       expect(bInstr).toContain('User review gate');
       expect(bInstr).toContain('user_acknowledged_brainstorm');

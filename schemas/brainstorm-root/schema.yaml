@@ -31,50 +31,34 @@ brainstorm:
   template: brainstorm.md
   requires: []
   instruction: |
-    PRECHECK — required skill availability:
-    Confirm `superpowers:brainstorming` appears in your available skills list.
-    If missing, STOP and inform the user that the Superpowers plugin must be
-    installed (or that they can explicitly opt to write `brainstorm.md`
-    manually). Do NOT silently fall back.
+    PRECHECK: `superpowers:brainstorming` must appear in your skills list; if missing, STOP
+    (plugin install or manual `brainstorm.md`). No silent fallback.
 
     Use the Skill tool to invoke **superpowers:brainstorming**.
 
     OpenSpec overrides:
-    - Persist the final approved outcome in `openspec/changes/<name>/brainstorm.md`
-      (NEVER `docs/superpowers/specs/`).
-    - Hand off to `/opsx:propose` (which generates `tasks.md`) — not directly
-      to `/opsx:writing-plans` or `/opsx:apply`.
+    - Write to `openspec/changes/<name>/brainstorm.md` (never `docs/superpowers/specs/`).
+    - Next step is `/opsx:propose` → `tasks.md` (not `/opsx:writing-plans` or `/opsx:apply` direct).
 
-    Interactive brainstorming flow (mandatory):
+    Interactive flow (mandatory):
     1. Explore project context
     2. Ask clarifying questions (one at a time)
     3. Propose 2-3 approaches with trade-offs
     4. Present design sections for approval
-    5. Write the approved outcome to `openspec/changes/<name>/brainstorm.md`
-       (follow the schema template structure; fill sections — do not leave an empty shell)
-    6. Spec self-review on the written artifact (align with superpowers:brainstorming
-       checklist — review the file as if it were `docs/superpowers/specs/…`, but fix
-       issues in `brainstorm.md`):
-       - Placeholder scan: no TBD/TODO/incomplete sections unless deliberate and listed
-         under Open Questions
-       - Internal consistency: sections do not contradict; architecture matches decisions
-       - Scope check: focused enough for `tasks.md` and one implementation plan
-       - Ambiguity check: requirements explicit; resolve dual interpretations
-       Fix issues inline; re-read after edits.
-    7. User review gate (align with superpowers:brainstorming before implementation):
-       Ask the user to review `brainstorm.md`. If they want changes, update the file
-       and repeat steps 6–7 until they approve or explicitly direct `/opsx:propose`.
+    5. Write `openspec/changes/<name>/brainstorm.md` (schema template; filled — no empty shell)
+    6. Spec self-review (**execute** on the file — do **not** paste this step into `brainstorm.md`):
+       Fix substantive sections until Placeholder scan, Internal consistency, Scope check, and
+       Ambiguity check pass (superpowers:brainstorming bar). Do **not** add standalone
+       self-review/procedure headings — edit content inline; re-read; `spec_self_review_passed`
+       only after substantive edits (not checklist copy-paste).
+    7. User review gate: user reviews `brainstorm.md`; on changes, edit file and repeat 6–7 until
+       approval or explicit `/opsx:propose`.
 
-    Readiness gate before handoff to `/opsx:propose`:
-    - all_questions_resolved = true
-    - design_approved = true
-    - spec_self_review_passed = true (step 6)
-    - user_acknowledged_brainstorm = true (step 7)
+    Readiness gate → `/opsx:propose`:
+    all_questions_resolved; design_approved; spec_self_review_passed (step 6);
+    user_acknowledged_brainstorm (step 7)
 
-    Guardrail — no silent scaffolding:
-    Do NOT dump empty templates without completing the interactive flow above
-    via **superpowers:brainstorming** (unless the user explicitly chooses
-    manual authoring).
+    Guardrail: no empty templates without **superpowers:brainstorming** flow (unless manual opt-in).
 
 plan:
   generates: plan.md
