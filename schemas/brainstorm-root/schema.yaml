@@ -80,7 +80,7 @@ plan:
       expected outcomes — same quality bar as the skill; only the destination path changes.
 
     Run AFTER `/opsx:propose` has produced `tasks.md`, BEFORE `/opsx:apply`.
-    Do **not** choose execution mode here (inline vs subagent); `/opsx:apply` owns that policy.
+    `/opsx:apply` owns execution policy: default is **inline** in the primary session; subagents or Task tool are only for **review** or **read-only research** per `apply.instruction`. Do not sequence full-plan subagent orchestration here.
 
     Mandatory planning flow (align with superpowers:writing-plans):
     1. **Announce** (one line): you are using **writing-plans** to draft the implementation plan.
@@ -116,66 +116,66 @@ apply:
   tracks: tasks.md
   executionPlan: plan.md
   instruction: |
-    Before implementing, set up an isolated workspace and executor:
+    Before implementing, confirm skills and execution path:
 
-    0. **Pre-flight — verify required Superpowers skills**:
+    0. **Pre-flight — verify required Superpowers skills**
 
-       This schema's apply phase requires the following skills.
-       Confirm each appears in your available skills list before
-       proceeding:
+       This schema's apply phase requires ALL of the following skills. Confirm
+       each appears in your available skills list before proceeding:
 
-       - superpowers:subagent-driven-development
-         (transitively: superpowers:test-driven-development,
-                        superpowers:requesting-code-review)
+       - **superpowers:test-driven-development**
+       - **superpowers:requesting-code-review**
+       - **superpowers:verification-before-completion**
 
-       If any required skill is missing, STOP and inform the user —
-       do NOT proceed and do NOT silently fall back to manual
-       implementation. The user can install the Superpowers plugin,
-       or explicitly opt into the manual fallback path described at
-       the end of this instruction.
+       If any required skill is missing, STOP and inform the user — do NOT
+       proceed and do NOT silently fall back.
 
-    1. **Executor — subagent-driven-development**:
+    1. **Primary path — inline in the primary session (default)**
 
-       Use the Skill tool to invoke **superpowers:subagent-driven-development** to execute the plan.md micro-tasks with fresh subagents per task.
+       By default, YOU (the primary agent in this session) implement `plan.md`
+       micro-tasks and update `tasks.md` checkboxes as coarse tasks complete.
 
-       Tell the executor:
-       - Read plan.md in this change directory for micro-tasks
-       - Update tasks.md checkboxes as coarse tasks complete
-       - Do NOT run git commit while executing this flow unless the user
-         explicitly asks for a commit; track progress with tasks.md
-         checkboxes and working-tree changes only.
-       - Do **not** default to `using-git-worktrees` unless the user
-         explicitly asks for isolated worktrees.
+       Discipline contract (follow these skills from the primary session; do not
+       skip their rules):
 
-       IMPORTANT — transitive skill activation:
-       subagent-driven-development internally enforces the
-       following skills, so you do NOT need to invoke them
-       manually:
-       - **superpowers:test-driven-development** — every task
-         follows RED-GREEN-REFACTOR. Implementation code written
-         before a failing test is deleted.
-       - **superpowers:requesting-code-review** — after each
-         task, a code-reviewer subagent is dispatched to catch
-         spec compliance and code quality issues. A final review
-         runs for the entire implementation before apply
-         concludes.
+       - **superpowers:test-driven-development** — RED-GREEN-REFACTOR; delete
+         implementation code written before a failing test exists.
+       - **superpowers:requesting-code-review** — run review rounds after
+         substantive work per that skill. Review delegation to a subagent or
+         Task-style reviewer is allowed **only** for this review work.
+       - **superpowers:verification-before-completion** — run the verification
+         gate before claiming apply is complete or marking remaining work done.
 
-       This schema does NOT support `superpowers:executing-plans`
-       as a fallback for non-subagent platforms. Per its SKILL.md,
-       executing-plans does not transitively activate TDD or
-       code-review — defeating the rigor that Superpowers brings.
-       If your platform lacks subagent support, use the built-in
-       `spec-driven` schema instead of this one.
+       Working agreements:
 
-    2. **Default vs inline apply (explicit opt-in only)**
+       - Read `plan.md` in this change directory for micro-tasks.
+       - Do NOT run `git commit` while executing this flow unless the user
+         explicitly asks for a commit; track progress with `tasks.md` checkboxes
+         and working-tree changes only.
+       - Do **not** default to `using-git-worktrees` unless the user explicitly
+         asks for isolated worktrees.
 
-       Follow the executor in section 1 by default: drive implementation
-       by invoking **superpowers:subagent-driven-development** from the
-       primary agent.
+       Do **not** invoke **superpowers:subagent-driven-development** to run the
+       full apply implementation loop. That orchestration model is not the default
+       for this schema.
 
-       Do **not** implement tasks inline in the primary agent session
-       unless the user **explicitly** requests inline apply (for example:
-       phrases like ``apply inline``, ``inline mode``, or ``implement
-       inline in this session``). Treat scope size, speed, or
-       convenience as irrelevant — silent fallback to inline is
-       forbidden.
+    2. **Delegated subagents / Task tool — review and research only**
+
+       You MAY use subagents or the Task tool **only** for:
+
+       - **Review** passes aligned with `superpowers:requesting-code-review`.
+       - **Research** / read-only exploration (for example mapping code or
+         locating call sites) to support implementation decisions.
+
+       You MUST NOT hand off bulk implementation of `plan.md` micro-tasks to
+       implementation subagents in place of the primary inline path.
+
+    3. **No `superpowers:executing-plans` substitute**
+
+       This schema does NOT support `superpowers:executing-plans` as a shortcut
+       that replaces the TDD + code-review + verification discipline in sections
+       0–1. If you cannot satisfy the required skills in section 0, STOP and
+       explain the gap — do not substitute `superpowers:executing-plans`.
+
+       Lack of Task/subagent support does **not** excuse skipping section 0; the
+       default path is inline in this session, not multi-subagent implementation.

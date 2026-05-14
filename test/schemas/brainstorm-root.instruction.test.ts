@@ -116,30 +116,44 @@ describe('brainstorm-root schema instruction (canonical content, v2)', () => {
       expect(pInstr).toContain('user_acknowledged_plan');
     });
 
-    it('delegates execution mode to apply, not the plan phase', () => {
-      expect(pInstr).toContain('Do **not** choose execution mode');
-      expect(pInstr).toContain('owns that policy');
+    it('hands off apply execution policy without sequencing subagent orchestration here', () => {
+      expect(pInstr).toContain('`/opsx:apply` owns execution policy');
+      expect(pInstr).toContain('**inline**');
+      expect(pInstr).toContain('**review**');
+      expect(pInstr).toContain('**read-only research**');
+      expect(pInstr).toContain('apply.instruction');
     });
   });
 
-  describe('apply.instruction (preserved from v1)', () => {
+  describe('apply.instruction (inline-default policy)', () => {
     const aInstr = schema.apply?.instruction ?? '';
 
-    it('mentions subagent-driven-development executor', () => {
-      expect(aInstr).toContain('superpowers:subagent-driven-development');
+    it('requires verification-before-completion in preflight', () => {
+      expect(aInstr).toContain('superpowers:verification-before-completion');
     });
 
-    it('mentions transitive TDD and code-review skills', () => {
+    it('mentions TDD and requesting-code-review skills', () => {
       expect(aInstr).toContain('superpowers:test-driven-development');
       expect(aInstr).toContain('superpowers:requesting-code-review');
     });
 
-    it('rejects executing-plans fallback', () => {
+    it('rejects executing-plans substitute', () => {
       expect(aInstr).toContain('superpowers:executing-plans');
     });
 
-    it('mentions inline opt-in policy', () => {
+    it('defaults to inline primary session', () => {
+      expect(aInstr).toContain('primary session');
       expect(aInstr).toContain('inline');
+    });
+
+    it('scopes subagents to review and research only', () => {
+      expect(aInstr).toContain('review');
+      expect(aInstr).toContain('Research');
+    });
+
+    it('forbids invoking subagent-driven-development for the full apply loop', () => {
+      expect(aInstr).toContain('superpowers:subagent-driven-development');
+      expect(aInstr).toMatch(/Do \*\*not\*\* invoke/i);
     });
 
     it('mentions git commit defaulting policy', () => {
@@ -148,12 +162,6 @@ describe('brainstorm-root schema instruction (canonical content, v2)', () => {
 
     it('mentions using-git-worktrees defaulting policy', () => {
       expect(aInstr).toContain('using-git-worktrees');
-    });
-
-    it('contains canonical Use-the-Skill-tool phrase on a single line', () => {
-      expect(aInstr).toContain(
-        'Use the Skill tool to invoke **superpowers:subagent-driven-development**'
-      );
     });
   });
 });

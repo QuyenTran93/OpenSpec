@@ -17,7 +17,9 @@ function expectPlanGatePrecedesImplementationLoop(template: string): void {
   expect(step6ToImplement?.[1]).toContain('plan.md');
   expect(step6ToImplement?.[1]).not.toContain('execution-plan.md');
   expect(step6ToImplement?.[1]).toContain('writing-plans');
-  expect(step6ToImplement?.[1]).toContain('superpowers:subagent-driven-development');
+  expect(step6ToImplement?.[1]).toContain('superpowers:test-driven-development');
+  expect(step6ToImplement?.[1]).toContain('superpowers:requesting-code-review');
+  expect(step6ToImplement?.[1]).toContain('superpowers:verification-before-completion');
   expect(step6ToImplement?.[1]).toContain('using-git-worktrees');
 }
 

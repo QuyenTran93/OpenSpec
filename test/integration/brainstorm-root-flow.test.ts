@@ -69,7 +69,8 @@ describe('brainstorm-root v2 end-to-end smoke flow', () => {
     writeFileSync(join(changeDir, 'plan.md'), '# Plan');
     const apply = await generateApplyInstructions(projectRoot, 'demo');
     expect(apply.state).toBe('ready');
-    expect(apply.instruction).toContain('superpowers:subagent-driven-development');
+    expect(apply.instruction).toContain('superpowers:verification-before-completion');
+    expect(apply.instruction).toContain('primary session');
   });
 
   it('generateInstructions for brainstorm phase returns canonical instruction', () => {

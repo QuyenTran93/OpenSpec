@@ -16,9 +16,9 @@ const APPLY_EXECUTION_PLAN_GATE_STEP = (
 
    Required pre-checks (from CLI output):
    - \`openspec/changes/<name>/plan.md\` exists. If missing, STOP and ask the user to run \`/opsx:writing-plans\` (or \`openspec-writing-plans\`), then rerun ${rerunInstruction}.
-   - \`superpowers:subagent-driven-development\` is available (transitive: \`superpowers:test-driven-development\`, \`superpowers:requesting-code-review\`).
+   - \`superpowers:test-driven-development\`, \`superpowers:requesting-code-review\`, and \`superpowers:verification-before-completion\` are available.
 
-   Follow CLI \`instruction\` for: default executor (subagent-driven-development), inline opt-in policy, \`git commit\` defaults, \`using-git-worktrees\` defaults, no \`superpowers:executing-plans\` fallback.
+   Follow CLI \`instruction\` for: **default inline** implementation in the primary session; subagents or Task tool **only** for review or read-only research; \`git commit\` defaults; \`using-git-worktrees\` defaults; no \`superpowers:executing-plans\` substitute.
 
    STOP if any prerequisite is missing; do NOT silently fall back.`;
 

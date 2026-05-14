@@ -69,18 +69,18 @@ const EXPECTED_FUNCTION_HASHES: Record<string, string> = {
 };
 
 const EXPECTED_BRAINSTORM_ROOT_FUNCTION_HASHES: Record<string, string> = {
-  getBrainstormRootBrainstormSkillTemplate: 'f5225a2a856e7bfebb3ac5e0301d97db5a8c908e1d5de6a9935f5cad216fec22',
-  getBrainstormRootProposeSkillTemplate: 'd49e6c3b77c64f2e9157934d2cd120ad9d150166ae9cbcd10980503680d760a6',
-  getBrainstormRootWritingPlansSkillTemplate: '68d19a6d10dca9fe7a9b1bae107b11951bdf2193efeff4e8b41a26f176184a11',
-  getBrainstormRootApplyChangeSkillTemplate: '4c3ba2e6ae9b7940530d953af7394141698474d2c411eef8714f0c43714b2515',
-  getBrainstormRootNewChangeSkillTemplate: '31312a0668c886984021bf20240379b93fd836ec0093a09b758f3232b3d1a70a',
-  getBrainstormRootArchiveChangeSkillTemplate: '04a7eaaa12e825d17f1bf1f5edd1a81a02dc97b289fdd99abd82d1b3258396b9',
-  getOpsxBrainstormRootBrainstormCommandTemplate: '63d64bff7e09c12b4c43797395147a9d4607f8dd4ef291192dddacf32ba905e6',
-  getOpsxBrainstormRootProposeCommandTemplate: 'a9c9c4a27e6ea0819a10d5d93af12ac16691c81a349214075bf8e0be40cb32f6',
-  getOpsxBrainstormRootWritingPlansCommandTemplate: 'ef6d5437e026be42741379f4749624aa221bc593322c24b4a86fe9b7a1dc966b',
-  getOpsxBrainstormRootApplyCommandTemplate: '9c3ab7d929ae86d73cf696d60b244f4a19c9bcf25e186f993ed04303a395d77d',
-  getOpsxBrainstormRootNewCommandTemplate: '7c4995a022a8a7e981f98052037893fa8f8cfe57ff9fce7d342747dcbf2e2245',
-  getOpsxBrainstormRootArchiveCommandTemplate: '9a2694cae06cd58d10f75e39aa325fda20b071045ff4a5349374ee0790a73af0',
+  getBrainstormRootBrainstormSkillTemplate: '13ad63df6a65f76ec09d4213400b90ea9fd2a2e5d8ba46a3b11bde852cae52e7',
+  getBrainstormRootProposeSkillTemplate: '87f3398628973c428fc74d90bc96711beb20f32618a073be28e3ee9965586105',
+  getBrainstormRootWritingPlansSkillTemplate: '713a26abe03e8c9d41facf78137d7820d7dc613d86dc1046b3e78f2076417d28',
+  getBrainstormRootApplyChangeSkillTemplate: '5ca80544d64a87129d0e5a4d9bbeb8d9068e15dc6007e124d6e375a16282dd97',
+  getBrainstormRootNewChangeSkillTemplate: '565ee2b1f9e1658312ac8dba3253a2c871ab9bb0df26c0c27b2aaed9b88e3998',
+  getBrainstormRootArchiveChangeSkillTemplate: '739b1e99467c9dfdf142ba66163ed460ad027a6869f0baad3c11a0f65dff91fd',
+  getOpsxBrainstormRootBrainstormCommandTemplate: '750d0c0ec014b06c0a9518722ec3030f92472e595774e2ac229f2f36a879cfa4',
+  getOpsxBrainstormRootProposeCommandTemplate: 'be5bfe39018590a2a515e10de511409d583b0e8e54443f7a4fa73cad87093041',
+  getOpsxBrainstormRootWritingPlansCommandTemplate: '8de9eb176cee8871ad5ed1fcf61ddc53e089c4cbdac60832fc36fa9ab3b6f801',
+  getOpsxBrainstormRootApplyCommandTemplate: '5fd9065e42727c935bde3a4f249e7ecc23282908b8751385f37fe763020f7d7c',
+  getOpsxBrainstormRootNewCommandTemplate: 'c403c4f252a30f4ddb39c5e3375062e07bd23080faa4c1c3a4ce3bdc428bd39c',
+  getOpsxBrainstormRootArchiveCommandTemplate: 'b51b9629c01f47243843ea20a9b31b9545f5dda5a017a70b1dfb967b806da808',
 };
 
 const EXPECTED_GENERATED_SKILL_CONTENT_HASHES: Record<string, string> = {
@@ -229,7 +229,9 @@ describe('skill templates split parity', () => {
     expect(applySkill.instructions).toContain('plan.md');
     expect(applySkill.instructions).not.toContain('execution-plan.md');
     expect(applySkill.instructions).toContain('writing-plans');
-    expect(applySkill.instructions).toContain('superpowers:subagent-driven-development');
+    expect(applySkill.instructions).toContain('superpowers:test-driven-development');
+    expect(applySkill.instructions).toContain('superpowers:requesting-code-review');
+    expect(applySkill.instructions).toContain('superpowers:verification-before-completion');
     expect(applySkill.instructions).toContain('superpowers:executing-plans');
     expect(applySkill.instructions).toContain('using-git-worktrees');
 
@@ -238,7 +240,9 @@ describe('skill templates split parity', () => {
     expect(applyCommand.content).toContain('plan.md');
     expect(applyCommand.content).not.toContain('execution-plan.md');
     expect(applyCommand.content).toContain('writing-plans');
-    expect(applyCommand.content).toContain('superpowers:subagent-driven-development');
+    expect(applyCommand.content).toContain('superpowers:test-driven-development');
+    expect(applyCommand.content).toContain('superpowers:requesting-code-review');
+    expect(applyCommand.content).toContain('superpowers:verification-before-completion');
     expect(applyCommand.content).toContain('superpowers:executing-plans');
     expect(applyCommand.content).toContain('using-git-worktrees');
   });
