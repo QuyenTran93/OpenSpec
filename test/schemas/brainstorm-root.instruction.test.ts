@@ -78,7 +78,7 @@ describe('brainstorm-root schema instruction (canonical content, v2)', () => {
 
     it('requires user review of brainstorm.md before propose handoff', () => {
       expect(bInstr).toContain('User review gate');
-      expect(bInstr).not.toContain('user_acknowledged_brainstorm');
+      expect(bInstr).toContain('user_acknowledged_brainstorm');
     });
 
     it('hands off to /opsx:propose, not writing-plans/apply', () => {
@@ -113,7 +113,7 @@ describe('brainstorm-root schema instruction (canonical content, v2)', () => {
 
     it('requires user review of plan.md before apply handoff', () => {
       expect(pInstr).toContain('User review gate');
-      expect(pInstr).not.toContain('user_acknowledged_plan');
+      expect(pInstr).toContain('user_acknowledged_plan');
     });
 
     it('hands off apply execution policy without sequencing subagent orchestration here', () => {

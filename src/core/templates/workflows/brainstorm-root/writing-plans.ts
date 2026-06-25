@@ -27,7 +27,7 @@ Use the Skill tool to invoke **superpowers:writing-plans**.
    - PRECHECK and **superpowers:writing-plans** invocation
    - OpenSpec path overrides (\`plan.md\` only — never \`docs/superpowers/plans/\`)
    - Mandatory planning flow **steps 1–7** (scope + file map + draft + **plan self-review** + **user review** of \`plan.md\`, matching the skill’s *Self-Review* and *No Placeholders* bars)
-   - Readiness gate (\`plan_self_review_passed\` + step 7 user approval)
+   - Readiness gate (\`plan_self_review_passed\`, \`user_acknowledged_plan\`)
 
 4. Use \`template\` from the JSON as the structure. Apply \`context\` and \`rules\` as constraints — do NOT copy them into the artifact.
 

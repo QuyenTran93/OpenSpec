@@ -55,7 +55,8 @@ brainstorm:
        approval or explicit `/opsx:propose`.
 
     Readiness gate → `/opsx:propose`:
-    all_questions_resolved; design_approved; spec_self_review_passed (step 6)
+    all_questions_resolved; design_approved; spec_self_review_passed (step 6);
+    user_acknowledged_brainstorm (step 7)
 
     Guardrail: no empty templates without **superpowers:brainstorming** flow (unless manual opt-in).
 
@@ -104,6 +105,7 @@ plan:
     Readiness gate before handoff to `/opsx:apply`:
     - `plan.md` exists and is materially complete (not an empty template)
     - plan_self_review_passed = true (step 6)
+    - user_acknowledged_plan = true (step 7)
 
     Guardrail — no silent scaffolding:
     Do NOT write an empty `plan.md` without completing the flow above via **superpowers:writing-plans**
