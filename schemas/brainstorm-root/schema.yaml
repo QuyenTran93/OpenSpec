@@ -46,6 +46,16 @@ brainstorm:
     3. Propose 2-3 approaches with trade-offs
     4. Present design sections for approval
     5. Write `openspec/changes/<name>/brainstorm.md` (schema template; filled — no empty shell)
+       Incremental artifact drafting (when long):
+       - Default: a single Write is fine when the brainstorm will be short (few sections,
+         no heavy research).
+       - When the brainstorm will be long (e.g. 3+ substantive sections, 2+ detailed
+         alternatives, large-scope research, or you judge a single Write risks stream-stall),
+         do NOT write the entire file in one Write. Instead: Write `## Design Summary` first,
+         then append in batches — typically 2–3 `##` sections per edit (e.g. Agreed Approach +
+         Key Decisions together). Within `## Alternatives Considered`, when there are many options,
+         batch 2–3 `### Option` blocks per edit. Goal: cap each generation chunk size, not
+         maximize round-trips.
     6. Spec self-review (**execute** on the file — do **not** paste this step into `brainstorm.md`):
        Fix substantive sections until Placeholder scan, Internal consistency, Scope check, and
        Ambiguity check pass (superpowers:brainstorming bar). Do **not** add standalone
@@ -93,6 +103,14 @@ plan:
     5. **Draft `plan.md`**: follow the schema template and the skill’s required plan header,
        bite-sized steps, and *No Placeholders* rule (no TBD/TODO shell steps, no vague “add
        validation” without concrete actions — see skill).
+       Incremental artifact drafting (when long):
+       - Default: a single Write is fine when the plan will be short (few tasks, small output).
+       - When the plan will be long (many `### Task N:` sections or micro-steps such that a single
+         Write risks stream-stall), do NOT write the entire file in one Write. Instead: Write the
+         plan header block first (Goal, Architecture, Tech Stack, constraints, `---`), then append
+         tasks in batches — typically 3–5 `### Task N:` sections per edit, or one batch per
+         `tasks.md` group (`## N.`). Goal: cap each generation chunk size, not maximize round-trips
+         (40 tasks ≈ 8–10 batches, not 40 appends).
     6. **Plan self-review** (same checklist as superpowers:writing-plans *Self-Review* — fix inline):
        - **Spec coverage:** each requirement implied by `brainstorm.md` and each coarse
          `tasks.md` item maps to at least one plan task; add tasks for gaps.

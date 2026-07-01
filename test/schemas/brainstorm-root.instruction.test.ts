@@ -84,6 +84,21 @@ describe('brainstorm-root schema instruction (canonical content, v2)', () => {
     it('hands off to /opsx:propose, not writing-plans/apply', () => {
       expect(bInstr).toContain('/opsx:propose');
     });
+
+    it('describes incremental artifact drafting when brainstorm is long', () => {
+      expect(bInstr).toMatch(/incremental artifact drafting/i);
+      expect(bInstr.toLowerCase()).toMatch(/when long|long brainstorm|artifact.*long/);
+    });
+
+    it('allows single Write when brainstorm is short', () => {
+      expect(bInstr.toLowerCase()).toMatch(/short|single write|one write/);
+    });
+
+    it('defines batched section append when drafting long brainstorm incrementally', () => {
+      expect(bInstr).toContain('## Design Summary');
+      expect(bInstr).toMatch(/batch|2.?3|sections per/i);
+      expect(bInstr).toMatch(/append|incremental/i);
+    });
   });
 
   describe('plan.instruction', () => {
@@ -122,6 +137,21 @@ describe('brainstorm-root schema instruction (canonical content, v2)', () => {
       expect(pInstr).toContain('**review**');
       expect(pInstr).toContain('**read-only research**');
       expect(pInstr).toContain('apply.instruction');
+    });
+
+    it('describes incremental artifact drafting when plan is long', () => {
+      expect(pInstr).toMatch(/incremental artifact drafting/i);
+      expect(pInstr.toLowerCase()).toMatch(/when long|long plan|plan.*long/);
+    });
+
+    it('allows single Write when plan is short', () => {
+      expect(pInstr.toLowerCase()).toMatch(/short|single write|one write/);
+    });
+
+    it('defines header-first and batched task append when drafting long plan incrementally', () => {
+      expect(pInstr).toMatch(/header/i);
+      expect(pInstr).toMatch(/batch|3.?5|tasks\.md.*group|per group/i);
+      expect(pInstr).toMatch(/append|incremental/i);
     });
   });
 
