@@ -2,7 +2,12 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'yaml';
 import { ChangeMetadataSchema, type ChangeMetadata } from '../core/change-metadata/index.js';
-import { getSchemaDir, listSchemas, resolveSchema } from '../core/artifact-graph/resolver.js';
+import {
+  canonicalizeBuiltInSchemaName,
+  getSchemaDir,
+  listSchemas,
+  resolveSchema,
+} from '../core/artifact-graph/resolver.js';
 import { readProjectConfig, type ProjectConfig } from '../core/project-config.js';
 
 export const METADATA_FILENAME = '.openspec.yaml';
@@ -276,7 +281,10 @@ export function readSkipSpecsMarker(changeDir: string): SkipSpecsMarker {
     // schema actually parses. Any failure fails closed.
     try {
       const projectRoot = path.resolve(changeDir, '../../..');
-      if (!getSchemaDir(result.data.schema, projectRoot)) {
+      const availableSchemas = listSchemas(projectRoot);
+      const isDeprecatedBuiltInAlias =
+        canonicalizeBuiltInSchemaName(result.data.schema) !== result.data.schema;
+      if (!availableSchemas.includes(result.data.schema) && !isDeprecatedBuiltInAlias) {
         return {
           declared: false,
           invalidReason: `schema: unknown schema '${result.data.schema}'`,

@@ -1,8 +1,18 @@
 export const NATIVE_BRAINSTORM_METHOD = `
 Explore the project context first. Ask one clarifying question at a time. Compare
-viable approaches and their trade-offs, recommend one, and obtain agreement on
-the chosen design. Write brainstorm.md, then review it for placeholders,
+two or three viable approaches and their trade-offs, recommend one, and obtain
+agreement on the chosen design. If fewer are genuinely viable, explain why fewer.
+Choose for long-term project quality, favoring a clean design and reuse. Never
+select a weaker approach because shipping speed alone makes it convenient.
+Write brainstorm.md, then review it for placeholders,
 consistency, scope, and ambiguity; fix findings inline.
+
+Review the artifact for requirements coverage and alignment between behavior and
+architecture. When available, use a review-only subagent for independent review
+of consistency, feasibility, and unnecessary scope. The subagent must not edit
+files. Evaluate its findings in the primary session. If subagents are unavailable,
+perform an expanded inline self-review from a fresh pass. Obtain user approval
+before handing off to downstream artifacts.
 
 Visual assistance is optional. Offer it only when the current question is
 materially easier to answer by seeing a UI/layout, architecture flow, state
@@ -27,4 +37,9 @@ the failing path, test one hypothesis at a time, fix the root cause, and add a
 regression test. Review requirements compliance before code quality. Verify
 review feedback against the code and requirements. Never claim completion
 without fresh verification evidence.
+
+Implementation runs inline in the primary session. Subagents are limited to
+independent review or read-only research; they must not edit files, implement
+tasks, or orchestrate the apply loop. If unavailable, use expanded inline
+self-review and record that review mode in the handoff summary.
 `.trim();

@@ -4,6 +4,15 @@
 
 ### Minor Changes
 
+- Raise the standalone `brainstorm` profile's artifact quality to closely match
+  rigorous design and implementation-planning workflows. `brainstorm.md` now
+  captures architecture, interfaces, failure behavior, testing, risks, and review
+  evidence; `plan.md` now requires executable task-level TDD steps, interfaces,
+  expected results, review and commit checkpoints, and final verification.
+  Implementation always runs inline in the primary session. Subagents are limited
+  to independent review or read-only research, with expanded inline self-review as
+  the fallback when they are unavailable.
+
 - Rename the built-in `brainstorm-root` schema to `brainstorm`. New profile
   initialization, generated workflows, schema listings, and runtime output use
   the shorter canonical name. Existing configuration and change metadata remain

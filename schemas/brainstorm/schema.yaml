@@ -9,13 +9,22 @@ artifacts:
     requires: []
     instruction: |
       Explore the project context before proposing changes. Ask one clarifying
-      question at a time, compare viable approaches and their trade-offs, then
-      obtain agreement on the chosen design.
+      question at a time, compare two or three viable approaches and their
+      trade-offs, then obtain agreement on the chosen design. If fewer approaches
+      are genuinely viable, explain why fewer before recommending one. Select for
+      long-term project quality, favoring a clean design and reuse; never choose a
+      weaker approach because shipping speed alone makes it convenient.
 
       Write a substantive brainstorm.md using the resolved output path returned
-      by this command. Review it for placeholders, internal consistency, scope,
-      and ambiguity; fix findings inline. Ask the user to review the resulting
-      artifact before handing off to propose. Do not require an external plugin.
+      by this command. Cover success criteria, current context, viable approaches,
+      architecture, component responsibilities, interfaces and data flow, errors
+      and edge cases, compatibility and migration, testing, risks, and questions.
+      Review it for placeholders, contradictions, scope, ambiguity, requirements coverage,
+      and alignment between behavior and architecture; fix findings
+      inline. When available, use a review-only subagent for independent review;
+      otherwise perform an expanded inline self-review from a fresh pass. Evaluate
+      review findings rather than accepting them blindly. Obtain user approval
+      before handing off to propose. Do not require an external plugin.
 
   - id: tasks
     generates: tasks.md
@@ -37,10 +46,19 @@ artifacts:
     instruction: |
       Read brainstorm.md and tasks.md from this resolved change directory. Map
       files to responsibilities and decompose the work into independently
-      testable deliverables with concrete paths, commands, and expected results.
-      Check requirement coverage, placeholders, and identifier consistency.
-      Keep execution-host policy out of the artifact and do not require an
-      external plugin.
+      testable deliverables. Include architecture, tech stack, global constraints,
+      file responsibilities, source task IDs, exact paths, interfaces, bite-sized
+      checkbox steps, failing tests, RED commands and expected failures, minimal
+      implementation guidance, GREEN commands and expected passes, refactoring,
+      review and commit checkpoints, and final verification. Ban placeholders and
+      undefined interfaces. Check requirements coverage, dependency order, task
+      sizing, executable commands, and identifier/type consistency. When available,
+      use a review-only subagent for independent review; otherwise perform expanded
+      inline self-review. Obtain user approval before apply. Do not require an
+      external plugin. A documentation-only or configuration-only task may omit
+      RED/GREEN steps only when it states why no behavior changes and supplies a
+      concrete validation command with its expected result. Record accepted
+      follow-up work in <planningHome.root>/TODO.md, preserving existing entries.
 
 apply:
   requires: [plan]
@@ -51,4 +69,13 @@ apply:
     evidence, trace the failing path, test one hypothesis at a time, fix the root
     cause, and add a regression test. Review requirements compliance before code
     quality. Verify review feedback against the code and requirements. Never
-    claim completion without fresh verification evidence.
+    claim completion without fresh verification evidence. Implementation runs
+    inline in the primary session. Subagents may be used only for independent
+    review or read-only research; they must not edit files, implement tasks, or
+    orchestrate the apply loop. Establish or verify an isolated worktree when safe,
+    preserve dirty overlapping work, and execute tasks in dependency order. Verify
+    review feedback against the code and requirements. If unavailable, use expanded
+    inline self-review. Leave commit, push, merge, and branch integration decisions
+    to the user or controlling repository policy. Record accepted follow-up work
+    in <planningHome.root>/TODO.md, preserving existing entries and enough context
+    to resume it.

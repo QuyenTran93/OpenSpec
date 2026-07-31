@@ -31,6 +31,16 @@ describe('skill-generation', () => {
     expect(runtime).toContain('fresh verification evidence');
     expect(runtime).toContain('--schema brainstorm');
     expect(runtime).not.toContain('brainstorm-root');
+    expect(runtime).toContain('inline in the primary session');
+    expect(runtime).toContain('review-only subagent');
+    expect(runtime).toContain('read-only research');
+    expect(runtime).toContain('expanded inline self-review');
+    expect(runtime).toContain('isolated worktree');
+    expect(runtime).toContain('dependency order');
+    expect(runtime).toContain('requirements compliance before code quality');
+    expect(runtime).toContain('<planningHome.root>/TODO.md');
+    expect(runtime).toContain('follow-up work');
+    expect(runtime).not.toMatch(/subagent-driven (?:development|execution|implementation)/i);
   });
   describe('getSkillTemplates', () => {
     it('should return all 12 skill templates', () => {

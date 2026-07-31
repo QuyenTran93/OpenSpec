@@ -3,6 +3,7 @@ import {
   BRAINSTORM_GATE_POLICY_BLOCK,
   BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
   BRAINSTORM_WRITING_PLANS_SHARED_BODY,
+  BRAINSTORM_INLINE_EXECUTION_POLICY_BLOCK,
 } from './workflow-policy.js';
 
 const WRITING_PLANS_THIN_BODY = (argDescription: string): string => `**Input**: ${argDescription}
@@ -23,6 +24,8 @@ const WRITING_PLANS_THIN_BODY = (argDescription: string): string => `**Input**: 
 5. Write the plan to the returned resolved output path.
 
 ${BRAINSTORM_WRITING_PLANS_SHARED_BODY}
+
+${BRAINSTORM_INLINE_EXECUTION_POLICY_BLOCK}
 
 ${BRAINSTORM_GATE_POLICY_BLOCK}
 

@@ -5,7 +5,7 @@
  * templates file into workflow-focused modules.
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
-import { BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK } from './workflow-policy.js';
+import { BRAINSTORM_INLINE_EXECUTION_POLICY_BLOCK, BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK } from './workflow-policy.js';
 import { APPLY_EXECUTION_ENVIRONMENT_POLICY_BLOCK } from '../shared/execution-environment-policy.js';
 import { NATIVE_APPLY_DISCIPLINE } from './native-discipline.js';
 
@@ -19,7 +19,9 @@ const APPLY_EXECUTION_PLAN_GATE_STEP = (
    \`openspec-writing-plans\`), then rerun ${rerunInstruction}. Use the resolved
    context paths instead of constructing a repository-local path.
 
-   ${NATIVE_APPLY_DISCIPLINE}`;
+   ${NATIVE_APPLY_DISCIPLINE}
+
+   ${BRAINSTORM_INLINE_EXECUTION_POLICY_BLOCK}`;
 
 export function getBrainstormApplyChangeSkillTemplate(): SkillTemplate {
   return {

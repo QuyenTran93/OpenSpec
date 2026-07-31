@@ -13,6 +13,9 @@ Use \`openspec status --change <name> --json\` and the resolved paths returned b
 \`openspec instructions <artifact> --change <name> --json\`. Preserve the same
 \`--store <id>\` on every follow-up when one was selected. Never rebuild change
 paths from the process working directory.
+
+Record accepted follow-up work in \`<planningHome.root>/TODO.md\`. Preserve existing
+entries and include enough context, scope, and provenance to resume each item.
 `.trim();
 
 export const BRAINSTORM_GATE_POLICY_BLOCK = `Before creating downstream artifacts, read the current brainstorm.md and confirm the user agrees with its chosen approach. If the design is ambiguous or still changing, ask one clarifying question at a time and update brainstorm.md first.`;
@@ -21,8 +24,30 @@ export const BRAINSTORM_WRITING_PLANS_SHARED_BODY = `Planning method:
 - Read brainstorm.md and tasks.md in full.
 - Check that the scope is one coherent change.
 - Map files to responsibilities before decomposing work.
-- Produce independently testable deliverables with concrete paths, commands,
-  expected outcomes, and interfaces only where they matter.
-- Check requirement coverage, placeholders, and identifier consistency.
-- Ask the user to review plan.md before implementation.
+- Produce independently testable deliverables with exact paths, interfaces,
+  bite-sized checkbox steps, RED/GREEN commands and expected outcomes, concrete
+  implementation guidance, refactoring, review, and commit checkpoints.
+- Check requirement coverage, placeholders, dependency order, task sizing,
+  executable commands, and identifier/type consistency.
+- Documentation-only or configuration-only tasks may omit RED/GREEN steps only
+  after stating why no behavior changes and supplying a validation command with
+  its expected result.
+- When available, use a review-only subagent for independent review; it must not
+  edit files. Otherwise perform expanded inline self-review from a fresh pass.
+- Ask for user approval of plan.md before implementation.
 - Do not start implementation in this workflow.`;
+
+export const BRAINSTORM_INLINE_EXECUTION_POLICY_BLOCK = `Execution policy:
+- Implementation always runs inline in the primary session.
+- Establish or verify an isolated worktree when safe and available. Preserve
+  existing dirty overlapping work instead of replacing it implicitly.
+- Execute tasks in dependency order and keep task completion state current.
+- Use test-first development for behavior changes and systematic root-cause
+  debugging for unexpected behavior.
+- Review requirements compliance before code quality. Verify review feedback
+  against the code and requirements before accepting it.
+- Subagents may be used only for independent review or read-only research.
+- Subagents must not edit files, implement tasks, or orchestrate the apply loop.
+- If subagents are unavailable, use expanded inline self-review and record the review mode.
+- Keep task state current and require fresh verification evidence before completion.
+- Leave commit, push, merge, and branch integration decisions to the user or controlling repository policy.`;
