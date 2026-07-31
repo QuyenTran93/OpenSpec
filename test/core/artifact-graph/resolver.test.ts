@@ -57,6 +57,36 @@ describe('artifact-graph/resolver', () => {
       expect(dir).toContain('spec-driven');
     });
 
+    it('should resolve the legacy brainstorm-root name to the canonical built-in schema', () => {
+      const dir = getSchemaDir('brainstorm-root');
+
+      expect(dir).not.toBeNull();
+      expect(dir).toContain(path.join('schemas', 'brainstorm'));
+      expect(dir).not.toContain(path.join('schemas', 'brainstorm-root'));
+      expect(getSchemaDir('brainstorm-root.yaml')).toBe(dir);
+      expect(getSchemaDir('brainstorm-root.yml')).toBe(dir);
+    });
+
+    it('should prefer an exact project-local brainstorm-root schema over the built-in alias', () => {
+      const projectSchemaDir = path.join(tempDir, 'openspec', 'schemas', 'brainstorm-root');
+      fs.mkdirSync(projectSchemaDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(projectSchemaDir, 'schema.yaml'),
+        [
+          'name: local-legacy',
+          'version: 1',
+          'artifacts:',
+          '  - id: note',
+          '    generates: note.md',
+          '    description: Local legacy schema',
+          '    template: note.md',
+        ].join('\n')
+      );
+
+      expect(getSchemaDir('brainstorm-root', tempDir)).toBe(projectSchemaDir);
+      expect(resolveSchema('brainstorm-root', tempDir).name).toBe('local-legacy');
+    });
+
     it('should prefer user override directory', () => {
       process.env.XDG_DATA_HOME = tempDir;
       const userSchemaDir = path.join(tempDir, 'openspec', 'schemas', 'spec-driven');
@@ -92,6 +122,12 @@ describe('artifact-graph/resolver', () => {
       const schema2 = resolveSchema('spec-driven.yml');
 
       expect(schema1).toEqual(schema2);
+    });
+
+    it('should resolve legacy brainstorm-root filename forms to brainstorm', () => {
+      expect(resolveSchema('brainstorm-root').name).toBe('brainstorm');
+      expect(resolveSchema('brainstorm-root.yaml').name).toBe('brainstorm');
+      expect(resolveSchema('brainstorm-root.yml').name).toBe('brainstorm');
     });
 
     it('should prefer user override over built-in', () => {
@@ -254,6 +290,16 @@ version: [[[invalid yaml
         const error = e as Error;
         expect(error.message).toContain('spec-driven');
       }
+    });
+  });
+
+  describe('canonical schema listings', () => {
+    it('should list brainstorm without exposing the legacy alias', () => {
+      const names = listSchemas();
+
+      expect(names).toContain('brainstorm');
+      expect(names).not.toContain('brainstorm-root');
+      expect(listSchemasWithInfo().map((schema) => schema.name)).toContain('brainstorm');
     });
   });
 

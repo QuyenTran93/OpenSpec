@@ -12,10 +12,15 @@ import type { Profile } from './global-config.js';
  * These provide the streamlined experience for new users.
  */
 export const CORE_WORKFLOWS = ['propose', 'explore', 'apply', 'update', 'sync', 'archive'] as const;
-export const CORE_WORKFLOWS = ['propose', 'explore', 'apply', 'archive'] as const;
-// brainstorm-root v2 dropped the `continue` workflow; tasks.md is generated/
-// reconciled by `propose`, plan.md by `writing-plans`.
-export const BRAINSTORM_WORKFLOWS = ['propose', 'brainstorm', 'new', 'writing-plans', 'apply', 'archive'] as const;
+export const BRAINSTORM_WORKFLOWS = [
+  'propose',
+  'brainstorm',
+  'new',
+  'writing-plans',
+  'update',
+  'apply',
+  'archive',
+] as const;
 
 /**
  * All available workflows in the system.
@@ -57,18 +62,4 @@ export function getProfileWorkflows(
     return BRAINSTORM_WORKFLOWS;
   }
   return CORE_WORKFLOWS;
-}
-
-/**
- * When the user enables brainstorm but did not pick writing-plans, add writing-plans.
- * Preset brainstorm already includes both workflows.
- */
-export function ensureWritingPlansWhenBrainstormSelected(workflows: readonly string[]): string[] {
-  if (!workflows.includes('brainstorm')) {
-    return [...workflows];
-  }
-  if (workflows.includes('writing-plans')) {
-    return [...workflows];
-  }
-  return [...workflows, 'writing-plans'];
 }

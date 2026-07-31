@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as yaml from 'yaml';
 import { ChangeMetadataSchema, type ChangeMetadata } from '../core/change-metadata/index.js';
-import { listSchemas, resolveSchema } from '../core/artifact-graph/resolver.js';
+import { getSchemaDir, listSchemas, resolveSchema } from '../core/artifact-graph/resolver.js';
 import { readProjectConfig, type ProjectConfig } from '../core/project-config.js';
 
 export const METADATA_FILENAME = '.openspec.yaml';
@@ -34,7 +34,7 @@ export function validateSchemaName(
   projectRoot?: string
 ): string {
   const availableSchemas = listSchemas(projectRoot);
-  if (!availableSchemas.includes(schemaName)) {
+  if (!getSchemaDir(schemaName, projectRoot)) {
     throw new Error(
       `Unknown schema '${schemaName}'. Available: ${availableSchemas.join(', ')}`
     );
@@ -136,7 +136,7 @@ export function readChangeMetadata(
 
   // Validate that the schema exists
   const availableSchemas = listSchemas(projectRoot);
-  if (!availableSchemas.includes(parseResult.data.schema)) {
+  if (!getSchemaDir(parseResult.data.schema, projectRoot)) {
     throw new ChangeMetadataError(
       `Unknown schema '${parseResult.data.schema}'. Available: ${availableSchemas.join(', ')}`,
       metaPath
@@ -271,13 +271,12 @@ export function readSkipSpecsMarker(changeDir: string): SkipSpecsMarker {
     // Schema loading is checked only when the marker is set: a broken schema
     // on an ordinary change is status's problem to report, but honoring a
     // marker that status rejects would let validate/archive pass what the
-    // rest of the CLI refuses to load. The membership check mirrors
-    // readChangeMetadata (which rejects names like 'spec-driven.yaml' that
-    // resolveSchema alone would normalize and accept); resolveSchema then
-    // proves the schema actually parses. Any failure fails closed.
+    // rest of the CLI refuses to load. getSchemaDir mirrors readChangeMetadata
+    // and accepts deprecated built-in aliases; resolveSchema then proves the
+    // schema actually parses. Any failure fails closed.
     try {
       const projectRoot = path.resolve(changeDir, '../../..');
-      if (!listSchemas(projectRoot).includes(result.data.schema)) {
+      if (!getSchemaDir(result.data.schema, projectRoot)) {
         return {
           declared: false,
           invalidReason: `schema: unknown schema '${result.data.schema}'`,

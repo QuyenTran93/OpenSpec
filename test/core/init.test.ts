@@ -748,11 +748,12 @@ describe('InitCommand - profile and detection features', () => {
     );
   });
 
-  it('should set openspec/config.yaml schema to brainstorm-root when --profile brainstorm', async () => {
+  it('should set openspec/config.yaml schema to brainstorm when --profile brainstorm', async () => {
     const initCommand = new InitCommand({ tools: 'claude', force: true, profile: 'brainstorm' });
     await initCommand.execute(testDir);
     const content = await fs.readFile(path.join(testDir, 'openspec', 'config.yaml'), 'utf-8');
-    expect(content).toContain('schema: brainstorm-root');
+    expect(content).toContain('schema: brainstorm');
+    expect(content).not.toContain('schema: brainstorm-root');
   });
 
   it('should generate propose skill and command when --profile brainstorm', async () => {

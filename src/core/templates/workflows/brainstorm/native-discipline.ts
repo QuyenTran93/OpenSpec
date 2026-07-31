@@ -1,0 +1,30 @@
+export const NATIVE_BRAINSTORM_METHOD = `
+Explore the project context first. Ask one clarifying question at a time. Compare
+viable approaches and their trade-offs, recommend one, and obtain agreement on
+the chosen design. Write brainstorm.md, then review it for placeholders,
+consistency, scope, and ambiguity; fix findings inline.
+
+Visual assistance is optional. Offer it only when the current question is
+materially easier to answer by seeing a UI/layout, architecture flow, state
+machine, spatial relationship, or visual comparison. Ask permission before
+running \`openspec visual start --port <port>\` (omit \`--port\` for an ephemeral
+port). Read the printed \`screenDir\` and \`events.jsonl\` paths. For each visual
+question, write a new semantic, accessible HTML fragment into \`screenDir\`;
+mark selectable buttons/cards with a short \`data-choice\` value. Wait for the
+corresponding JSONL choice event, then confirm it in the terminal. A later
+terminal answer always overrides a visual selection. On Remote SSH, tell the
+user to forward the printed port in the IDE Ports panel and open the printed
+localhost URL; never try to open the remote browser. Requirements, scope, APIs,
+data models, and textual trade-offs stay in the terminal. If visual tooling is
+unavailable, continue with Mermaid, ASCII, SVG/HTML, or text.
+`.trim();
+
+export const NATIVE_APPLY_DISCIPLINE = `
+For behavior changes use RED → GREEN → REFACTOR: write a focused test, observe
+the intended failure, add the minimum implementation, and keep tests green while
+refactoring. For unexpected behavior, reproduce first, gather evidence, trace
+the failing path, test one hypothesis at a time, fix the root cause, and add a
+regression test. Review requirements compliance before code quality. Verify
+review feedback against the code and requirements. Never claim completion
+without fresh verification evidence.
+`.trim();

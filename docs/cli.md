@@ -757,12 +757,12 @@ something that requires it - and artifacts that become ready at the same time
 (spec-driven's `specs` and `design` both need only `proposal`) keep the order the
 schema declares them rather than an alphabetical one. So the first `ready` entry
 is the artifact to write next.
-For `brainstorm-root` v2, status also includes a top-level `phases[]` array (phases are tracked workflow steps that produce files but do not gate `isComplete`):
+For `brainstorm` v2, status also includes a top-level `phases[]` array (phases are tracked workflow steps that produce files but do not gate `isComplete`):
 
 ```json
 {
   "changeName": "add-dark-mode",
-  "schemaName": "brainstorm-root",
+  "schemaName": "brainstorm",
   "isComplete": false,
   "applyRequires": ["tasks", "plan"],
   "artifacts": [
@@ -790,7 +790,7 @@ openspec instructions [id] [options]
 | Argument | Required | Description |
 |----------|----------|-------------|
 | `artifact` | No | Artifact ID, or workflow input surface: `apply` or `archive` |
-| `id` | No | Artifact ID, phase ID, or `apply`. Spec-driven schema: `proposal`, `specs`, `design`, `tasks`. Brainstorm-root v2: artifact `tasks`; phases `brainstorm`, `plan`. |
+| `id` | No | Artifact ID, phase ID, or `apply`. Spec-driven schema: `proposal`, `specs`, `design`, `tasks`. Brainstorm v2: artifact `tasks`; phases `brainstorm`, `plan`. |
 
 **Options:**
 
@@ -814,7 +814,7 @@ openspec instructions --change add-dark-mode
 # Get specific artifact instructions (spec-driven)
 openspec instructions design --change add-dark-mode
 
-# Get phase instructions (brainstorm-root v2)
+# Get phase instructions (brainstorm v2)
 openspec instructions brainstorm --change add-dark-mode
 openspec instructions plan --change add-dark-mode
 

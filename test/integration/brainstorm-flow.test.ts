@@ -9,21 +9,21 @@ import {
 } from '../../src/core/artifact-graph/index.js';
 import { generateApplyInstructions } from '../../src/commands/workflow/instructions.js';
 
-describe('brainstorm-root v2 end-to-end smoke flow', () => {
+describe('brainstorm artifact-only end-to-end smoke flow', () => {
   let projectRoot: string;
   let changeDir: string;
   const repoRoot = process.cwd();
 
   beforeEach(() => {
-    projectRoot = mkdtempSync(join(tmpdir(), 'brainstorm-root-e2e-'));
-    const realSchemaDir = join(repoRoot, 'schemas', 'brainstorm-root');
-    const targetSchemaDir = join(projectRoot, 'openspec', 'schemas', 'brainstorm-root');
+    projectRoot = mkdtempSync(join(tmpdir(), 'brainstorm-e2e-'));
+    const realSchemaDir = join(repoRoot, 'schemas', 'brainstorm');
+    const targetSchemaDir = join(projectRoot, 'openspec', 'schemas', 'brainstorm');
     mkdirSync(targetSchemaDir, { recursive: true });
     cpSync(realSchemaDir, targetSchemaDir, { recursive: true });
 
     changeDir = join(projectRoot, 'openspec', 'changes', 'demo');
     mkdirSync(changeDir, { recursive: true });
-    writeFileSync(join(changeDir, '.openspec.yaml'), 'schema: brainstorm-root\n');
+    writeFileSync(join(changeDir, '.openspec.yaml'), 'schema: brainstorm\n');
   });
 
   afterEach(() => {
@@ -34,10 +34,10 @@ describe('brainstorm-root v2 end-to-end smoke flow', () => {
     const ctx = loadChangeContext(projectRoot, 'demo');
     const status = formatChangeStatus(ctx);
 
-    expect(status.schemaName).toBe('brainstorm-root');
+    expect(status.schemaName).toBe('brainstorm');
 
-    const brainstormPhase = status.phases.find((p) => p.id === 'brainstorm');
-    expect(brainstormPhase?.status).toBe('ready');
+    const brainstormArtifact = status.artifacts.find((a) => a.id === 'brainstorm');
+    expect(brainstormArtifact?.status).toBe('ready');
 
     const tasksArtifact = status.artifacts.find((a) => a.id === 'tasks');
     expect(tasksArtifact?.status).toBe('blocked');
@@ -49,9 +49,9 @@ describe('brainstorm-root v2 end-to-end smoke flow', () => {
     const ctx = loadChangeContext(projectRoot, 'demo');
     const status = formatChangeStatus(ctx);
 
-    expect(status.phases.find((p) => p.id === 'brainstorm')?.status).toBe('done');
+    expect(status.artifacts.find((p) => p.id === 'brainstorm')?.status).toBe('done');
     expect(status.artifacts.find((a) => a.id === 'tasks')?.status).toBe('ready');
-    expect(status.phases.find((p) => p.id === 'plan')?.status).toBe('blocked');
+    expect(status.artifacts.find((p) => p.id === 'plan')?.status).toBe('blocked');
   });
 
   it('after tasks.md: plan ready', () => {
@@ -60,7 +60,7 @@ describe('brainstorm-root v2 end-to-end smoke flow', () => {
     const ctx = loadChangeContext(projectRoot, 'demo');
     const status = formatChangeStatus(ctx);
 
-    expect(status.phases.find((p) => p.id === 'plan')?.status).toBe('ready');
+    expect(status.artifacts.find((p) => p.id === 'plan')?.status).toBe('ready');
   });
 
   it('after plan.md: apply unblocked (generateApplyInstructions returns ready)', async () => {
@@ -69,31 +69,27 @@ describe('brainstorm-root v2 end-to-end smoke flow', () => {
     writeFileSync(join(changeDir, 'plan.md'), '# Plan');
     const apply = await generateApplyInstructions(projectRoot, 'demo');
     expect(apply.state).toBe('ready');
-    expect(apply.instruction).toContain('superpowers:verification-before-completion');
-    expect(apply.instruction).toContain('primary session');
+    expect(apply.instruction).toContain('fresh verification evidence');
+    expect(apply.instruction).not.toContain('superpowers:');
   });
 
-  it('generateInstructions for brainstorm phase returns canonical instruction', () => {
+  it('generateInstructions for brainstorm artifact returns canonical instruction', () => {
     const ctx = loadChangeContext(projectRoot, 'demo');
     const inst = generateInstructions(ctx, 'brainstorm', projectRoot);
-    expect(inst.kind).toBe('phase');
     expect(inst.outputPath).toBe('brainstorm.md');
-    expect(inst.instruction).toContain('superpowers:brainstorming');
-    expect(inst.instruction).toContain('all_questions_resolved');
+    expect(inst.instruction).toContain('Ask one clarifying');
+    expect(inst.instruction).not.toContain('superpowers:');
   });
 
-  it('generateInstructions for plan phase lists brainstorm + tasks deps with kind', () => {
+  it('generateInstructions for plan artifact lists brainstorm + tasks deps with kind', () => {
     writeFileSync(join(changeDir, 'brainstorm.md'), '# B');
     writeFileSync(join(changeDir, 'tasks.md'), '## 1. G\n- [ ] 1.1 t');
     const ctx = loadChangeContext(projectRoot, 'demo');
     const inst = generateInstructions(ctx, 'plan', projectRoot);
-    expect(inst.kind).toBe('phase');
     expect(inst.outputPath).toBe('plan.md');
     const brainstormDep = inst.dependencies.find((d) => d.id === 'brainstorm');
     const tasksDep = inst.dependencies.find((d) => d.id === 'tasks');
-    expect(brainstormDep?.kind).toBe('phase');
     expect(brainstormDep?.done).toBe(true);
-    expect(tasksDep?.kind).toBe('artifact');
     expect(tasksDep?.done).toBe(true);
   });
 
@@ -102,7 +98,7 @@ describe('brainstorm-root v2 end-to-end smoke flow', () => {
       projectRoot,
       'openspec',
       'schemas',
-      'brainstorm-root',
+      'brainstorm',
       'templates',
       'plan.md'
     );

@@ -1,0 +1,54 @@
+name: brainstorm
+version: 1
+description: Brainstorm-first workflow — brainstorm.md → tasks.md → plan.md → apply
+artifacts:
+  - id: brainstorm
+    generates: brainstorm.md
+    description: Agreed problem framing and design direction
+    template: brainstorm.md
+    requires: []
+    instruction: |
+      Explore the project context before proposing changes. Ask one clarifying
+      question at a time, compare viable approaches and their trade-offs, then
+      obtain agreement on the chosen design.
+
+      Write a substantive brainstorm.md using the resolved output path returned
+      by this command. Review it for placeholders, internal consistency, scope,
+      and ambiguity; fix findings inline. Ask the user to review the resulting
+      artifact before handing off to propose. Do not require an external plugin.
+
+  - id: tasks
+    generates: tasks.md
+    description: Stable, trackable implementation checklist
+    template: tasks.md
+    requires: [brainstorm]
+    instruction: |
+      Read brainstorm.md from this resolved change directory. Create or reconcile
+      outcome-oriented tasks in dependency order. Use stable numeric task IDs and
+      preserve - [x] state when a task's meaning is unchanged. Never silently
+      delete a completed task that conflicts with revised scope; annotate it for
+      explicit user resolution.
+
+  - id: plan
+    generates: plan.md
+    description: Concrete implementation plan with verification
+    template: plan.md
+    requires: [brainstorm, tasks]
+    instruction: |
+      Read brainstorm.md and tasks.md from this resolved change directory. Map
+      files to responsibilities and decompose the work into independently
+      testable deliverables with concrete paths, commands, and expected results.
+      Check requirement coverage, placeholders, and identifier consistency.
+      Keep execution-host policy out of the artifact and do not require an
+      external plugin.
+
+apply:
+  requires: [plan]
+  tracks: tasks.md
+  instruction: |
+    Implement the agreed plan using test-first development for behavior changes:
+    RED → GREEN → REFACTOR. When behavior is unexpected, reproduce it, gather
+    evidence, trace the failing path, test one hypothesis at a time, fix the root
+    cause, and add a regression test. Review requirements compliance before code
+    quality. Verify review feedback against the code and requirements. Never
+    claim completion without fresh verification evidence.

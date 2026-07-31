@@ -246,25 +246,6 @@ artifacts:
       expect(graph.isComplete(new Set(['A']))).toBe(false);
       expect(graph.isComplete(new Set())).toBe(false);
     });
-
-    it('should ignore optional artifacts when incomplete', () => {
-      const schema = createSchema([
-        { id: 'A', generates: 'a.md', description: 'A', template: 't.md', requires: [] },
-        {
-          id: 'B',
-          generates: 'b.md',
-          description: 'B',
-          template: 't.md',
-          requires: ['A'],
-          optional: true,
-        },
-        { id: 'C', generates: 'c.md', description: 'C', template: 't.md', requires: ['A'] },
-      ]);
-      const graph = ArtifactGraph.fromSchema(schema);
-
-      expect(graph.isComplete(new Set(['A', 'C']))).toBe(true);
-      expect(graph.isComplete(new Set(['A']))).toBe(false);
-    });
   });
 
   describe('getBlocked', () => {
@@ -330,76 +311,6 @@ artifacts:
       const graph = ArtifactGraph.fromSchema(schema);
 
       expect(graph.getBlocked(new Set())).toEqual({ last: ['second', 'first'] });
-    });
-  });
-
-  describe('phase node access (brainstorm-root v2)', () => {
-    const yaml = `
-name: ts
-version: 2
-artifacts:
-  - id: tasks
-    generates: tasks.md
-    description: Tasks
-    template: tasks.md
-    requires: [brainstorm]
-brainstorm:
-  generates: brainstorm.md
-  template: brainstorm.md
-  requires: []
-plan:
-  generates: plan.md
-  template: plan.md
-  requires: [brainstorm, tasks]
-apply:
-  requires: [tasks, plan]
-  tracks: tasks.md
-  executionPlan: plan.md
-`;
-
-    it('getPhase returns brainstorm and plan phases', () => {
-      const graph = ArtifactGraph.fromYamlContent(yaml);
-      expect(graph.getPhase('brainstorm')?.generates).toBe('brainstorm.md');
-      expect(graph.getPhase('plan')?.generates).toBe('plan.md');
-    });
-
-    it('getPhase returns undefined when phase is not declared', () => {
-      const graph = ArtifactGraph.fromYamlContent(`
-name: ts
-version: 1
-artifacts:
-  - id: tasks
-    generates: tasks.md
-    description: Tasks
-    template: tasks.md
-    requires: []
-`);
-      expect(graph.getPhase('brainstorm')).toBeUndefined();
-      expect(graph.getPhase('plan')).toBeUndefined();
-    });
-
-    it('getNode returns artifact for artifact id and phase for phase id', () => {
-      const graph = ArtifactGraph.fromYamlContent(yaml);
-      const tasksNode = graph.getNode('tasks');
-      expect(tasksNode?.kind).toBe('artifact');
-      expect(tasksNode?.id).toBe('tasks');
-
-      const brainstormNode = graph.getNode('brainstorm');
-      expect(brainstormNode?.kind).toBe('phase');
-      expect(brainstormNode?.id).toBe('brainstorm');
-    });
-
-    it('getAllNodes returns artifacts and phases combined', () => {
-      const graph = ArtifactGraph.fromYamlContent(yaml);
-      const ids = graph.getAllNodes().map((n) => n.id).sort();
-      expect(ids).toEqual(['brainstorm', 'plan', 'tasks']);
-    });
-
-    it('getNextArtifacts and isComplete only consider artifacts', () => {
-      const graph = ArtifactGraph.fromYamlContent(yaml);
-      expect(graph.getNextArtifacts(new Set(['brainstorm']))).toEqual(['tasks']);
-      expect(graph.isComplete(new Set(['tasks']))).toBe(true);
-      expect(graph.isComplete(new Set())).toBe(false);
     });
   });
 });

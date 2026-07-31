@@ -168,3 +168,6 @@ opencode.json
 .cursor/
 # Local git worktrees
 .worktrees/
+
+# Local visual companion sessions
+.openspec/visual-companion/

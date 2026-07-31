@@ -21,6 +21,8 @@ export { artifactOutputExists, isGlobPattern, resolveArtifactOutputs } from './o
 // Schema resolution
 export {
   resolveSchema,
+  resolveSchemaName,
+  canonicalizeBuiltInSchemaName,
   listSchemas,
   listSchemasWithInfo,
   getSchemaDir,

@@ -4,6 +4,12 @@
 
 ### Minor Changes
 
+- Rename the built-in `brainstorm-root` schema to `brainstorm`. New profile
+  initialization, generated workflows, schema listings, and runtime output use
+  the shorter canonical name. Existing configuration and change metadata remain
+  compatible through the deprecated `brainstorm-root` alias and are not rewritten
+  merely by being read.
+
 - [#1475](https://github.com/Fission-AI/OpenSpec/pull/1475) [`17af60c`](https://github.com/Fission-AI/OpenSpec/commit/17af60c66e4c049e3986fdbafcdc16b202cda59f) Thanks [@clay-good](https://github.com/clay-good)! - Add CodeArts Agent skills support: `openspec init --tools codeartsagent` installs the workflow skills.
 
 - [#1475](https://github.com/Fission-AI/OpenSpec/pull/1475) [`17af60c`](https://github.com/Fission-AI/OpenSpec/commit/17af60c66e4c049e3986fdbafcdc16b202cda59f) Thanks [@clay-good](https://github.com/clay-good)! - Add Hermes Agent as a supported AI tool: `openspec init --tools hermes` installs the workflow skills (Hermes is skills-only and invokes them directly).

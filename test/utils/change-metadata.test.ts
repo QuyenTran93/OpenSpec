@@ -7,6 +7,7 @@ import {
   readChangeMetadata,
   resolveSchemaForChange,
   validateSchemaName,
+  readSkipSpecsMarker,
   ChangeMetadataError,
 } from '../../src/utils/change-metadata.js';
 import { ChangeMetadataSchema } from '../../src/core/change-metadata/index.js';
@@ -380,5 +381,24 @@ describe('validateSchemaName', () => {
     expect(() => validateSchemaName('unknown-schema')).toThrow(
       /Unknown schema 'unknown-schema'/
     );
+  });
+});
+
+describe('readSkipSpecsMarker legacy schema compatibility', () => {
+  it('should honor skip_specs for legacy brainstorm-root metadata', async () => {
+    const testDir = await fs.mkdtemp(path.join(os.tmpdir(), 'openspec-test-'));
+    const changeDir = path.join(testDir, 'openspec', 'changes', 'test-change');
+    await fs.mkdir(changeDir, { recursive: true });
+    await fs.writeFile(
+      path.join(changeDir, '.openspec.yaml'),
+      'schema: brainstorm-root\nskip_specs: true\n',
+      'utf-8'
+    );
+
+    try {
+      expect(readSkipSpecsMarker(changeDir)).toEqual({ declared: true });
+    } finally {
+      await fs.rm(testDir, { recursive: true, force: true });
+    }
   });
 });

@@ -87,7 +87,18 @@ Implement tasks from an OpenSpec change.
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+6. **Execution environment policy**
+
+   Execution environment policy:
+- Tests MUST run outside sandbox.
+- Lint MUST run outside sandbox.
+- Build MUST run outside sandbox.
+- For non-test commands, first run in the default sandboxed environment unless a stronger policy explicitly overrides it.
+- Retry outside sandbox only when the failure clearly indicates sandbox/environment restrictions.
+- Retry outside sandbox at most once.
+- If the outside-sandbox retry fails, pause and report the failure details before continuing.
+
+7. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
@@ -102,7 +113,7 @@ Implement tasks from an OpenSpec change.
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session

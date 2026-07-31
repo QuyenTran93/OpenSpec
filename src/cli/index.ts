@@ -33,6 +33,7 @@ import { registerStoreCommand } from '../commands/store.js';
 import { registerDoctorCommand } from '../commands/doctor.js';
 import { registerContextCommand } from '../commands/context.js';
 import { registerWorksetCommand } from '../commands/workset.js';
+import { registerVisualCommand } from '../commands/visual.js';
 import {
   statusCommand,
   instructionsCommand,
@@ -157,11 +158,9 @@ program
   .description('Initialize OpenSpec in your project')
   .option('--tools <tools>', toolsOptionDescription)
   .option('--force', 'Auto-cleanup legacy files without prompting')
-  .option('--profile <profile>', 'Override global config profile (core or custom)')
+  .option('--profile <profile>', 'Override global config profile (core, custom, or brainstorm)')
   .option('--no-animation', 'Show a static welcome screen instead of the animated one')
   .action(async (targetPath = '.', options?: { tools?: string; force?: boolean; profile?: string; animation?: boolean }) => {
-  .option('--profile <profile>', 'Override global config profile (core, custom, or brainstorm)')
-  .action(async (targetPath = '.', options?: { tools?: string; force?: boolean; profile?: string }) => {
     try {
       // Validate that the path is a valid directory
       const resolvedPath = path.resolve(targetPath);
@@ -428,6 +427,7 @@ registerStoreCommand(program);
 registerDoctorCommand(program);
 registerContextCommand(program);
 registerWorksetCommand(program);
+registerVisualCommand(program);
 
 // Top-level validate command
 program

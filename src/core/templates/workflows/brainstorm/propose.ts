@@ -1,20 +1,20 @@
 /**
- * Skill Template Workflow Modules — propose (brainstorm-root v2)
+ * Skill Template Workflow Modules — propose (brainstorm v2)
  *
  * Generates or reconciles tasks.md from brainstorm.md. The only artifact
  * produced by /opsx:propose. Plan generation lives in /opsx:writing-plans.
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
-  BRAINSTORM_ROOT_GATE_POLICY_BLOCK,
-  BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK,
-} from './superpowers-openspec-mapping.js';
+  BRAINSTORM_GATE_POLICY_BLOCK,
+  BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
+} from './workflow-policy.js';
 
 const PROPOSE_BODY = (argDescription: string): string => `Generate or reconcile \`tasks.md\` from the approved \`brainstorm.md\`.
 
-${BRAINSTORM_ROOT_WORKFLOW_SEQUENCE_BLOCK}
+${BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK}
 
-${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
+${BRAINSTORM_GATE_POLICY_BLOCK}
 
 ---
 
@@ -34,22 +34,23 @@ ${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
 2. **Check status**
 
    \`\`\`bash
-   openspec status --change "<name>" --schema brainstorm-root --json
+   openspec status --change "<name>" --schema brainstorm --json
    \`\`\`
 
    Parse the JSON. Important fields:
-   - \`phases.brainstorm.status\` — must be \`done\` (i.e., \`brainstorm.md\` exists). If \`ready\` or \`blocked\`, STOP and instruct the user to run \`/opsx:brainstorm\` first.
-   - \`artifacts[id=tasks].status\` — \`done\` means \`tasks.md\` already exists; this is a **rerun** (reconcile branch). Otherwise this is a **first run**.
+   - \`artifacts[id=brainstorm].status\` — must be \`done\`. Otherwise STOP and instruct the user to run \`/opsx:brainstorm\` first.
+   - \`artifacts[id=tasks].status\` — \`done\` means the resolved tasks artifact already exists; this is a **rerun** (reconcile branch). Otherwise this is a **first run**.
+   - \`planningHome\`, \`changeRoot\`, and \`artifactPaths\` — use these resolved workspace/store paths; never infer a repository-local change directory.
 
 3. **Get the canonical task instructions**
 
    \`\`\`bash
-   openspec instructions tasks --change "<name>" --schema brainstorm-root --json
+   openspec instructions tasks --change "<name>" --schema brainstorm --json
    \`\`\`
 
-   The JSON includes \`instruction\` (canonical from \`schemas/brainstorm-root/schema.yaml\` \`artifacts[id=tasks].instruction\`), \`template\`, \`outputPath\`, and \`dependencies\` (with \`brainstorm\` listed as a phase dep).
+   The JSON includes \`instruction\`, \`template\`, \`outputPath\`/\`resolvedOutputPath\`, and \`dependencies\` (including the brainstorm artifact).
 
-4. **Read \`openspec/changes/<name>/brainstorm.md\`** in full. This is the source of truth for scope, decisions, and open questions.
+4. **Read the brainstorm path returned in \`dependencies\` or \`artifactPaths.brainstorm.existingOutputPaths\`** in full. This is the source of truth for scope, decisions, and open questions.
 
 5. **Generate or reconcile \`tasks.md\`**
 
@@ -60,7 +61,7 @@ ${BRAINSTORM_ROOT_GATE_POLICY_BLOCK}
      - Rename/rephrase tasks whose underlying decision changed.
      - **Preserve \`- [x]\` completion state** for tasks whose meaning is unchanged.
 
-6. **Write to \`outputPath\`** (\`openspec/changes/<name>/tasks.md\`). Apply \`context\` and \`rules\` from the instructions JSON as constraints — do NOT copy them into the file.
+6. **Write only to the returned \`resolvedOutputPath\`** (or resolve \`outputPath\` against the returned \`changeRoot\`). Apply \`context\` and \`rules\` from the instructions JSON as constraints — do NOT copy them into the file.
 
 7. **Show final status**
 
@@ -81,13 +82,13 @@ After completion, summarize:
 - Never run \`/opsx:propose\` before \`brainstorm.md\` exists — STOP and direct the user to \`/opsx:brainstorm\`.
 - Never auto-create \`plan.md\` here — that is \`/opsx:writing-plans\`'s job.
 - Never silently overwrite \`[x]\` completion state during reconcile.
-- Always invoke schema-sensitive CLI commands with \`--schema brainstorm-root\`.
+- Always invoke schema-sensitive CLI commands with \`--schema brainstorm\`.
 - Verify \`tasks.md\` exists after writing before reporting success.`;
 
-export function getBrainstormRootProposeSkillTemplate(): SkillTemplate {
+export function getBrainstormProposeSkillTemplate(): SkillTemplate {
   return {
     name: 'openspec-propose',
-    description: 'Generate or reconcile tasks.md for a brainstorm-root change. Reads brainstorm.md as the canonical input.',
+    description: 'Generate or reconcile tasks.md for a brainstorm change. Reads brainstorm.md as the canonical input.',
     instructions: PROPOSE_BODY(
       "The user's request may include a change name (kebab-case); if unclear, resolve the active change."
     ),
@@ -97,10 +98,10 @@ export function getBrainstormRootProposeSkillTemplate(): SkillTemplate {
   };
 }
 
-export function getOpsxBrainstormRootProposeCommandTemplate(): CommandTemplate {
+export function getOpsxBrainstormProposeCommandTemplate(): CommandTemplate {
   return {
     name: 'OPSX: Propose',
-    description: 'Generate or reconcile tasks.md from brainstorm.md (brainstorm-root v2)',
+    description: 'Generate or reconcile tasks.md from brainstorm.md (brainstorm v2)',
     category: 'Workflow',
     tags: ['workflow', 'tasks', 'experimental'],
     content: PROPOSE_BODY(

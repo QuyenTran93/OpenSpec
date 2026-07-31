@@ -83,7 +83,7 @@ describe('artifact-workflow CLI commands', () => {
       const result = await runCLI(['status', '--change', 'scaffolded-change'], { cwd: tempDir });
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('scaffolded-change');
-      expect(result.stdout).toContain('0/4 required artifacts complete');
+      expect(result.stdout).toContain('0/4 artifacts complete');
     });
 
     it('shows status for a change with proposal only', async () => {
@@ -94,7 +94,7 @@ describe('artifact-workflow CLI commands', () => {
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain('minimal-change');
       expect(result.stdout).toContain('spec-driven');
-      expect(result.stdout).toContain('1/4 required artifacts complete');
+      expect(result.stdout).toContain('1/4 artifacts complete');
     });
 
     it('shows status for a change with proposal and design', async () => {
@@ -102,7 +102,7 @@ describe('artifact-workflow CLI commands', () => {
 
       const result = await runCLI(['status', '--change', 'partial-change'], { cwd: tempDir });
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('2/4 required artifacts complete');
+      expect(result.stdout).toContain('2/4 artifacts complete');
       expect(result.stdout).toContain('[x]');
     });
 
@@ -144,8 +144,8 @@ describe('artifact-workflow CLI commands', () => {
 
       const result = await runCLI(['status', '--change', 'complete-change'], { cwd: tempDir });
       expect(result.exitCode).toBe(0);
-      expect(result.stdout).toContain('4/4 required artifacts complete');
-      expect(result.stdout).toContain('All required artifacts complete!');
+      expect(result.stdout).toContain('4/4 artifacts complete');
+      expect(result.stdout).toContain('All artifacts complete!');
     });
 
     it('exits gracefully when no changes exist', async () => {
@@ -327,8 +327,8 @@ describe('artifact-workflow CLI commands', () => {
       });
       expect(result.exitCode).toBe(1);
       const output = getOutput(result);
-      expect(output).toContain("Artifact or phase 'unknown-artifact' not found");
-      expect(output).toContain('Valid ids');
+      expect(output).toContain("Artifact 'unknown-artifact' not found");
+      expect(output).toContain('Valid artifacts');
     });
 
     it('accepts digit-leading change names that exist on disk (#1308)', async () => {
@@ -506,46 +506,6 @@ operations:
       expect(result.stdout).toContain('Missing artifacts: tasks');
       expect(result.stdout).toContain('### Project Context (required instruction input)');
       expect(result.stdout).toContain('### Operation Guidance (advisory)');
-    });
-
-    it('blocks apply when brainstorm-root plan phase output is missing', async () => {
-      const changeDir = path.join(changesDir, 'brainstorm-apply-no-plan');
-      await fs.mkdir(changeDir, { recursive: true });
-      await fs.writeFile(path.join(changeDir, '.openspec.yaml'), 'schema: brainstorm-root\n');
-      await fs.writeFile(path.join(changeDir, 'brainstorm.md'), '# Brainstorm');
-      await fs.writeFile(path.join(changeDir, 'tasks.md'), '## Tasks\n- [ ] Task 1');
-
-      const result = await runCLI(
-        ['instructions', 'apply', '--change', 'brainstorm-apply-no-plan', '--json'],
-        { cwd: tempDir }
-      );
-      expect(result.exitCode).toBe(0);
-
-      const json = JSON.parse(result.stdout);
-      expect(json.schemaName).toBe('brainstorm-root');
-      expect(json.state).toBe('blocked');
-      // brainstorm-root v2 reports phase ids in missingArtifacts
-      expect(json.missingArtifacts ?? []).toContain('plan');
-    });
-
-    it('allows apply when plan.md exists for brainstorm-root v2 workflow', async () => {
-      const changeDir = path.join(changesDir, 'brainstorm-apply-with-plan');
-      await fs.mkdir(changeDir, { recursive: true });
-      await fs.writeFile(path.join(changeDir, '.openspec.yaml'), 'schema: brainstorm-root\n');
-      await fs.writeFile(path.join(changeDir, 'brainstorm.md'), '# Brainstorm');
-      await fs.writeFile(path.join(changeDir, 'tasks.md'), '- [ ] 1.1 Implement capability');
-      await fs.writeFile(path.join(changeDir, 'plan.md'), '# Plan');
-
-      const result = await runCLI(
-        ['instructions', 'apply', '--change', 'brainstorm-apply-with-plan', '--json'],
-        { cwd: tempDir }
-      );
-
-      expect(result.exitCode).toBe(0);
-      const json = JSON.parse(result.stdout);
-      expect(json.schemaName).toBe('brainstorm-root');
-      expect(json.state).toBe('ready');
-      expect(json.instruction).not.toContain('Missing required plan file');
     });
 
     it('outputs JSON for apply instructions', async () => {
@@ -1179,10 +1139,8 @@ operations:
     });
 
     it('creates skills for Claude tool', async () => {
-      const configHome = path.join(tempDir, '.xdg-config');
       const result = await runCLI(['experimental', '--tool', 'claude'], {
         cwd: tempDir,
-        env: { XDG_CONFIG_HOME: configHome },
       });
       expect(result.exitCode).toBe(0);
       const output = normalizePaths(getOutput(result));
@@ -1196,10 +1154,8 @@ operations:
     });
 
     it('creates skills for Cursor tool', async () => {
-      const configHome = path.join(tempDir, '.xdg-config');
       const result = await runCLI(['experimental', '--tool', 'cursor'], {
         cwd: tempDir,
-        env: { XDG_CONFIG_HOME: configHome },
       });
       expect(result.exitCode).toBe(0);
       const output = normalizePaths(getOutput(result));
@@ -1218,11 +1174,8 @@ operations:
     });
 
     it('creates skills for the retired windsurf id, under Devin Desktop', async () => {
-    it('creates skills for Windsurf tool', async () => {
-      const configHome = path.join(tempDir, '.xdg-config');
       const result = await runCLI(['experimental', '--tool', 'windsurf'], {
         cwd: tempDir,
-        env: { XDG_CONFIG_HOME: configHome },
       });
       expect(result.exitCode).toBe(0);
       const output = normalizePaths(getOutput(result));

@@ -310,6 +310,13 @@ describe('config profile command', () => {
     expect(isCoreMatch).toBe(true);
   });
 
+  it('selecting exactly brainstorm workflows should set profile to brainstorm', async () => {
+    const { deriveProfileFromWorkflowSelection } = await import('../../src/commands/config.js');
+    const { BRAINSTORM_WORKFLOWS } = await import('../../src/core/profiles.js');
+
+    expect(deriveProfileFromWorkflowSelection([...BRAINSTORM_WORKFLOWS])).toBe('brainstorm');
+  });
+
   it('config schema should validate profile and delivery values', async () => {
     const { validateConfig } = await import('../../src/core/config-schema.js');
 

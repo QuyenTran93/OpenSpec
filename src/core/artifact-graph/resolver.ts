@@ -5,6 +5,37 @@ import { getGlobalDataDir } from '../global-config.js';
 import { parseSchema, SchemaValidationError } from './schema.js';
 import type { SchemaYaml } from './types.js';
 
+const BUILT_IN_SCHEMA_ALIASES: Readonly<Record<string, string>> = {
+  'brainstorm-root': 'brainstorm',
+};
+
+/** Returns the canonical name for a deprecated built-in schema alias. */
+export function canonicalizeBuiltInSchemaName(name: string): string {
+  return BUILT_IN_SCHEMA_ALIASES[name] ?? name;
+}
+
+function getExactSchemaDir(name: string, projectRoot?: string): string | null {
+  if (projectRoot) {
+    const projectDir = path.join(getProjectSchemasDir(projectRoot), name);
+    if (fs.existsSync(path.join(projectDir, 'schema.yaml'))) return projectDir;
+  }
+
+  const userDir = path.join(getUserSchemasDir(), name);
+  if (fs.existsSync(path.join(userDir, 'schema.yaml'))) return userDir;
+
+  const packageDir = path.join(getPackageSchemasDir(), name);
+  if (fs.existsSync(path.join(packageDir, 'schema.yaml'))) return packageDir;
+
+  return null;
+}
+
+/** Returns the runtime schema ID after exact-name precedence and alias fallback. */
+export function resolveSchemaName(name: string, projectRoot?: string): string {
+  const normalizedName = name.replace(/\.ya?ml$/, '');
+  if (getExactSchemaDir(normalizedName, projectRoot)) return normalizedName;
+  return canonicalizeBuiltInSchemaName(normalizedName);
+}
+
 /**
  * Error thrown when loading a schema fails.
  */
@@ -92,27 +123,16 @@ export function getSchemaDir(
   name: string,
   projectRoot?: string
 ): string | null {
-  // 1. Check project-local directory (if projectRoot provided)
-  if (projectRoot) {
-    const projectDir = path.join(getProjectSchemasDir(projectRoot), name);
-    const projectSchemaPath = path.join(projectDir, 'schema.yaml');
-    if (fs.existsSync(projectSchemaPath)) {
-      return projectDir;
-    }
-  }
+  const normalizedName = name.replace(/\.ya?ml$/, '');
+  const exactDir = getExactSchemaDir(normalizedName, projectRoot);
+  if (exactDir) return exactDir;
 
-  // 2. Check user override directory
-  const userDir = path.join(getUserSchemasDir(), name);
-  const userSchemaPath = path.join(userDir, 'schema.yaml');
-  if (fs.existsSync(userSchemaPath)) {
-    return userDir;
-  }
-
-  // 3. Check package built-in directory
-  const packageDir = path.join(getPackageSchemasDir(), name);
-  const packageSchemaPath = path.join(packageDir, 'schema.yaml');
-  if (fs.existsSync(packageSchemaPath)) {
-    return packageDir;
+  // Deprecated built-in names are aliases only after every exact lookup has
+  // failed. This preserves project and user schemas that intentionally use a
+  // legacy built-in name.
+  const canonicalName = canonicalizeBuiltInSchemaName(normalizedName);
+  if (canonicalName !== normalizedName) {
+    return getSchemaDir(canonicalName, projectRoot);
   }
 
   return null;

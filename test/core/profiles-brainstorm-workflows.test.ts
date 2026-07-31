@@ -1,21 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { ensureWritingPlansWhenBrainstormSelected } from '../../src/core/profiles.js';
+import { BRAINSTORM_WORKFLOWS, getProfileWorkflows } from '../../src/core/profiles.js';
 
-describe('ensureWritingPlansWhenBrainstormSelected', () => {
-  it('returns same list when brainstorm is absent', () => {
-    expect(ensureWritingPlansWhenBrainstormSelected(['new', 'apply'])).toEqual(['new', 'apply']);
-  });
-
-  it('appends writing-plans when brainstorm is present and writing-plans missing', () => {
-    expect(ensureWritingPlansWhenBrainstormSelected(['brainstorm', 'new']).sort()).toEqual(
-      ['brainstorm', 'new', 'writing-plans'].sort()
-    );
-  });
-
-  it('does not duplicate writing-plans', () => {
-    expect(ensureWritingPlansWhenBrainstormSelected(['brainstorm', 'writing-plans'])).toEqual([
+describe('brainstorm profile workflows', () => {
+  it('declares the complete preset explicitly, including update', () => {
+    expect(BRAINSTORM_WORKFLOWS).toEqual([
+      'propose',
       'brainstorm',
+      'new',
       'writing-plans',
+      'update',
+      'apply',
+      'archive',
     ]);
+    expect(getProfileWorkflows('brainstorm')).toBe(BRAINSTORM_WORKFLOWS);
   });
 });

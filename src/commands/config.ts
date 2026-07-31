@@ -25,7 +25,6 @@ import {
   BRAINSTORM_WORKFLOWS,
   ALL_WORKFLOWS,
   getProfileWorkflows,
-  ensureWritingPlansWhenBrainstormSelected,
 } from '../core/profiles.js';
 import { OPENSPEC_DIR_NAME } from '../core/config.js';
 import { hasProjectConfigDrift } from '../core/profile-sync-drift.js';
@@ -114,6 +113,11 @@ export function resolveCurrentProfileState(config: GlobalConfig): ProfileState {
  * Derive profile type from selected workflows.
  */
 export function deriveProfileFromWorkflowSelection(selectedWorkflows: string[]): Profile {
+  const isBrainstormMatch =
+    selectedWorkflows.length === BRAINSTORM_WORKFLOWS.length &&
+    BRAINSTORM_WORKFLOWS.every((w) => selectedWorkflows.includes(w));
+  if (isBrainstormMatch) return 'brainstorm';
+
   const isCoreMatch =
     selectedWorkflows.length === CORE_WORKFLOWS.length &&
     CORE_WORKFLOWS.every((w) => selectedWorkflows.includes(w));
@@ -481,7 +485,7 @@ export function registerConfigCommand(program: Command): void {
         config.profile = 'brainstorm';
         config.workflows = [...BRAINSTORM_WORKFLOWS];
         saveGlobalConfig(config);
-        console.log('Config updated. Run `openspec update` in your projects to apply.');
+        printConfigProfileApplyGuidance();
         return;
       }
 
@@ -609,9 +613,8 @@ export function registerConfigCommand(program: Command): void {
             },
             choices: ALL_WORKFLOWS.map(formatWorkflowChoice),
           });
-          const withWritingPlans = ensureWritingPlansWhenBrainstormSelected(selectedWorkflows);
-          nextState.workflows = stableWorkflowOrder(withWritingPlans);
-          nextState.profile = deriveProfileFromWorkflowSelection(nextState.workflows);
+          nextState.workflows = selectedWorkflows;
+          nextState.profile = deriveProfileFromWorkflowSelection(selectedWorkflows);
         }
 
         const diff = diffProfileState(currentState, nextState);

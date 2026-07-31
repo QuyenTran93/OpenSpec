@@ -131,57 +131,6 @@ describe('artifact-graph workflow integration', () => {
     });
   });
 
-  describe('brainstorm-root workflow (v2 slim)', () => {
-    it('should resolve brainstorm-root built-in schema (v2)', () => {
-      const schema = resolveSchema('brainstorm-root');
-      const graph = ArtifactGraph.fromSchema(schema);
-
-      expect(graph.getName()).toBe('brainstorm-root');
-      expect(schema.version).toBe(2);
-      expect(graph.getAllArtifacts()).toHaveLength(1);
-      expect(graph.getBuildOrder()).toEqual(['tasks']);
-      expect(schema.artifacts.map((artifact) => artifact.template)).toEqual(['tasks.md']);
-      expect(schema.apply?.tracks).toBe('tasks.md');
-      expect(schema.apply?.executionPlan).toBe('plan.md');
-      expect(schema.apply?.requires).toEqual(['tasks', 'plan']);
-
-      // Phases (top-level)
-      expect(graph.getPhase('brainstorm')?.generates).toBe('brainstorm.md');
-      expect(graph.getPhase('plan')?.generates).toBe('plan.md');
-      expect(graph.getPhase('plan')?.requires).toEqual(['brainstorm', 'tasks']);
-    });
-
-    it('should progress brainstorm phase → tasks artifact → plan phase', () => {
-      const schema = resolveSchema('brainstorm-root');
-      const graph = ArtifactGraph.fromSchema(schema);
-
-      let completed = detectCompleted(graph, tempDir);
-      expect(completed.size).toBe(0);
-      // tasks blocked on brainstorm phase
-      expect(graph.getNextArtifacts(completed)).toEqual([]);
-      expect(normalizeBlocked(graph.getBlocked(completed))).toEqual({
-        tasks: ['brainstorm'],
-      });
-
-      fs.writeFileSync(path.join(tempDir, 'brainstorm.md'), '# Brainstorm');
-      completed = detectCompleted(graph, tempDir);
-      expect(completed).toEqual(new Set(['brainstorm']));
-      expect(graph.getNextArtifacts(completed)).toEqual(['tasks']);
-      expect(graph.getBlocked(completed)).toEqual({});
-
-      fs.writeFileSync(path.join(tempDir, 'tasks.md'), '# Tasks');
-      completed = detectCompleted(graph, tempDir);
-      expect(completed).toEqual(new Set(['brainstorm', 'tasks']));
-      expect(graph.getNextArtifacts(completed)).toEqual([]);
-      expect(graph.isComplete(completed)).toBe(true);
-
-      // plan phase becomes completed once plan.md exists
-      fs.writeFileSync(path.join(tempDir, 'plan.md'), '# Plan');
-      completed = detectCompleted(graph, tempDir);
-      expect(completed).toEqual(new Set(['brainstorm', 'tasks', 'plan']));
-    });
-  });
-
   describe('build order consistency', () => {
     it('should follow the documented proposal -> specs -> design -> tasks sequence', () => {
       // specs and design are siblings (both require only proposal). Ordering

@@ -19,9 +19,9 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
       },
       {
         name: 'profile',
-        description: 'Override global config profile (core or custom)',
+        description: 'Override global config profile (core, custom, or brainstorm)',
         takesValue: true,
-        values: ['core', 'custom'],
+        values: ['core', 'custom', 'brainstorm'],
       },
       {
         name: 'no-animation',
@@ -69,6 +69,39 @@ export const COMMAND_REGISTRY: CommandDefinition[] = [
     description: 'Display an interactive dashboard of specs and changes',
     flags: [
       COMMON_FLAGS.store,
+    ],
+  },
+  {
+    name: 'visual',
+    description: 'Run the optional local visual brainstorming companion',
+    flags: [],
+    subcommands: [
+      {
+        name: 'start',
+        description: 'Start a visual companion session',
+        flags: [
+          { name: 'project', description: 'Project root', takesValue: true },
+          { name: 'port', description: 'Fixed remote/listening port', takesValue: true },
+          { name: 'open', description: 'Open the browser when running locally' },
+          COMMON_FLAGS.json,
+        ],
+      },
+      {
+        name: 'status',
+        description: 'Show the latest running visual companion session',
+        flags: [
+          { name: 'project', description: 'Project root', takesValue: true },
+          COMMON_FLAGS.json,
+        ],
+      },
+      {
+        name: 'stop',
+        description: 'Stop the latest running visual companion session',
+        flags: [
+          { name: 'project', description: 'Project root', takesValue: true },
+          COMMON_FLAGS.json,
+        ],
+      },
     ],
   },
   {

@@ -100,6 +100,19 @@ describe('instruction-loader', () => {
       expect(context.graph.getName()).toBe('spec-driven');
     });
 
+    it('should canonicalize legacy built-in metadata without rewriting it', () => {
+      const changeDir = path.join(tempDir, 'openspec', 'changes', 'my-change');
+      const metadataPath = path.join(changeDir, '.openspec.yaml');
+      fs.mkdirSync(changeDir, { recursive: true });
+      fs.writeFileSync(metadataPath, 'schema: brainstorm-root\n');
+
+      const context = loadChangeContext(tempDir, 'my-change');
+
+      expect(context.schemaName).toBe('brainstorm');
+      expect(context.graph.getName()).toBe('brainstorm');
+      expect(fs.readFileSync(metadataPath, 'utf-8')).toBe('schema: brainstorm-root\n');
+    });
+
     it('should use explicit schema over metadata schema', () => {
       // Create change directory with metadata file using spec-driven
       const changeDir = path.join(tempDir, 'openspec', 'changes', 'my-change');
@@ -267,7 +280,7 @@ describe('instruction-loader', () => {
       const context = loadChangeContext(tempDir, 'my-change');
 
       expect(() => generateInstructions(context, 'nonexistent')).toThrow(
-        "Artifact or phase 'nonexistent' not found"
+        "Artifact 'nonexistent' not found"
       );
     });
 
@@ -702,146 +715,6 @@ rules:
       // proposal must come before specs, specs before tasks
       expect(proposalIdx).toBeLessThan(specsIdx);
       expect(specsIdx).toBeLessThan(tasksIdx);
-    });
-
-    it('reaches isComplete on brainstorm-root v2 once tasks.md exists', () => {
-      const changeDir = path.join(tempDir, 'openspec', 'changes', 'brainstorm-opt');
-      fs.mkdirSync(changeDir, { recursive: true });
-      fs.writeFileSync(path.join(changeDir, '.openspec.yaml'), 'schema: brainstorm-root\n');
-      fs.writeFileSync(path.join(changeDir, 'brainstorm.md'), '# B');
-      fs.writeFileSync(path.join(changeDir, 'tasks.md'), '## 1.\n- [ ] 1.1 t');
-
-      const context = loadChangeContext(tempDir, 'brainstorm-opt');
-      const status = formatChangeStatus(context);
-
-      expect(status.isComplete).toBe(true);
-      // brainstorm-root v2 has only `tasks` artifact
-      expect(status.artifacts.map((a) => a.id)).toEqual(['tasks']);
-      const tasks = status.artifacts.find((a) => a.id === 'tasks');
-      expect(tasks?.status).toBe('done');
-    });
-  });
-
-  describe('phase instructions (brainstorm-root v2)', () => {
-    let tempDir: string;
-
-    const yaml = `name: brainstorm-root-test
-version: 2
-artifacts:
-  - id: tasks
-    generates: tasks.md
-    description: Trackable implementation checklist
-    template: tasks.md
-    requires: [brainstorm]
-    instruction: 'Read brainstorm.md and reconcile tasks.'
-brainstorm:
-  generates: brainstorm.md
-  template: brainstorm.md
-  description: Brainstorm artifact
-  requires: []
-  instruction: 'Use superpowers:brainstorming.'
-plan:
-  generates: plan.md
-  template: plan.md
-  description: Execution plan
-  requires: [brainstorm, tasks]
-  instruction: 'Use superpowers:writing-plans.'
-apply:
-  requires: [tasks, plan]
-  tracks: tasks.md
-  executionPlan: plan.md
-  instruction: 'Apply the plan.'
-`;
-
-    function setupSchemaFixture(root: string) {
-      const schemaDir = path.join(root, 'openspec', 'schemas', 'brainstorm-root-test');
-      fs.mkdirSync(path.join(schemaDir, 'templates'), { recursive: true });
-      fs.writeFileSync(path.join(schemaDir, 'schema.yaml'), yaml);
-      fs.writeFileSync(
-        path.join(schemaDir, 'templates', 'tasks.md'),
-        '## 1. Group\n- [ ] 1.1 Task'
-      );
-      fs.writeFileSync(path.join(schemaDir, 'templates', 'brainstorm.md'), '# Brainstorm template');
-      fs.writeFileSync(path.join(schemaDir, 'templates', 'plan.md'), '# Plan template');
-    }
-
-    function setupChangeFixture(root: string, files: Record<string, string> = {}) {
-      const dir = path.join(root, 'openspec', 'changes', 'demo');
-      fs.mkdirSync(dir, { recursive: true });
-      fs.writeFileSync(path.join(dir, '.openspec.yaml'), 'schema: brainstorm-root-test\n');
-      for (const [name, content] of Object.entries(files)) {
-        fs.writeFileSync(path.join(dir, name), content);
-      }
-      return dir;
-    }
-
-    beforeEach(() => {
-      tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'openspec-phase-'));
-      setupSchemaFixture(tempDir);
-    });
-
-    afterEach(() => {
-      fs.rmSync(tempDir, { recursive: true, force: true });
-    });
-
-    it('generateInstructions returns kind=phase for phase id (brainstorm)', () => {
-      setupChangeFixture(tempDir);
-      const ctx = loadChangeContext(tempDir, 'demo');
-      const inst = generateInstructions(ctx, 'brainstorm', tempDir);
-      expect(inst.kind).toBe('phase');
-      expect(inst.outputPath).toBe('brainstorm.md');
-      expect(inst.unlocks).toEqual([]);
-      expect(inst.instruction).toContain('superpowers:brainstorming');
-    });
-
-    it('generateInstructions for plan phase lists deps with kind labels', () => {
-      setupChangeFixture(tempDir, {
-        'brainstorm.md': '# B',
-        'tasks.md': '## 1.\n- [ ] 1.1 t',
-      });
-      const ctx = loadChangeContext(tempDir, 'demo');
-      const inst = generateInstructions(ctx, 'plan', tempDir);
-      expect(inst.kind).toBe('phase');
-      const brainstormDep = inst.dependencies.find((d) => d.id === 'brainstorm');
-      const tasksDep = inst.dependencies.find((d) => d.id === 'tasks');
-      expect(brainstormDep?.kind).toBe('phase');
-      expect(brainstormDep?.done).toBe(true);
-      expect(tasksDep?.kind).toBe('artifact');
-      expect(tasksDep?.done).toBe(true);
-    });
-
-    it('generateInstructions for tasks artifact resolves brainstorm phase as dep', () => {
-      setupChangeFixture(tempDir, { 'brainstorm.md': '# B' });
-      const ctx = loadChangeContext(tempDir, 'demo');
-      const inst = generateInstructions(ctx, 'tasks', tempDir);
-      expect(inst.kind).toBe('artifact');
-      const brainstormDep = inst.dependencies.find((d) => d.id === 'brainstorm');
-      expect(brainstormDep?.kind).toBe('phase');
-      expect(brainstormDep?.done).toBe(true);
-    });
-
-    it('formatChangeStatus reports phases with done/blocked', () => {
-      setupChangeFixture(tempDir, { 'brainstorm.md': '# B' });
-      const ctx = loadChangeContext(tempDir, 'demo');
-      const status = formatChangeStatus(ctx);
-
-      const brainstormPhase = status.phases.find((p) => p.id === 'brainstorm');
-      expect(brainstormPhase?.status).toBe('done');
-
-      const planPhase = status.phases.find((p) => p.id === 'plan');
-      expect(planPhase?.status).toBe('blocked');
-      expect(planPhase?.missingDeps).toEqual(['tasks']);
-    });
-
-    it('formatChangeStatus marks plan phase ready when both deps done', () => {
-      setupChangeFixture(tempDir, {
-        'brainstorm.md': '# B',
-        'tasks.md': '## 1.\n- [ ] 1.1 t',
-      });
-      const ctx = loadChangeContext(tempDir, 'demo');
-      const status = formatChangeStatus(ctx);
-      const planPhase = status.phases.find((p) => p.id === 'plan');
-      expect(planPhase?.status).toBe('ready');
     });
   });
 });
