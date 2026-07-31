@@ -1,6 +1,7 @@
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
   BRAINSTORM_GATE_POLICY_BLOCK,
+  BRAINSTORM_FOLLOW_UP_POLICY_BLOCK,
   BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
 } from './workflow-policy.js';
 import { NATIVE_BRAINSTORM_METHOD } from './native-discipline.js';
@@ -27,6 +28,8 @@ const BRAINSTORM_THIN_BODY_TEMPLATE = (
 4. Write to the returned \`resolvedOutputPath\` (or \`outputPath\` relative to the returned change directory). ${invokeNote}
 
 Then \`/opsx:propose\` → \`tasks.md\` (not writing-plans/apply direct).
+
+${BRAINSTORM_FOLLOW_UP_POLICY_BLOCK}
 
 ${BRAINSTORM_GATE_POLICY_BLOCK}
 

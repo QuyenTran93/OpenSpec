@@ -95,8 +95,17 @@ command with its expected result.
 - If unavailable, use expanded inline self-review and record the review mode.
 - Never claim completion without fresh focused and project-level verification.
 - Leave commit, push, merge, and branch integration decisions to the user or controlling repository policy.
-- Record any accepted follow-up work in `<planningHome.root>/TODO.md`; preserve existing entries and include enough context to resume it.
 - User approval is required before apply begins.
+
+## Deferred Follow-up Handoff
+
+- Follow-up work is accepted product or engineering scope deliberately deferred beyond this change.
+- Work required to complete the current change or meet its requirements and success criteria must remain in tasks.md and plan.md.
+- Excluded routine workflow-completion steps include manual testing, verification, archiving, automated checks, review, required documentation, correctness cleanup, VCS decisions, and handoff.
+- Record eligible work in `<planningHome.root>/TODO.md`, using the store-aware planning root returned by the CLI. Read and preserve existing content first.
+- Reconcile semantically equivalent entries rather than duplicating them.
+- Each entry states the deferred outcome, why it was deferred, the originating change, and enough context or acceptance criteria to resume it.
+- Do not create or modify `TODO.md` when no eligible follow-up work exists.
 
 ## Final Verification
 

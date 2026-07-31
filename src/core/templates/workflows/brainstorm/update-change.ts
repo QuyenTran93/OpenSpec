@@ -1,9 +1,14 @@
 import type { CommandTemplate, SkillTemplate } from '../../types.js';
-import { BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK } from './workflow-policy.js';
+import {
+  BRAINSTORM_FOLLOW_UP_POLICY_BLOCK,
+  BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
+} from './workflow-policy.js';
 
 const UPDATE_BODY = (input: string): string => `Revise an existing brainstorm change while keeping planning artifacts coherent.
 
 ${BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK}
+
+${BRAINSTORM_FOLLOW_UP_POLICY_BLOCK}
 
 **Input:** ${input}
 

@@ -87,6 +87,17 @@ describe('brainstorm schema', () => {
     expect(template).toContain('user or controlling repository policy');
     expect(template).toContain('<planningHome.root>/TODO.md');
     expect(template).toContain('follow-up work');
+    expect(template).toContain('manual testing, verification, archiving');
+    expect(template).toContain('routine workflow-completion steps');
+    expect(template).toContain('VCS decisions');
+    expect(template).toContain('required to complete the current change');
+    expect(template).toContain('must remain in tasks.md and plan.md');
+    expect(template).toContain('semantically equivalent');
+    expect(template).toContain('Do not create or modify');
+    expect(template).toContain('deferred outcome');
+    expect(template).toContain('why it was deferred');
+    expect(template).toContain('originating change');
+    expect(template).toContain('acceptance criteria');
 
     for (const marker of [
       '## Architecture',
@@ -119,5 +130,8 @@ describe('brainstorm schema', () => {
     }
 
     expect(schema.apply?.instruction).toContain('<planningHome.root>/TODO.md');
+    expect(schema.apply?.instruction).toContain('manual testing, verification, archiving');
+    expect(schema.apply?.instruction).toContain('semantically equivalent');
+    expect(schema.apply?.instruction).toContain('Do not create or modify');
   });
 });

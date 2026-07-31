@@ -40,7 +40,33 @@ describe('skill-generation', () => {
     expect(runtime).toContain('requirements compliance before code quality');
     expect(runtime).toContain('<planningHome.root>/TODO.md');
     expect(runtime).toContain('follow-up work');
+    expect(runtime).toContain('manual testing, verification, archiving');
+    expect(runtime).toContain('routine workflow-completion steps');
+    expect(runtime).toContain('VCS decisions');
     expect(runtime).not.toMatch(/subagent-driven (?:development|execution|implementation)/i);
+  });
+
+  it('scopes the deferred follow-up policy to workflows that can discover deferred work', () => {
+    const included = ['brainstorm', 'propose', 'writing-plans', 'update', 'apply'];
+    const excluded = ['new', 'archive'];
+
+    for (const workflowId of included) {
+      const skill = getSkillTemplates([workflowId], 'brainstorm')[0].template.instructions;
+      const command = getCommandTemplates([workflowId], 'brainstorm')[0].template.content;
+      for (const content of [skill, command]) {
+        expect(content, workflowId).toContain('Deferred follow-up policy:');
+        expect(content, workflowId).toContain('<planningHome.root>/TODO.md');
+        expect(content, workflowId).toContain('semantically equivalent');
+        expect(content, workflowId).toContain('Do not create or modify');
+      }
+    }
+
+    for (const workflowId of excluded) {
+      const skill = getSkillTemplates([workflowId], 'brainstorm')[0].template.instructions;
+      const command = getCommandTemplates([workflowId], 'brainstorm')[0].template.content;
+      expect(skill, workflowId).not.toContain('Deferred follow-up policy:');
+      expect(command, workflowId).not.toContain('Deferred follow-up policy:');
+    }
   });
   describe('getSkillTemplates', () => {
     it('should return all 12 skill templates', () => {

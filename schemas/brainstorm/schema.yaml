@@ -24,7 +24,17 @@ artifacts:
       inline. When available, use a review-only subagent for independent review;
       otherwise perform an expanded inline self-review from a fresh pass. Evaluate
       review findings rather than accepting them blindly. Obtain user approval
-      before handing off to propose. Do not require an external plugin.
+      before handing off to propose. Do not require an external plugin. Treat
+      follow-up as accepted product or engineering scope deliberately deferred
+      beyond this change. Keep work required for the current requirements and
+      success criteria in this change. Record only eligible deferred work in
+      <planningHome.root>/TODO.md: preserve existing content, reconcile
+      semantically equivalent entries, and include the deferred outcome, reason,
+      originating change, and resumable context or acceptance criteria. Do not
+      create or modify TODO.md when no eligible follow-up exists. Excluded routine
+      workflow-completion steps include manual testing, verification, archiving,
+      automated checks, review, required documentation, correctness cleanup, VCS
+      decisions, and handoff.
 
   - id: tasks
     generates: tasks.md
@@ -57,8 +67,17 @@ artifacts:
       inline self-review. Obtain user approval before apply. Do not require an
       external plugin. A documentation-only or configuration-only task may omit
       RED/GREEN steps only when it states why no behavior changes and supplies a
-      concrete validation command with its expected result. Record accepted
-      follow-up work in <planningHome.root>/TODO.md, preserving existing entries.
+      concrete validation command with its expected result. Follow-up is accepted
+      product or engineering scope deliberately deferred beyond this change. Work
+      required to complete the current change or meet its requirements and success
+      criteria must remain in tasks.md and plan.md. Record eligible work in
+      <planningHome.root>/TODO.md using the CLI-returned planning root. Preserve
+      existing content, reconcile semantically equivalent entries, and state the
+      deferred outcome, why it was deferred, the originating change, and resumable
+      context or acceptance criteria. Do not create or modify TODO.md when no
+      eligible follow-up exists. Excluded routine workflow-completion steps include
+      manual testing, verification, archiving, automated checks, review, required
+      documentation, correctness cleanup, VCS decisions, and handoff.
 
 apply:
   requires: [plan]
@@ -76,6 +95,14 @@ apply:
     preserve dirty overlapping work, and execute tasks in dependency order. Verify
     review feedback against the code and requirements. If unavailable, use expanded
     inline self-review. Leave commit, push, merge, and branch integration decisions
-    to the user or controlling repository policy. Record accepted follow-up work
-    in <planningHome.root>/TODO.md, preserving existing entries and enough context
-    to resume it.
+    to the user or controlling repository policy. Follow-up is accepted product or
+    engineering scope deliberately deferred beyond this change. Work required to
+    complete the current change or meet its requirements and success criteria must
+    remain in tasks.md and plan.md. Record eligible work in
+    <planningHome.root>/TODO.md using the CLI-returned planning root. Preserve
+    existing content, reconcile semantically equivalent entries, and state the
+    deferred outcome, why it was deferred, the originating change, and resumable
+    context or acceptance criteria. Do not create or modify TODO.md when no eligible
+    follow-up exists. Excluded routine workflow-completion steps include
+    manual testing, verification, archiving, automated checks, review, required
+    documentation, correctness cleanup, VCS decisions, and handoff.

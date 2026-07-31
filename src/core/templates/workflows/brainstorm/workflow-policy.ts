@@ -13,10 +13,22 @@ Use \`openspec status --change <name> --json\` and the resolved paths returned b
 \`openspec instructions <artifact> --change <name> --json\`. Preserve the same
 \`--store <id>\` on every follow-up when one was selected. Never rebuild change
 paths from the process working directory.
-
-Record accepted follow-up work in \`<planningHome.root>/TODO.md\`. Preserve existing
-entries and include enough context, scope, and provenance to resume each item.
 `.trim();
+
+export const BRAINSTORM_FOLLOW_UP_POLICY_BLOCK = `**Deferred follow-up policy:**
+
+- Follow-up work is accepted product or engineering scope deliberately deferred
+  beyond the current change. Work required to complete the current change or meet
+  its requirements and success criteria must remain in tasks.md and plan.md.
+- Excluded routine workflow-completion steps include manual testing, verification, archiving,
+  automated checks, review, required documentation, correctness cleanup,
+  VCS decisions, and handoff.
+- Record eligible work in \`<planningHome.root>/TODO.md\`, using the store-aware
+  planning root returned by the CLI. Read and preserve existing content first.
+- Reconcile semantically equivalent entries instead of duplicating them. Each
+  entry must state the deferred outcome, why it was deferred, the originating
+  change, and enough context or acceptance criteria to resume it.
+- Do not create or modify TODO.md when no eligible follow-up work exists.`;
 
 export const BRAINSTORM_GATE_POLICY_BLOCK = `Before creating downstream artifacts, read the current brainstorm.md and confirm the user agrees with its chosen approach. If the design is ambiguous or still changing, ask one clarifying question at a time and update brainstorm.md first.`;
 
