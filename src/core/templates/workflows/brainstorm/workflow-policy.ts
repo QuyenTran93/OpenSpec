@@ -36,6 +36,14 @@ export const BRAINSTORM_WRITING_PLANS_SHARED_BODY = `Planning method:
 - Read brainstorm.md and tasks.md in full.
 - Check that the scope is one coherent change.
 - Map files to responsibilities before decomposing work.
+- Before choosing Test paths, inspect the relevant repository, package, or module.
+  The existing local test convention is authoritative: reuse \`tests/\`, \`test/\`, or \`__tests__/\`,
+  or preserve a deliberate colocated-test convention. If none exists,
+  use \`tests/\` at the nearest package or module scope.
+  Do not introduce a second test-root convention within the same scope. Do not migrate existing tests.
+  Do not create an empty test directory for documentation-only or configuration-only work.
+- Replace every semantic template placeholder with the exact project-specific path, code-fence language, command, and expected result.
+  Raw semantic placeholders must not remain in plan.md.
 - Produce independently testable deliverables with exact paths, interfaces,
   bite-sized checkbox steps, RED/GREEN commands and expected outcomes, concrete
   implementation guidance, refactoring, review, and commit checkpoints.
@@ -61,5 +69,9 @@ export const BRAINSTORM_INLINE_EXECUTION_POLICY_BLOCK = `Execution policy:
 - Subagents may be used only for independent review or read-only research.
 - Subagents must not edit files, implement tasks, or orchestrate the apply loop.
 - If subagents are unavailable, use expanded inline self-review and record the review mode.
-- Keep task state current and require fresh verification evidence before completion.
+- A task is complete only after its acceptance criteria and focused verification pass.
+  Immediately persist its \`- [ ]\` → \`- [x]\` transition in tasks.md before starting the next task.
+- Never batch-fill checkboxes at the end of a session. Never mark failed, partial, or blocked work complete.
+- If updating tasks.md fails, stop before the next task and report the error.
+  On resume, reread tasks.md and continue from the first incomplete task in dependency order.
 - Leave commit, push, merge, and branch integration decisions to the user or controlling repository policy.`;

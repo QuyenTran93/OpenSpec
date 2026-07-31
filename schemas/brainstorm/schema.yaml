@@ -62,7 +62,16 @@ artifacts:
       implementation guidance, GREEN commands and expected passes, refactoring,
       review and commit checkpoints, and final verification. Ban placeholders and
       undefined interfaces. Check requirements coverage, dependency order, task
-      sizing, executable commands, and identifier/type consistency. When available,
+      sizing, executable commands, and identifier/type consistency.
+      Before choosing Test paths, inspect the relevant repository,
+      package, or module. The existing local test convention is authoritative:
+      reuse `tests/`, `test/`, or `__tests__/`, or preserve a deliberate colocated-test convention.
+      If none exists, use `tests/` at the nearest package or module scope.
+      Do not introduce a second test-root convention within the same scope.
+      Do not migrate existing tests. Do not create an empty test directory for
+      documentation-only or configuration-only work. Replace every semantic template placeholder
+      with the exact project-specific path, code-fence language, command, and expected result.
+      Raw semantic placeholders must not remain in plan.md. When available,
       use a review-only subagent for independent review; otherwise perform expanded
       inline self-review. Obtain user approval before apply. Do not require an
       external plugin. A documentation-only or configuration-only task may omit
@@ -106,3 +115,8 @@ apply:
     follow-up exists. Excluded routine workflow-completion steps include
     manual testing, verification, archiving, automated checks, review, required
     documentation, correctness cleanup, VCS decisions, and handoff.
+    A task is complete only after its acceptance criteria and focused verification pass.
+    Immediately persist its - [ ] → - [x] transition in tasks.md before starting the next task.
+    Never batch-fill checkboxes at the end of a session. Never mark failed, partial, or blocked work complete.
+    If updating tasks.md fails, stop before the next task and report the error.
+    On resume, reread tasks.md and continue from the first incomplete task in dependency order.

@@ -30,7 +30,7 @@
 
 - Create: `path/to/new-file`
 - Modify: `path/to/file`
-- Test: `path/to/test`
+- Test: `<resolved-test-path>`
 
 **Interfaces:**
 
@@ -39,24 +39,24 @@
 
 - [ ] **Step 1: Write the failing test**
 
-```ts
+```<language>
 // Concrete focused test derived from the approved behavior.
 ```
 
 - [ ] **Step 2: Run the test to verify RED**
 
-Run: `pnpm test -- path/to/test`
+Run: `<focused-test-command>`
 Expected: FAIL with the specific missing-behavior message.
 
 - [ ] **Step 3: Add the minimal implementation**
 
-```ts
+```<language>
 // Concrete implementation or precise pseudocode with exact symbols.
 ```
 
 - [ ] **Step 4: Run the test to verify GREEN**
 
-Run: `pnpm test -- path/to/test`
+Run: `<focused-test-command>`
 Expected: PASS with no new warnings.
 
 - [ ] **Step 5: Refactor while tests remain green**
@@ -69,7 +69,7 @@ Expected: PASS with no new warnings.
 
 - [ ] **Step 7: Commit checkpoint**
 
-Run: `git add path/to/test path/to/file && git commit -m "feat: concrete deliverable"`
+Run: `git add <resolved-test-path> <resolved-source-path> && git commit -m "feat: concrete deliverable"`
 
 For a documentation-only or configuration-only task, replace RED/GREEN steps
 only after stating why no behavior changes and providing a concrete validation
@@ -82,12 +82,18 @@ command with its expected result.
 - Identifier and type consistency
 - Dependency order and task sizing
 - Executable commands and expected results
+- Package/module scope and duplicate-root scan
 
 ## Execution Handoff
 
 - Implementation runs inline in the primary session.
 - Establish or verify an isolated worktree when safe; preserve dirty overlapping work.
 - Execute tasks in dependency order and keep task state current.
+- A task is complete only after its acceptance criteria and focused verification pass.
+- Immediately persist its `- [ ]` → `- [x]` transition in tasks.md before starting the next task.
+- Never batch-fill checkboxes at the end of a session. Never mark failed, partial, or blocked work complete.
+- If updating tasks.md fails, stop before the next task and report the error.
+- On resume, reread tasks.md and continue from the first incomplete task in dependency order.
 - Use test-first development and systematic root-cause debugging for behavior changes.
 - Review requirements compliance before code quality and verify review feedback.
 - Subagents are limited to independent review or read-only research.

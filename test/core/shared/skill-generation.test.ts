@@ -68,6 +68,41 @@ describe('skill-generation', () => {
       expect(command, workflowId).not.toContain('Deferred follow-up policy:');
     }
   });
+
+  it('makes writing-plans resolve and reuse the local test organization', () => {
+    const skill = getSkillTemplates(['writing-plans'], 'brainstorm')[0].template.instructions;
+    const command = getCommandTemplates(['writing-plans'], 'brainstorm')[0].template.content;
+
+    for (const content of [skill, command]) {
+      expect(content).toContain('existing local test convention is authoritative');
+      expect(content).toContain('`tests/`, `test/`, or `__tests__/`');
+      expect(content).toContain('nearest package or module scope');
+      expect(content).toContain('deliberate colocated-test convention');
+      expect(content).toContain('second test-root convention');
+      expect(content).toContain('Do not migrate existing tests');
+      expect(content).toContain('Do not create an empty test directory');
+      expect(content).not.toContain('test-path organization');
+      expect(content).toContain('Replace every semantic template placeholder');
+      expect(content).toContain('exact project-specific path, code-fence language, command, and expected result');
+      expect(content).toContain('Raw semantic placeholders must not remain in plan.md');
+    }
+  });
+
+  it('persists each verified task checkbox before advancing or resuming', () => {
+    for (const workflowId of ['writing-plans', 'apply']) {
+      const skill = getSkillTemplates([workflowId], 'brainstorm')[0].template.instructions;
+      const command = getCommandTemplates([workflowId], 'brainstorm')[0].template.content;
+      for (const content of [skill, command]) {
+        expect(content, workflowId).toContain('acceptance criteria and focused verification pass');
+        expect(content, workflowId).toContain('before starting the next task');
+        expect(content, workflowId).toContain('Never batch-fill');
+        expect(content, workflowId).toContain('failed, partial, or blocked');
+        expect(content, workflowId).toContain('If updating tasks.md fails, stop');
+        expect(content, workflowId).toContain('On resume, reread tasks.md');
+        expect(content, workflowId).toContain('first incomplete task');
+      }
+    }
+  });
   describe('getSkillTemplates', () => {
     it('should return all 12 skill templates', () => {
       const templates = getSkillTemplates();

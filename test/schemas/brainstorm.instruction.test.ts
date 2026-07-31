@@ -98,6 +98,14 @@ describe('brainstorm schema', () => {
     expect(template).toContain('why it was deferred');
     expect(template).toContain('originating change');
     expect(template).toContain('acceptance criteria');
+    expect(template).toContain('- Test: `<resolved-test-path>`');
+    expect(template).toContain('```<language>');
+    expect(template).toContain('Run: `<focused-test-command>`');
+    expect(template).not.toContain('file.test.ts');
+    expect(template).not.toContain('```ts');
+    expect(template).not.toContain('pnpm test');
+    expect(template).not.toContain('- Test: `path/to/test`');
+    expect(template).not.toContain('## Test Organization');
 
     for (const marker of [
       '## Architecture',
@@ -125,13 +133,44 @@ describe('brainstorm schema', () => {
       'dependency order',
       'requirements compliance before code quality',
       'Verify review feedback',
+      'existing local test convention is authoritative',
+      '`tests/`, `test/`, or `__tests__/`',
+      'nearest package or module scope',
+      'deliberate colocated-test convention',
+      'second test-root convention',
+      'Do not migrate existing tests',
+      'Do not create an empty test directory',
+      'Replace every semantic template placeholder',
+      'exact project-specific path, code-fence language, command, and expected result',
+      'Raw semantic placeholders must not remain in plan.md',
     ]) {
       expect(contract).toContain(marker);
     }
+
+    expect(contract).not.toContain('test-path organization');
 
     expect(schema.apply?.instruction).toContain('<planningHome.root>/TODO.md');
     expect(schema.apply?.instruction).toContain('manual testing, verification, archiving');
     expect(schema.apply?.instruction).toContain('semantically equivalent');
     expect(schema.apply?.instruction).toContain('Do not create or modify');
+    expect(schema.apply?.instruction).toContain('acceptance criteria and focused verification pass');
+    expect(schema.apply?.instruction).toContain('before starting the next task');
+    expect(schema.apply?.instruction).toContain('Never batch-fill');
+    expect(schema.apply?.instruction).toContain('failed, partial, or blocked');
+    expect(schema.apply?.instruction).toContain('If updating tasks.md fails, stop');
+    expect(schema.apply?.instruction).toContain('On resume, reread tasks.md');
+    expect(schema.apply?.instruction).toContain('first incomplete task');
+
+    for (const marker of [
+      'acceptance criteria and focused verification pass',
+      'before starting the next task',
+      'Never batch-fill',
+      'failed, partial, or blocked',
+      'If updating tasks.md fails, stop',
+      'On resume, reread tasks.md',
+      'first incomplete task',
+    ]) {
+      expect(template).toContain(marker);
+    }
   });
 });
