@@ -5,6 +5,7 @@ import ora from 'ora';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { promises as fs } from 'fs';
+import os from 'os';
 import { AI_TOOLS, TOOL_ID_ALIASES } from '../core/config.js';
 import { UpdateCommand } from '../core/update.js';
 import {
@@ -34,6 +35,7 @@ import { registerDoctorCommand } from '../commands/doctor.js';
 import { registerContextCommand } from '../commands/context.js';
 import { registerWorksetCommand } from '../commands/workset.js';
 import { registerVisualCommand } from '../commands/visual.js';
+import { registerCleanCommand } from '../commands/clean.js';
 import {
   statusCommand,
   instructionsCommand,
@@ -52,6 +54,7 @@ import {
 import { maybeShowTelemetryNotice, trackCommand, shutdown } from '../telemetry/index.js';
 import { COMMON_FLAGS } from '../core/completions/shared-flags.js';
 import { isInteractive } from '../utils/interactive.js';
+import type { Profile } from '../core/global-config.js';
 
 const STORE_OPTION_DESCRIPTION = COMMON_FLAGS.store.description;
 
@@ -153,15 +156,66 @@ const toolAliasNote = Object.entries(TOOL_ID_ALIASES)
   .join(', ');
 const toolsOptionDescription = `Configure AI tools non-interactively. Use "all", "none", or a comma-separated list of: ${availableToolIds.join(', ')}. Also accepted: ${toolAliasNote}`;
 
+async function displayProjectCleanupHint(toolIds: string[]): Promise<void> {
+  const { discoverProjectArtifacts } = await import('../core/global-artifacts/project-cleanup.js');
+  const plan = await discoverProjectArtifacts(process.cwd(), toolIds);
+  if (plan.removable.length === 0) return;
+  const tools = toolIds.join(',');
+  console.log();
+  console.log(`Found ${plan.removable.length} project-local OpenSpec artifact(s) that may shadow the global install.`);
+  console.log(`Preview cleanup: openspec clean --scope project --tools ${tools}`);
+  console.log(`Apply cleanup:   openspec clean --scope project --tools ${tools} --yes`);
+  console.log('Warning: removing committed local artifacts may affect collaborators without a global install.');
+}
+
 program
   .command('init [path]')
   .description('Initialize OpenSpec in your project')
   .option('--tools <tools>', toolsOptionDescription)
+  .option('--scope <scope>', 'Install scope: project (default) or global', 'project')
   .option('--force', 'Auto-cleanup legacy files without prompting')
   .option('--profile <profile>', 'Override global config profile (core, custom, or brainstorm)')
   .option('--no-animation', 'Show a static welcome screen instead of the animated one')
-  .action(async (targetPath = '.', options?: { tools?: string; force?: boolean; profile?: string; animation?: boolean }) => {
+  .action(async (targetPath = '.', options?: { tools?: string; scope?: string; force?: boolean; profile?: string; animation?: boolean }) => {
     try {
+      const { parseInstallScope } = await import('../core/install-scope.js');
+      const scope = parseInstallScope(options?.scope);
+      if (scope === 'global') {
+        if (targetPath !== '.') {
+          throw new Error('Global init does not accept a project path. Run it without [path].');
+        }
+        const { getGlobalCapableToolIds } = await import('../core/global-artifacts/capabilities.js');
+        const { installGlobalArtifacts } = await import('../core/global-artifacts/install.js');
+        const context = { env: process.env, platform: process.platform, homedir: os.homedir() };
+        const capable = getGlobalCapableToolIds(context);
+        const requested = options?.tools?.trim() || 'all';
+        if (requested === 'none') {
+          throw new Error('Global init requires at least one tool.');
+        }
+        const toolIds = requested === 'all'
+          ? capable
+          : requested.split(',').map((id) => TOOL_ID_ALIASES[id.trim()] ?? id.trim());
+        const unsupported = toolIds.filter((id) => !capable.includes(id));
+        if (unsupported.length > 0) {
+          throw new Error(
+            `Tool(s) ${unsupported.join(', ')} do not have a verified global path. ` +
+            `Globally supported tools: ${capable.join(', ')}`
+          );
+        }
+        if (options?.profile && !['core', 'custom', 'brainstorm'].includes(options.profile)) {
+          throw new Error(`Invalid profile '${options.profile}'. Expected core, custom, or brainstorm.`);
+        }
+        const result = await installGlobalArtifacts({
+          toolIds,
+          context,
+          profile: options?.profile as Profile | undefined,
+        });
+        console.log(`Global OpenSpec artifacts installed for: ${result.installed.join(', ')}`);
+        console.log(`Record: ${result.recordPath}`);
+        await displayProjectCleanupHint(result.installed);
+        return;
+      }
+
       // Validate that the path is a valid directory
       const resolvedPath = path.resolve(targetPath);
 
@@ -220,8 +274,26 @@ program
   .command('update [path]')
   .description('Update OpenSpec instruction files')
   .option('--force', 'Force update even when tools are up to date')
-  .action(async (targetPath = '.', options?: { force?: boolean }) => {
+  .option('--scope <scope>', 'Install scope: project (default) or global', 'project')
+  .action(async (targetPath = '.', options?: { force?: boolean; scope?: string }) => {
     try {
+      const { parseInstallScope } = await import('../core/install-scope.js');
+      const scope = parseInstallScope(options?.scope);
+      if (scope === 'global') {
+        if (targetPath !== '.') {
+          throw new Error('Global update does not accept a project path. Run it without [path].');
+        }
+        const { updateGlobalArtifacts } = await import('../core/global-artifacts/update.js');
+        const result = await updateGlobalArtifacts({
+          context: { env: process.env, platform: process.platform, homedir: os.homedir() },
+          cwd: process.cwd(),
+        });
+        console.log(`Global OpenSpec artifacts updated for: ${result.installed.join(', ')}`);
+        console.log(`Record: ${result.recordPath}`);
+        await displayProjectCleanupHint(result.installed);
+        return;
+      }
+
       const installDir = getInstallDir();
       // Running from a clone: the version is whatever the branch says, so any
       // upgrade advice would be noise. Decided before the request, so a
@@ -428,6 +500,7 @@ registerDoctorCommand(program);
 registerContextCommand(program);
 registerWorksetCommand(program);
 registerVisualCommand(program);
+registerCleanCommand(program);
 
 // Top-level validate command
 program

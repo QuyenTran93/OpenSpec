@@ -105,6 +105,24 @@ to read the hint.
 
 \*\*\*\* Windsurf was [rebranded to Devin Desktop](https://docs.devin.ai/desktop/devin-desktop-faq) on June 2, 2026, and its config directory moved: `.devin/` is the preferred read + write location, `.windsurf/` a legacy read-only fallback. OpenSpec follows the rename — the tool id is `devin`, and `--tools windsurf` still resolves to it so existing setup scripts keep working. A project still holding OpenSpec files in `.windsurf/` is offered the move on the next `openspec update`; declining leaves them in place, and files you wrote yourself are never touched. Workflows are invoked by filename, so `.devin/workflows/opsx-apply.md` is `/opsx-apply`. The [Devin Local agent does not support workflows](https://docs.devin.ai/desktop/devin-local) — only skills, and it does not read `.windsurf/` at all — so whenever OpenSpec writes Devin skills it keeps their bodies, and the getting-started hint, on `/openspec-*` skill invocations, which work on both agents. Under commands-only delivery no skills are written and both fall back to `/opsx-*`.
 
+## Verified Global Paths
+
+`openspec init --scope global --tools all` installs every entry in this table.
+Tools absent from the table remain project-scoped because OpenSpec does not guess
+user configuration paths.
+
+| Tool | Global skills | Global commands |
+|------|---------------|-----------------|
+| Claude Code | `~/.claude/skills/openspec-*/SKILL.md` | `~/.claude/commands/opsx/<id>.md` |
+| Codex | `~/.agents/skills/openspec-*/SKILL.md` | Not generated (skills-only) |
+| Cursor | `~/.cursor/skills/openspec-*/SKILL.md` | `~/.cursor/commands/opsx-<id>.md` |
+| Gemini CLI | `~/.gemini/skills/openspec-*/SKILL.md` | `~/.gemini/commands/opsx/<id>.toml` |
+| Hermes | `~/.hermes/skills/openspec-*/SKILL.md` | Not generated (skills-only) |
+
+Project-local artifacts and global artifacts may coexist. The AI tool's native
+precedence rules decide which copy wins; project-local commands commonly shadow
+global commands with the same name.
+
 ## Non-Interactive Setup
 
 For CI/CD or scripted setup, use `--tools` (and optionally `--profile`):

@@ -370,7 +370,10 @@ describe('offerCliUpgrade', () => {
 
   it('offers only for an npm-owned global install', () => {
     // Anchored on this machine's real npm root so the case is not fictional.
-    const npmGlobal = path.join(npmGlobalRoots()[0], '@fission-ai', 'openspec');
+    // Use a synthetic package below the real npm root. A contributor may have
+    // linked @fission-ai/openspec globally back to this checkout, in which case
+    // the real package path correctly looks like a source checkout.
+    const npmGlobal = path.join(npmGlobalRoots()[0], '@openspec-test', 'fixture');
     expect(canSelfUpgrade(npmGlobal, PROJECT_ROOT)).toBe(true);
 
     // `npm install -g` is the only command we run, so anything npm does not
@@ -389,7 +392,7 @@ describe('offerCliUpgrade', () => {
   });
 
   it('asks only where the answer can be given and acted on', () => {
-    const npmGlobal = path.join(npmGlobalRoots()[0], '@fission-ai', 'openspec');
+    const npmGlobal = path.join(npmGlobalRoots()[0], '@openspec-test', 'fixture');
     const base = { installDir: npmGlobal, projectPath: PROJECT_ROOT };
 
     expect(shouldOfferUpgrade({ ...base, interactive: true, stdoutIsTty: true })).toBe(true);

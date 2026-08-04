@@ -155,6 +155,34 @@ openspec update                              # run inside each project
 
 `openspec update` regenerates the skill and command files for the tools you've configured, so your slash commands stay current with the installed version. It also checks whether a newer CLI has been published and offers to upgrade, since upgrading is what makes new workflows available in the first place — see [CLI Reference](cli.md#openspec-update).
 
+## Install AI artifacts globally
+
+Project-local skills and commands remain the default. To make OpenSpec workflows
+available across repositories, install them once at user scope:
+
+```bash
+openspec init --scope global --tools all
+openspec update --scope global
+```
+
+At global scope, `--tools all` means every tool whose user-level discovery path
+OpenSpec has verified. OpenSpec currently supports Claude Code, Codex, Cursor,
+Gemini CLI, and Hermes at this scope. Global init creates no `openspec/` planning
+directory; it writes only AI-tool artifacts and a management record at
+`<OpenSpec config directory>/global-artifacts.json`.
+
+If project-local OpenSpec files may shadow the new global installation, setup
+prints a safe cleanup suggestion. Preview it first, then apply explicitly:
+
+```bash
+openspec clean --scope project --tools claude,codex
+openspec clean --scope project --tools claude,codex --yes
+```
+
+Cleanup never removes `openspec/`. It removes only recognized generated skills
+and unchanged generated commands. Keep committed local artifacts when teammates
+rely on them without a global installation.
+
 ## Uninstalling
 
 There's no `openspec uninstall` command, because OpenSpec is just a global package plus some files in your project. Removing it is a few manual steps, and nothing here touches your source code.
