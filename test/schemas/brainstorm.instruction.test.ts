@@ -76,6 +76,18 @@ describe('brainstorm schema', () => {
     }
   });
 
+  it('requires contextual recommendations for every multiple-choice question', () => {
+    const instruction = schema.artifacts.find((item) => item.id === 'brainstorm')?.instruction ?? '';
+    const normalized = instruction.replace(/\s+/g, ' ');
+
+    expect(normalized).toContain('two or more options');
+    expect(normalized).toContain('exactly one option as `(Recommended)`');
+    expect(normalized).toContain('briefly explain why');
+    expect(normalized).toContain('ask one focused clarifying question');
+    expect(normalized).toContain('Never guess');
+    expect(normalized).toContain('does not select it for the user');
+  });
+
   it('defines an executable plan contract and always-inline execution policy', () => {
     const artifact = schema.artifacts.find((item) => item.id === 'plan')!;
     const template = fs.readFileSync(path.join(schemaDir, 'templates', artifact.template), 'utf-8');

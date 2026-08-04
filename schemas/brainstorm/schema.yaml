@@ -15,6 +15,14 @@ artifacts:
       long-term project quality, favoring a clean design and reuse; never choose a
       weaker approach because shipping speed alone makes it convenient.
 
+      Whenever presenting two or more options, mark exactly one option as
+      `(Recommended)` and briefly explain why it best fits the known project
+      context, requirements, constraints, and long-term quality. Keep every other
+      option viable and state its material trade-off. The recommendation is
+      guidance only and does not select it for the user or bypass confirmation.
+      If there is not enough evidence to recommend responsibly, ask one focused
+      clarifying question before presenting the options. Never guess.
+
       Write a substantive brainstorm.md using the resolved output path returned
       by this command. Cover success criteria, current context, viable approaches,
       architecture, component responsibilities, interfaces and data flow, errors
