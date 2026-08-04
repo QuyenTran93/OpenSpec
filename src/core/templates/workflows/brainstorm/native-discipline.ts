@@ -1,7 +1,9 @@
 export const NATIVE_BRAINSTORM_METHOD = `
-Explore the project context first. Ask one clarifying question at a time. Compare
-two or three viable approaches and their trade-offs, recommend one, and obtain
-agreement on the chosen design. If fewer are genuinely viable, explain why fewer.
+Explore the project context first. Ask one clarifying question at a time. Identify
+only genuinely viable approaches and compare them when more than one remains.
+Do not target a minimum or default option count. When only one approach is
+genuinely viable, present it directly with its rationale instead of manufacturing
+alternatives. Obtain agreement on the chosen design.
 Choose for long-term project quality, favoring a clean design and reuse. Never
 select a weaker approach because shipping speed alone makes it convenient.
 Write brainstorm.md, then review it for placeholders,

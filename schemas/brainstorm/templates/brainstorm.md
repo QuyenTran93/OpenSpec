@@ -24,11 +24,12 @@
 
 ## Approaches Considered
 
-<!-- Compare two or three viable approaches and their concrete trade-offs. If fewer are genuinely viable, explain why fewer. Do not invent options. -->
+<!-- Present only genuinely viable approaches. For each, state concrete advantages and disadvantages. If one remains, present it directly; compare only when more than one remains. Do not invent options, benefits, or drawbacks. -->
 
 ## Chosen Approach
 
 <!-- Select for long-term project quality: optimize for a clean design and reuse.
+Record the user's chosen viable approach even when it differs from the recommendation.
 Do not choose a weaker approach because shipping speed alone makes it convenient. -->
 
 ## Architecture

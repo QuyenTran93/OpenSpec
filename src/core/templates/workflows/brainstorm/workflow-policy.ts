@@ -1,9 +1,10 @@
 /** Shared native policy for brainstorm generated skills and commands. */
-export const BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK = `**Multiple-choice guidance:**
+export const BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK = `**Choice guidance:**
 
-- Whenever presenting two or more options, mark exactly one option as \`(Recommended)\` and briefly explain why it best fits the known project context, requirements, constraints, and long-term quality.
-- Keep every other option viable and state its material trade-off. A recommendation is guidance only and does not select it for the user or bypass confirmation.
-- If there is not enough evidence to recommend responsibly, ask one focused clarifying question before presenting the options. Never guess.`;
+- Present only genuinely viable options. Do not target a minimum or default option count, and never add weaker, duplicate, cosmetic, or irrelevant alternatives merely to create a comparison.
+- State concrete advantages and disadvantages for every presented approach. When only one approach is genuinely viable, present it directly with its benefits, limitations, and rationale. Only when two or more genuinely viable options remain, mark exactly one option as \`(Recommended)\` and briefly explain why. Do not invent benefits or drawbacks merely to make the presentation look balanced.
+- A recommendation is guidance only and does not select an option or bypass confirmation. The viable option the user chooses becomes authoritative, even when it differs from the recommendation; follow it without relitigating or silently substituting another option.
+- If evidence is insufficient, ask one focused clarifying question before presenting options. Never guess. If new evidence later makes the chosen option infeasible or contradictory, surface that evidence and ask the user to decide again before changing direction.`;
 
 export const BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK = `
 **Workflow sequence (brainstorm):**

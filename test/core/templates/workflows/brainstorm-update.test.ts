@@ -19,20 +19,29 @@ describe('brainstorm update workflow', () => {
       const command = getCommandTemplates([workflowId], 'brainstorm')[0]?.template.content ?? '';
 
       for (const runtime of [skill, command]) {
-        expect(runtime, workflowId).toContain('Multiple-choice guidance:');
+        const normalized = runtime.replace(/\s+/g, ' ');
+
+        expect(runtime, workflowId).toContain('Choice guidance:');
         expect(runtime, workflowId).toContain('exactly one option as `(Recommended)`');
         expect(runtime, workflowId).toContain('briefly explain why');
         expect(runtime, workflowId).toContain('ask one focused clarifying question');
         expect(runtime, workflowId).toContain('Never guess');
-        expect(runtime, workflowId).toContain('does not select it for the user');
+        expect(normalized, workflowId).toContain('Do not target a minimum or default option count');
+        expect(normalized, workflowId).toContain('When only one approach is genuinely viable, present it directly');
+        expect(normalized, workflowId).toContain('Only when two or more genuinely viable options remain');
+        expect(normalized, workflowId).toContain('concrete advantages and disadvantages for every presented approach');
+        expect(normalized, workflowId).toContain('Do not invent benefits or drawbacks');
+        expect(normalized, workflowId).toContain('the user chooses becomes authoritative');
+        expect(normalized, workflowId).toContain('ask the user to decide again before changing direction');
+        expect(normalized, workflowId).not.toContain('Compare two or three viable approaches');
       }
     }
 
     for (const workflowId of ['new', 'propose', 'writing-plans', 'apply', 'archive']) {
       const skill = getSkillTemplates([workflowId], 'brainstorm')[0]?.template.instructions ?? '';
       const command = getCommandTemplates([workflowId], 'brainstorm')[0]?.template.content ?? '';
-      expect(skill, workflowId).not.toContain('Multiple-choice guidance:');
-      expect(command, workflowId).not.toContain('Multiple-choice guidance:');
+      expect(skill, workflowId).not.toContain('Choice guidance:');
+      expect(command, workflowId).not.toContain('Choice guidance:');
     }
   });
 });

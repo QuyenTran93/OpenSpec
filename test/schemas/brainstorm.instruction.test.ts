@@ -61,8 +61,7 @@ describe('brainstorm schema', () => {
       '## Testing Strategy',
       '## Risks and Mitigations',
       '## Questions',
-      'two or three viable approaches',
-      'explain why fewer',
+      'only genuinely viable approaches',
       'long-term project quality',
       'clean design and reuse',
       'shipping speed alone',
@@ -74,18 +73,27 @@ describe('brainstorm schema', () => {
     ]) {
       expect(contract).toContain(marker);
     }
+
+    expect(template).not.toContain('Compare two or three viable approaches');
   });
 
   it('requires contextual recommendations for every multiple-choice question', () => {
     const instruction = schema.artifacts.find((item) => item.id === 'brainstorm')?.instruction ?? '';
     const normalized = instruction.replace(/\s+/g, ' ');
 
-    expect(normalized).toContain('two or more options');
     expect(normalized).toContain('exactly one option as `(Recommended)`');
     expect(normalized).toContain('briefly explain why');
     expect(normalized).toContain('ask one focused clarifying question');
     expect(normalized).toContain('Never guess');
     expect(normalized).toContain('does not select it for the user');
+    expect(normalized).toContain('Do not target a minimum or default option count');
+    expect(normalized).toContain('When only one approach is genuinely viable, present it directly');
+    expect(normalized).toContain('Only when two or more genuinely viable options remain');
+    expect(normalized).toContain('concrete advantages and disadvantages for every presented approach');
+    expect(normalized).toContain('Do not invent benefits or drawbacks');
+    expect(normalized).toContain('the user chooses becomes authoritative');
+    expect(normalized).toContain('ask the user to decide again before changing direction');
+    expect(normalized).not.toContain('compare two or three viable approaches');
   });
 
   it('defines an executable plan contract and always-inline execution policy', () => {
