@@ -22,6 +22,17 @@ async function readable(filePath: string): Promise<string | null> {
   }
 }
 
+function commandRootForPath(projectRoot: string, commandPath: string): string | null {
+  if (path.isAbsolute(commandPath)) return null;
+  const [rootSegment] = commandPath.split(/[\\/]/);
+  return rootSegment ? path.resolve(projectRoot, rootSegment) : null;
+}
+
+function isInside(root: string, candidate: string): boolean {
+  const relative = path.relative(root, candidate);
+  return relative !== '' && relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
+}
+
 export async function discoverProjectArtifacts(
   projectRoot: string,
   toolIds: string[]
@@ -53,13 +64,15 @@ export async function discoverProjectArtifacts(
     for (const profile of ['core', 'brainstorm'] as const) {
       for (const command of generateCommands(getCommandContents(undefined, profile), adapter)) {
         const commandPath = path.resolve(projectRoot, command.path);
+        const commandRoot = commandRootForPath(projectRoot, command.path);
+        if (!commandRoot) continue;
+        assertContainedPath(commandRoot, commandPath);
         const variants = expectedByPath.get(commandPath) ?? new Set<string>();
         variants.add(command.fileContent);
         expectedByPath.set(commandPath, variants);
       }
     }
     for (const [commandPath, expectedVariants] of expectedByPath) {
-      assertContainedPath(toolRoot, commandPath);
       const content = await readable(commandPath);
       if (content === null) continue;
       (expectedVariants.has(content) ? removable : preserved).push(commandPath);
@@ -86,16 +99,26 @@ export async function applyProjectArtifactCleanup(
   plan: ProjectArtifactCleanupPlan
 ): Promise<ProjectArtifactCleanupPlan> {
   const removed: string[] = [];
+  const allowedRoots = plan.tools.flatMap((toolId) => {
+    const tool = AI_TOOLS.find((candidate) => candidate.value === toolId);
+    if (!tool?.skillsDir) return [];
+    const roots = new Set<string>([path.resolve(projectRoot, tool.skillsDir)]);
+    const adapter = CommandAdapterRegistry.get(toolId);
+    if (adapter) {
+      for (const command of generateCommands(getCommandContents(), adapter)) {
+        const commandRoot = commandRootForPath(projectRoot, command.path);
+        if (commandRoot) roots.add(commandRoot);
+      }
+    }
+    return [...roots];
+  });
   for (const filePath of plan.removable) {
-    const tool = AI_TOOLS.find((candidate) =>
-      candidate.skillsDir && filePath.startsWith(`${path.resolve(projectRoot, candidate.skillsDir)}${path.sep}`)
-    );
-    if (!tool?.skillsDir || !plan.tools.includes(tool.value)) continue;
-    const toolRoot = path.resolve(projectRoot, tool.skillsDir);
-    assertContainedPath(toolRoot, filePath);
+    const artifactRoot = allowedRoots.find((root) => isInside(root, filePath));
+    if (!artifactRoot) continue;
+    assertContainedPath(artifactRoot, filePath);
     await fs.rm(filePath);
     removed.push(filePath);
-    await removeEmptyParents(filePath, toolRoot);
+    await removeEmptyParents(filePath, artifactRoot);
   }
   return { ...plan, removed };
 }

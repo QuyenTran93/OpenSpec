@@ -98,4 +98,28 @@ describe('global artifact CLI', () => {
     await expect(fs.stat(command)).rejects.toMatchObject({ code: 'ENOENT' });
     expect(await fs.stat(path.join(root, 'openspec', 'config.yaml'))).toBeDefined();
   });
+
+  it('cleans command roots that differ from the tool skills root', async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'openspec-project-clean-cline-'));
+    roots.push(root);
+    const env = { XDG_CONFIG_HOME: path.join(root, 'config') };
+    expect((await runCLI(['init', '--tools', 'cline', '--no-animation'], { cwd: root, env })).exitCode)
+      .toBe(0);
+    const command = path.join(root, '.clinerules', 'workflows', 'opsx-explore.md');
+    expect(await fs.stat(command)).toBeDefined();
+
+    const preview = await runCLI(['clean', '--scope', 'project', '--tools', 'all'], {
+      cwd: root,
+      env,
+    });
+    expect(preview.exitCode).toBe(0);
+    expect(preview.stdout).toContain(path.join('.clinerules', 'workflows', 'opsx-explore.md'));
+
+    const applied = await runCLI(
+      ['clean', '--scope', 'project', '--tools', 'all', '--yes'],
+      { cwd: root, env }
+    );
+    expect(applied.exitCode).toBe(0);
+    await expect(fs.stat(command)).rejects.toMatchObject({ code: 'ENOENT' });
+  });
 });
