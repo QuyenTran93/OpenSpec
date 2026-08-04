@@ -1,5 +1,6 @@
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
+  BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK,
   BRAINSTORM_GATE_POLICY_BLOCK,
   BRAINSTORM_FOLLOW_UP_POLICY_BLOCK,
   BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
@@ -10,6 +11,8 @@ const BRAINSTORM_THIN_BODY_TEMPLATE = (
   argDescription: string,
   invokeNote: string
 ): string => `${NATIVE_BRAINSTORM_METHOD}
+
+${BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK}
 
 **Input**: ${argDescription}
 

@@ -1,4 +1,10 @@
 /** Shared native policy for brainstorm generated skills and commands. */
+export const BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK = `**Multiple-choice guidance:**
+
+- Whenever presenting two or more options, mark exactly one option as \`(Recommended)\` and briefly explain why it best fits the known project context, requirements, constraints, and long-term quality.
+- Keep every other option viable and state its material trade-off. A recommendation is guidance only and does not select it for the user or bypass confirmation.
+- If there is not enough evidence to recommend responsibly, ask one focused clarifying question before presenting the options. Never guess.`;
+
 export const BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK = `
 **Workflow sequence (brainstorm):**
 
