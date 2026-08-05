@@ -44,4 +44,26 @@ describe('brainstorm update workflow', () => {
       expect(command, workflowId).not.toContain('Choice guidance:');
     }
   });
+
+  it('applies choice guidance before the first question', () => {
+    const questionMarkerByWorkflow = {
+      brainstorm: 'Ask one clarifying question',
+      update: 'Ask focused questions',
+    } as const;
+
+    for (const workflowId of ['brainstorm', 'update'] as const) {
+      const skill = getSkillTemplates([workflowId], 'brainstorm')[0]?.template.instructions ?? '';
+      const command = getCommandTemplates([workflowId], 'brainstorm')[0]?.template.content ?? '';
+
+      for (const runtime of [skill, command]) {
+        const policyIndex = runtime.indexOf('Choice guidance:');
+        const questionIndex = runtime.indexOf(questionMarkerByWorkflow[workflowId]);
+
+        expect(runtime, workflowId).toContain('Apply this guidance from the first question onward');
+        expect(policyIndex, workflowId).toBeGreaterThanOrEqual(0);
+        expect(questionIndex, workflowId).toBeGreaterThanOrEqual(0);
+        expect(policyIndex, workflowId).toBeLessThan(questionIndex);
+      }
+    }
+  });
 });

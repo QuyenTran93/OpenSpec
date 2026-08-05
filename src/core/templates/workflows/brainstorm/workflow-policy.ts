@@ -1,6 +1,7 @@
 /** Shared native policy for brainstorm generated skills and commands. */
 export const BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK = `**Choice guidance:**
 
+- Apply this guidance from the first question onward; introductory and clarification questions are not exempt.
 - Present only genuinely viable options. Do not target a minimum or default option count, and never add weaker, duplicate, cosmetic, or irrelevant alternatives merely to create a comparison.
 - State concrete advantages and disadvantages for every presented approach. When only one approach is genuinely viable, present it directly with its benefits, limitations, and rationale. Only when two or more genuinely viable options remain, mark exactly one option as \`(Recommended)\` and briefly explain why. Do not invent benefits or drawbacks merely to make the presentation look balanced.
 - A recommendation is guidance only and does not select an option or bypass confirmation. The viable option the user chooses becomes authoritative, even when it differs from the recommendation; follow it without relitigating or silently substituting another option.

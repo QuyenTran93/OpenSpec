@@ -96,6 +96,17 @@ describe('brainstorm schema', () => {
     expect(normalized).not.toContain('compare two or three viable approaches');
   });
 
+  it('applies choice guidance before the first question', () => {
+    const instruction = schema.artifacts.find((item) => item.id === 'brainstorm')?.instruction ?? '';
+    const normalized = instruction.replace(/\s+/g, ' ');
+    const policyIndex = normalized.indexOf('Apply this guidance from the first question onward');
+    const questionIndex = normalized.indexOf('Ask one clarifying question');
+
+    expect(policyIndex).toBeGreaterThanOrEqual(0);
+    expect(questionIndex).toBeGreaterThanOrEqual(0);
+    expect(policyIndex).toBeLessThan(questionIndex);
+  });
+
   it('defines an executable plan contract and always-inline execution policy', () => {
     const artifact = schema.artifacts.find((item) => item.id === 'plan')!;
     const template = fs.readFileSync(path.join(schemaDir, 'templates', artifact.template), 'utf-8');

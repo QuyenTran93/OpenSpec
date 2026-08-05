@@ -10,9 +10,9 @@ import { NATIVE_BRAINSTORM_METHOD } from './native-discipline.js';
 const BRAINSTORM_THIN_BODY_TEMPLATE = (
   argDescription: string,
   invokeNote: string
-): string => `${NATIVE_BRAINSTORM_METHOD}
+): string => `${BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK}
 
-${BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK}
+${NATIVE_BRAINSTORM_METHOD}
 
 **Input**: ${argDescription}
 

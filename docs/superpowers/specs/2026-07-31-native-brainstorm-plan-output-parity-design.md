@@ -105,10 +105,77 @@ The generated plan and apply handoff states the following policy explicitly:
 9. Never claim completion without fresh focused and project-level verification.
 10. Leave commit, push, merge, and branch integration decisions to the user or
     the repository's controlling policy.
+11. A task becomes complete only after its acceptance criteria and focused
+    verification pass. Immediately persist its `- [ ]` → `- [x]` transition in
+    `tasks.md` before starting another task. Never batch-fill checkboxes at the
+    end of a session, and never mark failed, partial, or blocked work complete.
+    If the checkbox update cannot be persisted, stop before the next task and
+    report the error. On resume, reread `tasks.md` and continue from the first
+    incomplete task in dependency order.
 
 The policy is native prose and must not instruct users to install or invoke an
 external plugin. Execution-host details remain in the plan handoff and generated
 apply workflow rather than being mixed into design decisions.
+
+## Deferred Follow-up Contract
+
+Follow-up work is accepted product or engineering scope that the user deliberately
+defers beyond the current change. It is eligible for the planning-home backlog only
+when it is not required to implement, validate, or complete the current change's
+approved requirements and success criteria.
+
+Manual or automated testing, verification, review, documentation required by the
+current change, cleanup required for correctness, commit/push/merge decisions,
+handoff, and archive are workflow-completion work, not follow-up work. Required
+work remains in `tasks.md` and `plan.md`; the workflow must never move it to a
+backlog to make the current change appear complete.
+
+Accepted deferred work is recorded in `<planningHome.root>/TODO.md`, using the
+store-aware `planningHome.root` returned by the CLI. Before writing, read the
+existing file when present and reconcile semantically equivalent entries. Preserve
+unrelated content and update an existing matching entry rather than adding a
+duplicate. Each new or reconciled entry identifies:
+
+- the deferred outcome;
+- why it was deferred and its relevant scope boundary;
+- the originating change;
+- enough context or acceptance criteria for a later session to resume it.
+
+Do not create or modify `TODO.md` when no eligible follow-up exists. The policy is
+shared by brainstorm, propose, writing-plans, update, and apply workflows. It is
+not injected into new-change or archive workflows, where it could misclassify
+ordinary setup or completion work.
+
+## Test Organization Contract
+
+Plans group new test files under the test root already established by the
+relevant repository, package, or module. Recognized dedicated roots include
+`tests/`, `test/`, and `__tests__/`; the existing local convention is authoritative.
+The workflow must not introduce a second test-root convention within the same
+scope or scatter new tests beside source files when a dedicated test root exists.
+
+When no test convention exists, create `tests/` at the nearest package or module
+scope that owns the behavior. This fallback keeps tests grouped without imposing
+JavaScript-specific `__tests__/` naming on other ecosystems. A colocated-test
+convention may be preserved only when the project already uses it deliberately;
+the workflow does not migrate existing tests or reorganize unrelated files.
+
+The plan's file-responsibility map and each task's `Test:` paths must use the
+resolved convention. Canonical and generated planning instructions enforce the
+scope and duplicate-root rules without adding a test-path-organization item to
+the artifact's self-review checklist.
+The artifact does not add a standalone `## Test Organization` section; test-layout
+policy remains in canonical and generated instructions rather than becoming
+change-specific plan content. Documentation-only and configuration-only tasks do
+not create an empty test directory when no behavior test is required.
+
+The plan template is stack-neutral. Its example fields use semantic placeholders
+such as `<resolved-test-path>`, `<language>`, and `<focused-test-command>` rather
+than assuming TypeScript filenames, TypeScript code fences, or pnpm. When producing
+a real plan, the workflow must replace every semantic placeholder with the exact
+path, code-fence language, command, and expected result resolved from the approved
+tech stack and repository tooling. Raw template placeholders must not survive in
+the generated artifact.
 
 ## Source Ownership
 
@@ -118,7 +185,8 @@ apply workflow rather than being mixed into design decisions.
 - `src/core/templates/workflows/brainstorm/native-discipline.ts` owns reusable
   native design, implementation, review, and fallback discipline.
 - `src/core/templates/workflows/brainstorm/workflow-policy.ts` owns sequencing,
-  approval gates, planning method, and always-inline execution handoff.
+  approval gates, planning method, always-inline execution handoff, and the
+  reusable deferred-follow-up policy.
 - Brainstorm and writing-plans generated skill/command modules orchestrate those
   contracts without duplicating the full schema instructions.
 
@@ -135,6 +203,24 @@ commands. They verify:
   guidance, commit checkpoints, and final verification.
 - The execution policy says implementation is always inline and restricts
   subagents to review or read-only research.
+- Task tracking is durable and incremental: each verified task is checked off in
+  `tasks.md` before the next begins; failed/partial work stays unchecked, batch
+  completion is forbidden, persistence failure stops execution, and resume uses
+  the current file state.
+- Follow-up policy distinguishes deferred product/engineering scope from required
+  current-change and routine workflow-completion work, writes only eligible items
+  to the store-aware planning-home `TODO.md`, preserves content, and deduplicates.
+- New-change and archive generated workflows do not receive follow-up-backlog
+  instructions.
+- Plan instructions resolve and reuse the existing `tests/`, `test/`,
+  `__tests__/`, or deliberate colocated-test convention; otherwise they default
+  to a scoped `tests/` root without migrating existing tests.
+- Plan templates express the resolved convention through grouped `Test:` paths,
+  without a standalone Test Organization section or test-path-organization
+  self-review item; planning instructions reject duplicate roots.
+- Plan template examples are stack-neutral and generated plans replace semantic
+  placeholders with exact project-specific paths, languages, commands, and
+  expected results.
 - No generated runtime content contains `superpowers:` or requires an external
   plugin.
 - Skill and command variants remain behaviorally equivalent.

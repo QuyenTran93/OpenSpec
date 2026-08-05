@@ -1,73 +1,62 @@
-# Recommended Choices in Brainstorm and Update Implementation Plan
+# Viability-First Choices in Brainstorm and Update Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans` to implement this plan task-by-task inline in the primary session. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Make every multiple-choice question in the brainstorm profile's `brainstorm` and `update` workflows identify and briefly justify one contextually appropriate recommendation.
+**Goal:** Stop brainstorm and update from manufacturing a default number of options while preserving contextual recommendations when multiple viable choices genuinely exist.
 
-**Architecture:** Define one reusable prompt-policy constant and inject it into both generated workflow bodies so skill and command variants cannot drift. Mirror the contract in the canonical brainstorm schema instruction because direct `openspec instructions brainstorm` consumers do not depend solely on generated workflow prose.
+**Architecture:** Replace count-first approach language with one shared viability-first policy consumed by generated brainstorm and update workflows. Mirror the same contract in the canonical brainstorm schema instruction, including the rule that a user's selected viable option becomes authoritative after the choice.
 
 **Tech Stack:** TypeScript 6, YAML, Vitest 3, pnpm 9.
 
 ## Global Constraints
 
-- Apply the policy only to the brainstorm profile's `brainstorm` and `update` workflows.
-- Mark exactly one choice as `(Recommended)` whenever two or more choices are presented.
-- Briefly justify the recommendation from known project context, requirements, constraints, and long-term quality goals.
-- When evidence is insufficient, ask one focused clarifying question before presenting choices; never guess.
-- A recommendation never selects an option, bypasses user confirmation, or makes other options artificial.
-- Preserve unrelated worktree changes.
-- Implementation runs inline in the primary session; subagents must not implement tasks or edit files.
+- Present only genuinely viable options; never target a minimum or default option count.
+- When one approach is genuinely viable, present it directly with its rationale and do not fabricate alternatives.
+- Only when two or more viable options genuinely remain, mark exactly one as `(Recommended)` and state the material trade-offs.
+- State concrete, context-specific advantages and disadvantages for every presented approach, including a single viable approach.
+- Apply the contract from the first question onward; introductory and clarification questions are not exempt.
+- If evidence is insufficient, ask one focused clarifying question before presenting options; never guess.
+- After the user chooses, follow that viable option even when it differs from the recommendation.
+- Reopen a settled choice only after surfacing new evidence that makes it infeasible or contradictory and asking the user to decide again.
+- Preserve unrelated worktree changes and do not create commits.
+- Implementation runs inline in the primary session.
 
 ## File Responsibilities
 
-- `src/core/templates/workflows/brainstorm/workflow-policy.ts`: owns the reusable multiple-choice recommendation policy.
-- `src/core/templates/workflows/brainstorm/brainstorm.ts`: injects the shared policy into generated brainstorm skills and commands.
-- `src/core/templates/workflows/brainstorm/update-change.ts`: injects the shared policy into generated update skills and commands.
-- `test/core/templates/workflows/brainstorm-update.test.ts`: verifies both generated surfaces receive the policy and unrelated workflows do not.
+- `src/core/templates/workflows/brainstorm/native-discipline.ts`: removes the default two-or-three approach pressure from native brainstorm orchestration.
+- `src/core/templates/workflows/brainstorm/workflow-policy.ts`: owns shared viability, recommendation, and post-choice authority guidance.
+- `test/core/templates/workflows/brainstorm-update.test.ts`: verifies generated brainstorm/update skill and command behavior.
 - `schemas/brainstorm/schema.yaml`: owns the canonical direct brainstorm artifact instruction.
-- `test/schemas/brainstorm.instruction.test.ts`: verifies the canonical instruction matches the generated policy's behavioral contract.
+- `schemas/brainstorm/templates/brainstorm.md`: keeps the generated artifact shape free of count-first option guidance.
+- `test/schemas/brainstorm.instruction.test.ts`: verifies canonical viability-first and post-choice behavior.
 
 ---
 
-### Task 1: Shared recommendation policy for generated workflows
+### Task 1: Viability-first generated workflow guidance
 
 **Files:**
 - Modify: `test/core/templates/workflows/brainstorm-update.test.ts`
+- Modify: `src/core/templates/workflows/brainstorm/native-discipline.ts`
 - Modify: `src/core/templates/workflows/brainstorm/workflow-policy.ts`
-- Modify: `src/core/templates/workflows/brainstorm/brainstorm.ts`
-- Modify: `src/core/templates/workflows/brainstorm/update-change.ts`
 
 **Interfaces:**
-- Produces: `BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK: string` exported from `workflow-policy.ts`.
-- Consumes: `getSkillTemplates(workflowIds: string[], profile: "brainstorm")` and `getCommandTemplates(workflowIds: string[], profile: "brainstorm")` from existing skill generation.
+- Consumes: existing `BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK: string` injected by brainstorm and update templates.
+- Produces: generated skill and command prose with no default option count and with authoritative post-choice behavior.
 
-- [ ] **Step 1: Write a failing generated-workflow regression test**
+- [ ] **Step 1: Extend the generated-workflow test for viability-first behavior**
 
-Add this test to `test/core/templates/workflows/brainstorm-update.test.ts`:
+Inside the existing target-workflow loop in `test/core/templates/workflows/brainstorm-update.test.ts`, normalize whitespace and assert the new contract:
 
 ```ts
-it('recommends one contextually justified option for every multiple-choice question', () => {
-  for (const workflowId of ['brainstorm', 'update']) {
-    const skill = getSkillTemplates([workflowId], 'brainstorm')[0]?.template.instructions ?? '';
-    const command = getCommandTemplates([workflowId], 'brainstorm')[0]?.template.content ?? '';
-
-    for (const runtime of [skill, command]) {
-      expect(runtime, workflowId).toContain('Multiple-choice guidance:');
-      expect(runtime, workflowId).toContain('exactly one option as `(Recommended)`');
-      expect(runtime, workflowId).toContain('briefly explain why');
-      expect(runtime, workflowId).toContain('ask one focused clarifying question');
-      expect(runtime, workflowId).toContain('Never guess');
-      expect(runtime, workflowId).toContain('does not select it for the user');
-    }
-  }
-
-  for (const workflowId of ['new', 'propose', 'writing-plans', 'apply', 'archive']) {
-    const skill = getSkillTemplates([workflowId], 'brainstorm')[0]?.template.instructions ?? '';
-    const command = getCommandTemplates([workflowId], 'brainstorm')[0]?.template.content ?? '';
-    expect(skill, workflowId).not.toContain('Multiple-choice guidance:');
-    expect(command, workflowId).not.toContain('Multiple-choice guidance:');
-  }
-});
+const normalized = runtime.replace(/\s+/g, ' ');
+expect(normalized, workflowId).toContain('Do not target a minimum or default option count');
+expect(normalized, workflowId).toContain('When only one approach is genuinely viable, present it directly');
+expect(normalized, workflowId).toContain('Only when two or more genuinely viable options remain');
+expect(normalized, workflowId).toContain('concrete advantages and disadvantages for every presented approach');
+expect(normalized, workflowId).toContain('Do not invent benefits or drawbacks');
+expect(normalized, workflowId).toContain('the user chooses becomes authoritative');
+expect(normalized, workflowId).toContain('ask the user to decide again before changing direction');
+expect(normalized, workflowId).not.toContain('Compare two or three viable approaches');
 ```
 
 - [ ] **Step 2: Run the focused test and verify RED**
@@ -75,71 +64,76 @@ it('recommends one contextually justified option for every multiple-choice quest
 Run:
 
 ```bash
-pnpm exec vitest run test/core/templates/workflows/brainstorm-update.test.ts
+PATH=/home/dev/.nvm/versions/node/v22.23.0/bin:$PATH pnpm exec vitest run test/core/templates/workflows/brainstorm-update.test.ts
 ```
 
-Expected: FAIL because generated brainstorm/update content does not contain `Multiple-choice guidance:`.
+Expected: FAIL because current generated guidance still requests two or three approaches and lacks one-option and post-choice rules.
 
-- [ ] **Step 3: Add the shared policy constant**
+- [ ] **Step 3: Replace count-first native brainstorm prose**
 
-Add this exported constant to `src/core/templates/workflows/brainstorm/workflow-policy.ts`:
+Replace the opening approach guidance in `NATIVE_BRAINSTORM_METHOD` with:
 
 ```ts
-export const BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK = `**Multiple-choice guidance:**
-
-- Whenever presenting two or more options, mark exactly one option as \`(Recommended)\` and briefly explain why it best fits the known project context, requirements, constraints, and long-term quality.
-- Keep every other option viable and state its material trade-off. A recommendation is guidance only and does not select it for the user or bypass confirmation.
-- If there is not enough evidence to recommend responsibly, ask one focused clarifying question before presenting the options. Never guess.`;
+Explore the project context first. Ask one clarifying question at a time. Identify
+only genuinely viable approaches and compare them when more than one remains.
+Do not target a minimum or default option count. When only one approach is
+genuinely viable, present it directly with its rationale instead of manufacturing
+alternatives. Obtain agreement on the chosen design.
 ```
 
-- [ ] **Step 4: Inject the policy into both workflow bodies**
+Keep the existing long-term quality, artifact review, approval, and visual-assistance paragraphs unchanged.
 
-Import `BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK` in `brainstorm.ts` and `update-change.ts`. Place `${BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK}` once in each shared body, before workflow-specific steps or gates, so both the skill and command variants inherit identical text.
+- [ ] **Step 4: Strengthen the shared choice policy**
 
-- [ ] **Step 5: Run focused generation tests and verify GREEN**
+Replace `BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK` with:
+
+```ts
+export const BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK = `**Choice guidance:**
+
+- Present only genuinely viable options. Do not target a minimum or default option count, and never add weaker, duplicate, cosmetic, or irrelevant alternatives merely to create a comparison.
+- State concrete advantages and disadvantages for every presented approach. When only one approach is genuinely viable, present it directly with its benefits, limitations, and rationale. Only when two or more genuinely viable options remain, mark exactly one as \`(Recommended)\` and briefly explain why. Do not invent benefits or drawbacks merely to make the presentation look balanced.
+- A recommendation is guidance only and does not select an option or bypass confirmation. The viable option the user chooses becomes authoritative, even when it differs from the recommendation; follow it without relitigating or silently substituting another option.
+- If evidence is insufficient, ask one focused clarifying question before presenting options. Never guess. If new evidence later makes the chosen option infeasible or contradictory, surface that evidence and ask the user to decide again before changing direction.`;
+```
+
+- [ ] **Step 5: Run generated workflow tests and verify GREEN**
 
 Run:
 
 ```bash
-pnpm exec vitest run test/core/templates/workflows/brainstorm-update.test.ts test/core/shared/skill-generation.test.ts
+PATH=/home/dev/.nvm/versions/node/v22.23.0/bin:$PATH pnpm exec vitest run test/core/templates/workflows/brainstorm-update.test.ts test/core/shared/skill-generation.test.ts
 ```
 
-Expected: PASS; both target workflows contain the policy, excluded workflows do not, and general generation invariants remain green.
+Expected: PASS; brainstorm and update contain the viability-first contract and other generated workflow invariants remain green.
 
-- [ ] **Step 6: Review and commit Task 1**
+- [ ] **Step 6: Review Task 1 without committing**
 
-Review that the constant is imported only by `brainstorm.ts` and `update-change.ts`, no policy prose is duplicated, and existing approval gates remain unchanged. Then run:
+Run `git diff --check` for the three Task 1 files. Confirm no generated workflow outside brainstorm/update received the shared block and leave the changes uncommitted.
 
-```bash
-git add test/core/templates/workflows/brainstorm-update.test.ts src/core/templates/workflows/brainstorm/workflow-policy.ts src/core/templates/workflows/brainstorm/brainstorm.ts src/core/templates/workflows/brainstorm/update-change.ts
-git commit -m "feat: recommend choices in brainstorm workflows"
-```
-
-### Task 2: Canonical schema alignment and verification
+### Task 2: Canonical schema alignment
 
 **Files:**
 - Modify: `test/schemas/brainstorm.instruction.test.ts`
 - Modify: `schemas/brainstorm/schema.yaml`
+- Modify: `schemas/brainstorm/templates/brainstorm.md`
 
 **Interfaces:**
-- Consumes: the behavioral phrases defined by `BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK` in Task 1.
-- Produces: canonical `brainstorm` artifact instructions with the same exactly-one recommendation, concise rationale, clarification-before-options, and user-authority guarantees.
+- Consumes: behavioral contract from `BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK`.
+- Produces: direct brainstorm artifact instructions aligned with generated brainstorm/update behavior.
 
-- [ ] **Step 1: Write a failing schema-instruction regression test**
+- [ ] **Step 1: Extend the schema regression test**
 
-Add this test to `test/schemas/brainstorm.instruction.test.ts`:
+Add these assertions to the existing normalized instruction test:
 
 ```ts
-it('requires contextual recommendations for every multiple-choice question', () => {
-  const instruction = schema.artifacts.find((item) => item.id === 'brainstorm')?.instruction ?? '';
-
-  expect(instruction).toContain('two or more options');
-  expect(instruction).toContain('exactly one option as `(Recommended)`');
-  expect(instruction).toContain('briefly explain why');
-  expect(instruction).toContain('ask one focused clarifying question');
-  expect(instruction).toContain('Never guess');
-  expect(instruction).toContain('does not select it for the user');
-});
+expect(normalized).toContain('Do not target a minimum or default option count');
+expect(normalized).toContain('When only one approach is genuinely viable, present it directly');
+expect(normalized).toContain('Only when two or more genuinely viable options remain');
+expect(normalized).toContain('concrete advantages and disadvantages for every presented approach');
+expect(normalized).toContain('Do not invent benefits or drawbacks');
+expect(normalized).toContain('the user chooses becomes authoritative');
+expect(normalized).toContain('ask the user to decide again before changing direction');
+expect(normalized).not.toContain('compare two or three viable approaches');
 ```
 
 - [ ] **Step 2: Run the schema test and verify RED**
@@ -147,53 +141,104 @@ it('requires contextual recommendations for every multiple-choice question', () 
 Run:
 
 ```bash
-pnpm exec vitest run test/schemas/brainstorm.instruction.test.ts
+PATH=/home/dev/.nvm/versions/node/v22.23.0/bin:$PATH pnpm exec vitest run test/schemas/brainstorm.instruction.test.ts
 ```
 
-Expected: FAIL because the current schema recommends among design approaches but does not define the generalized multiple-choice contract.
+Expected: FAIL because the canonical instruction still requests two or three approaches and lacks authoritative post-choice behavior.
 
-- [ ] **Step 3: Align the canonical brainstorm instruction**
+- [ ] **Step 3: Align canonical schema prose**
 
-Add this paragraph after the opening approach-comparison paragraph in `schemas/brainstorm/schema.yaml`:
+Replace the opening approach and multiple-choice paragraphs in `schemas/brainstorm/schema.yaml` with the same viability-first semantics used by Task 1. Preserve YAML indentation and all later artifact, review, follow-up, and approval instructions unchanged.
 
-```yaml
-      Whenever presenting two or more options, mark exactly one option as
-      `(Recommended)` and briefly explain why it best fits the known project
-      context, requirements, constraints, and long-term quality. Keep every other
-      option viable and state its material trade-off. The recommendation is
-      guidance only and does not select it for the user or bypass confirmation.
-      If there is not enough evidence to recommend responsibly, ask one focused
-      clarifying question before presenting the options. Never guess.
-```
-
-- [ ] **Step 4: Run focused schema and workflow tests and verify GREEN**
+- [ ] **Step 4: Run focused tests and verify GREEN**
 
 Run:
 
 ```bash
-pnpm exec vitest run test/schemas/brainstorm.instruction.test.ts test/core/templates/workflows/brainstorm-update.test.ts test/core/shared/skill-generation.test.ts
+PATH=/home/dev/.nvm/versions/node/v22.23.0/bin:$PATH pnpm exec vitest run test/schemas/brainstorm.instruction.test.ts test/core/templates/workflows/brainstorm-update.test.ts test/core/shared/skill-generation.test.ts
 ```
 
 Expected: PASS with canonical and generated contracts aligned.
 
-- [ ] **Step 5: Run project verification**
+- [ ] **Step 5: Run project verification without committing**
 
 Run:
 
 ```bash
-pnpm lint
-pnpm build
-pnpm test
+PATH=/home/dev/.nvm/versions/node/v22.23.0/bin:$PATH pnpm lint
+PATH=/home/dev/.nvm/versions/node/v22.23.0/bin:$PATH pnpm build
+PATH=/home/dev/.nvm/versions/node/v22.23.0/bin:$PATH pnpm test
 git diff --check
 ```
 
-Expected: all commands exit 0. Review `git diff --stat` and `git status --short` afterward to distinguish this change from the user's pre-existing modified and untracked files.
+Expected: focused tests, lint, and build pass. The current branch's known unrelated completion-registry baseline may remain one failing full-suite test: `init --scope` exists in Commander but is absent from the completion registry. Report the exact final counts and do not broaden this change to fix it.
 
-- [ ] **Step 6: Review and commit Task 2**
+- [ ] **Step 6: Review the final diff without committing**
 
-Confirm every success criterion in the design spec is represented by focused assertions and that no workflow outside `brainstorm` and `update` received the generated policy. Then run:
+Confirm the diff contains only the approved spec, plan, two source-policy files, schema, and two regression tests plus the user's pre-existing unrelated workspace changes. Leave all new changes uncommitted as requested.
+
+### Task 3: First-question policy ordering
+
+**Files:**
+- Modify: `test/core/templates/workflows/brainstorm-update.test.ts`
+- Modify: `src/core/templates/workflows/brainstorm/brainstorm.ts`
+- Modify: `src/core/templates/workflows/brainstorm/workflow-policy.ts`
+- Modify: `test/schemas/brainstorm.instruction.test.ts`
+- Modify: `schemas/brainstorm/schema.yaml`
+
+**Interfaces:**
+- Consumes: `BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK` and generated brainstorm/update runtime strings.
+- Produces: first-question coverage enforced by both explicit prose and prompt ordering.
+
+- [ ] **Step 1: Add failing generated-order tests**
+
+For each generated brainstorm/update skill and command runtime, assert:
+
+```ts
+expect(runtime).toContain('Apply this guidance from the first question onward');
+expect(runtime.indexOf('Choice guidance:')).toBeLessThan(runtime.indexOf('Ask one clarifying question'));
+```
+
+For update, compare against `Ask focused questions` when `Ask one clarifying question` is absent. Assert every located question-producing instruction has an index greater than `Choice guidance:`.
+
+- [ ] **Step 2: Run generated tests and verify RED**
+
+Run:
 
 ```bash
-git add test/schemas/brainstorm.instruction.test.ts schemas/brainstorm/schema.yaml
-git commit -m "feat: align brainstorm recommendation guidance"
+PATH=/home/dev/.nvm/versions/node/v22.23.0/bin:$PATH pnpm exec vitest run test/core/templates/workflows/brainstorm-update.test.ts
 ```
+
+Expected: FAIL because brainstorm currently places native clarification guidance before the shared choice policy and the policy lacks explicit first-question scope.
+
+- [ ] **Step 3: Put shared choice guidance first**
+
+Add `Apply this guidance from the first question onward; introductory and clarification questions are not exempt.` to `BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK`. In `BRAINSTORM_THIN_BODY_TEMPLATE`, render `${BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK}` before `${NATIVE_BRAINSTORM_METHOD}`. Preserve update's existing policy-before-question ordering.
+
+- [ ] **Step 4: Add failing canonical-order test**
+
+Normalize the canonical brainstorm instruction and assert it begins with choice guidance that includes `Apply this guidance from the first question onward`, before `Ask one clarifying question`.
+
+- [ ] **Step 5: Run the schema test and verify RED**
+
+Run:
+
+```bash
+PATH=/home/dev/.nvm/versions/node/v22.23.0/bin:$PATH pnpm exec vitest run test/schemas/brainstorm.instruction.test.ts
+```
+
+Expected: FAIL because the canonical instruction currently asks for clarification before declaring first-question choice behavior.
+
+- [ ] **Step 6: Reorder canonical guidance and verify GREEN**
+
+Move the canonical choice-guidance paragraph before exploration and clarification instructions, include the explicit first-question sentence, then run:
+
+```bash
+PATH=/home/dev/.nvm/versions/node/v22.23.0/bin:$PATH pnpm exec vitest run test/schemas/brainstorm.instruction.test.ts test/core/templates/workflows/brainstorm-update.test.ts test/core/shared/skill-generation.test.ts
+```
+
+Expected: PASS with choice guidance preceding every first-question instruction.
+
+- [ ] **Step 7: Verify without committing**
+
+Run focused tests, lint, build, full tests, and `git diff --check`. Report the known unrelated completion-registry baseline separately and leave all changes unstaged and uncommitted.

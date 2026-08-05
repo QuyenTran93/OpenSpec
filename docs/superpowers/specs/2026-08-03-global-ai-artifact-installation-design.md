@@ -12,6 +12,8 @@ remains the default and keeps its current behavior.
 openspec init --scope global --tools codex,claude
 openspec init --scope global --tools all
 openspec update --scope global
+openspec clean --scope project --tools codex,claude
+openspec clean --scope project --tools codex,claude --yes
 ```
 
 `--scope` accepts `project` and `global`; `project` is the default. A global
@@ -89,6 +91,38 @@ recorded, matching the current best-effort per-tool setup behavior.
 
 The record is OpenSpec state, not the AI tool's discovery mechanism. Tools find
 artifacts through their native global paths.
+
+## Project artifact cleanup
+
+After a successful global init or update, OpenSpec scans the current directory
+for project-local OpenSpec skills and commands belonging to the tools installed
+globally. When matches exist, it explains that local artifacts may shadow the
+global installation and prints commands to preview and apply cleanup. It does
+not remove project artifacts automatically.
+
+```bash
+# Preview only
+openspec clean --scope project --tools codex,claude
+
+# Apply the previewed cleanup
+openspec clean --scope project --tools codex,claude --yes
+```
+
+Project cleanup is deliberately limited to generated AI-tool artifacts. It never
+removes `openspec/`, planning artifacts, project configuration, or an AI tool's
+root directory. A candidate is removable only when it is contained by the
+selected tool's declared project artifact paths and retains a recognized
+OpenSpec generated marker. Unmarked, modified, or user-created files are
+preserved and reported.
+
+The default mode is a dry run that lists removable and preserved paths and makes
+no filesystem changes. `--yes` applies exactly the same ownership and containment
+checks immediately before each deletion. Empty OpenSpec-created leaf directories
+may be removed; shared parent directories remain.
+
+`--json` returns a stable object containing `scope`, `tools`, `removable`,
+`removed`, `preserved`, and `status`. Cleanup warns that removing committed local
+artifacts can affect collaborators who have not installed OpenSpec globally.
 
 ## Init behavior
 
@@ -178,6 +212,13 @@ Keep global orchestration separate from the already-large project `InitCommand`
 and `UpdateCommand`. The CLI delegates by scope, while shared template/profile/
 delivery helpers preserve content parity between scopes.
 
+### Project cleanup command
+
+A focused cleanup command reuses existing tool detection, command adapters,
+generated-marker checks, and containment helpers. Candidate discovery and
+deletion are separate operations so dry-run output and `--yes` execution share
+the same policy without global init gaining destructive behavior.
+
 ## Error handling
 
 Validation errors happen before writes wherever possible. Messages name the
@@ -215,6 +256,10 @@ Tests cover:
 - conflicts with user-owned files;
 - preservation of modified or unmarked stale files;
 - partial multi-tool failure and atomic record updates;
+- post-global-install detection and cleanup command hints;
+- project cleanup dry-run, `--yes`, JSON output, containment, and ownership;
+- preservation of planning roots, tool roots, unmarked files, and files for
+  unselected tools;
 - coexistence with unchanged project-scoped init/update;
 - preservation of `--scope global` through the CLI upgrade re-run;
 - documentation parity with the capability registry.
@@ -230,5 +275,5 @@ write to the real user home.
 - Changing AI tools' precedence rules.
 - Creating a planning root or global store as part of global artifact install.
 - Automatically migrating existing project-local artifacts into global scope.
-- A new uninstall command; the installation record deliberately enables one
+- A global uninstall command; the installation record deliberately enables one
   later without expanding this implementation.
