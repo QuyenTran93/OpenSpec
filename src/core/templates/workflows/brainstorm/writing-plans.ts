@@ -1,5 +1,6 @@
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
+  BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK,
   BRAINSTORM_GATE_POLICY_BLOCK,
   BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
   BRAINSTORM_WRITING_PLANS_SHARED_BODY,
@@ -21,6 +22,8 @@ const WRITING_PLANS_THIN_BODY = (argDescription: string): string => `**Input**: 
 3. Follow the returned \`instruction\` field and resolved paths.
 
 4. Use \`template\` from the JSON as the structure. Apply \`context\` and \`rules\` as constraints — do NOT copy them into the artifact.
+
+${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
 
 5. Write the plan to the returned resolved output path.
 

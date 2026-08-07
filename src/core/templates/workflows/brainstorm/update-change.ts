@@ -1,5 +1,6 @@
 import type { CommandTemplate, SkillTemplate } from '../../types.js';
 import {
+  BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK,
   BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK,
   BRAINSTORM_FOLLOW_UP_POLICY_BLOCK,
   BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
@@ -19,6 +20,8 @@ ${BRAINSTORM_FOLLOW_UP_POLICY_BLOCK}
    Preserve an explicit \`--store <id>\` on every follow-up.
 2. Read existing artifacts from \`artifactPaths.<id>.existingOutputPaths\`.
 3. Ask focused questions about the requested revision.
+${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
+
 4. Reconcile planning artifacts in dependency order:
    \`brainstorm.md → tasks.md → plan.md\`.
 5. Preserve completed checkboxes when task meaning is unchanged. If revised

@@ -40,6 +40,31 @@ export const BRAINSTORM_FOLLOW_UP_POLICY_BLOCK = `**Deferred follow-up policy:**
 
 export const BRAINSTORM_GATE_POLICY_BLOCK = `Before creating downstream artifacts, read the current brainstorm.md and confirm the user agrees with its chosen approach. If the design is ambiguous or still changing, ask one clarifying question at a time and update brainstorm.md first.`;
 
+export const BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK = `**Artifact prose policy:**
+
+Before writing or saving an artifact, edit its prose so it reads like deliberate
+technical writing rather than generic AI copy.
+
+- Preserve the author's meaning, decisions, technical terms, uncertainty, and
+  level of confidence. Keep the template structure and required detail intact.
+- Remove generic framing and conclusions, inflated claims of importance,
+  promotional language, vague attribution, fake-depth “-ing” clauses, forced
+  groups of three, and stock transitions such as “Additionally” or “In today's
+  rapidly evolving landscape.”
+- Prefer concrete nouns, direct verbs, specific claims, and the shortest wording
+  that remains clear. Vary sentence length naturally; do not make every section
+  follow the same rhythm or outline pattern.
+- Do not manufacture personality. Add no jokes, feelings, first-person asides,
+  rhetorical questions, unsupported examples, or stronger certainty than the
+  source material supports. Technical artifacts should sound human because they
+  are precise and purposeful, not because they imitate casual conversation.
+- Do not rewrite commands, paths, identifiers, code, checklist markers,
+  acceptance criteria, requirement keywords such as MUST/SHOULD, or text whose
+  exact spelling carries operational meaning.
+
+Run this edit as a final pass. If style conflicts with correctness or
+completeness, preserve correctness and completeness.`;
+
 export const BRAINSTORM_WRITING_PLANS_SHARED_BODY = `Planning method:
 - Read brainstorm.md and tasks.md in full.
 - Check that the scope is one coherent change.

@@ -6,6 +6,7 @@
  */
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
+  BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK,
   BRAINSTORM_GATE_POLICY_BLOCK,
   BRAINSTORM_FOLLOW_UP_POLICY_BLOCK,
   BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
@@ -54,6 +55,8 @@ ${BRAINSTORM_GATE_POLICY_BLOCK}
    The JSON includes \`instruction\`, \`template\`, \`outputPath\`/\`resolvedOutputPath\`, and \`dependencies\` (including the brainstorm artifact).
 
 4. **Read the brainstorm path returned in \`dependencies\` or \`artifactPaths.brainstorm.existingOutputPaths\`** in full. This is the source of truth for scope, decisions, and open questions.
+
+${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
 
 5. **Generate or reconcile \`tasks.md\`**
 

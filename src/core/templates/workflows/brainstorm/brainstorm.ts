@@ -1,5 +1,6 @@
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
+  BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK,
   BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK,
   BRAINSTORM_GATE_POLICY_BLOCK,
   BRAINSTORM_FOLLOW_UP_POLICY_BLOCK,
@@ -27,6 +28,8 @@ ${NATIVE_BRAINSTORM_METHOD}
    Follow \`instruction\` and use the resolved paths it returns.
 
 3. Use JSON \`template\` for structure; apply \`context\`/\`rules\` — do not copy them into the file.
+
+${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
 
 4. Write to the returned \`resolvedOutputPath\` (or \`outputPath\` relative to the returned change directory). ${invokeNote}
 

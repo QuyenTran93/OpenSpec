@@ -69,6 +69,31 @@ describe('skill-generation', () => {
     }
   });
 
+  it('scopes the artifact prose policy to brainstorm planning artifact writers', () => {
+    const included = ['brainstorm', 'propose', 'writing-plans', 'update'];
+
+    for (const workflowId of included) {
+      const skill = getSkillTemplates([workflowId], 'brainstorm')[0].template.instructions;
+      const command = getCommandTemplates([workflowId], 'brainstorm')[0].template.content;
+      expect(skill, workflowId).toContain('Artifact prose policy:');
+      expect(command, workflowId).toContain('Artifact prose policy:');
+    }
+
+    for (const workflowId of ['new', 'apply', 'archive']) {
+      const skill = getSkillTemplates([workflowId], 'brainstorm')[0].template.instructions;
+      const command = getCommandTemplates([workflowId], 'brainstorm')[0].template.content;
+      expect(skill, workflowId).not.toContain('Artifact prose policy:');
+      expect(command, workflowId).not.toContain('Artifact prose policy:');
+    }
+
+    for (const workflowId of ['propose', 'update']) {
+      const skill = getSkillTemplates([workflowId], 'core')[0].template.instructions;
+      const command = getCommandTemplates([workflowId], 'core')[0].template.content;
+      expect(skill, workflowId).not.toContain('Artifact prose policy:');
+      expect(command, workflowId).not.toContain('Artifact prose policy:');
+    }
+  });
+
   it('makes writing-plans resolve and reuse the local test organization', () => {
     const skill = getSkillTemplates(['writing-plans'], 'brainstorm')[0].template.instructions;
     const command = getCommandTemplates(['writing-plans'], 'brainstorm')[0].template.content;
