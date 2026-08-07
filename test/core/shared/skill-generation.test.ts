@@ -94,6 +94,49 @@ describe('skill-generation', () => {
     }
   });
 
+  it.each([
+    {
+      workflowId: 'brainstorm',
+      writeMarker: '4. Write `brainstorm.md`',
+      reviewMarker: '5. Self-review the written artifact',
+      fixMarker: '6. Fix every finding in `brainstorm.md`',
+    },
+    {
+      workflowId: 'propose',
+      writeMarker: '6. **Write `tasks.md`',
+      reviewMarker: '7. **Self-review the written `tasks.md`**',
+      fixMarker: '8. **Fix every finding in `tasks.md`**',
+    },
+    {
+      workflowId: 'writing-plans',
+      writeMarker: '6. Write the plan to the returned resolved output path.',
+      reviewMarker: '7. Self-review the written `plan.md`',
+      fixMarker: '8. Fix every finding in `plan.md`',
+    },
+    {
+      workflowId: 'update',
+      writeMarker: '4. Reconcile and write existing planning artifacts',
+      reviewMarker: '5. Self-review the written artifacts',
+      fixMarker: '6. Fix every finding in the artifacts',
+    },
+  ])('runs $workflowId prose policy after writing, self-review, and fixes', ({ workflowId, writeMarker, reviewMarker, fixMarker }) => {
+    const generated = [
+      getSkillTemplates([workflowId], 'brainstorm')[0].template.instructions,
+      getCommandTemplates([workflowId], 'brainstorm')[0].template.content,
+    ];
+
+    for (const content of generated) {
+      const write = content.indexOf(writeMarker);
+      const review = content.indexOf(reviewMarker);
+      const fix = content.indexOf(fixMarker);
+      const policy = content.indexOf('Artifact prose policy:');
+      expect(write).toBeGreaterThan(-1);
+      expect(review).toBeGreaterThan(write);
+      expect(fix).toBeGreaterThan(review);
+      expect(policy).toBeGreaterThan(fix);
+    }
+  });
+
   it('makes writing-plans resolve and reuse the local test organization', () => {
     const skill = getSkillTemplates(['writing-plans'], 'brainstorm')[0].template.instructions;
     const command = getCommandTemplates(['writing-plans'], 'brainstorm')[0].template.content;

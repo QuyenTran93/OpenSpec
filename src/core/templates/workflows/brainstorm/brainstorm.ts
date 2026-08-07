@@ -29,9 +29,17 @@ ${NATIVE_BRAINSTORM_METHOD}
 
 3. Use JSON \`template\` for structure; apply \`context\`/\`rules\` — do not copy them into the file.
 
+4. Write \`brainstorm.md\` to the returned \`resolvedOutputPath\` (or \`outputPath\` relative to the returned change directory).
+
+5. Self-review the written artifact for placeholders, scope, consistency, ambiguity, requirements coverage, and alignment between behavior and architecture.
+
+6. Fix every finding in \`brainstorm.md\` and save the structural and content corrections.
+
+7. Strip AI-isms from the corrected artifact and save the final prose edits:
+
 ${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
 
-4. Write to the returned \`resolvedOutputPath\` (or \`outputPath\` relative to the returned change directory). ${invokeNote}
+${invokeNote}
 
 Then \`/opsx:propose\` → \`tasks.md\` (not writing-plans/apply direct).
 

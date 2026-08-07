@@ -20,13 +20,16 @@ ${BRAINSTORM_FOLLOW_UP_POLICY_BLOCK}
    Preserve an explicit \`--store <id>\` on every follow-up.
 2. Read existing artifacts from \`artifactPaths.<id>.existingOutputPaths\`.
 3. Ask focused questions about the requested revision.
-${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
-
-4. Reconcile planning artifacts in dependency order:
+4. Reconcile and write existing planning artifacts in dependency order:
    \`brainstorm.md → tasks.md → plan.md\`.
-5. Preserve completed checkboxes when task meaning is unchanged. If revised
+   Preserve completed checkboxes when task meaning is unchanged. If revised
    scope conflicts with completed work, retain it and ask the user to resolve it.
-6. Recheck scope, consistency, paths, tests, and verification steps after edits.
+5. Self-review the written artifacts for scope, dependency consistency, resolved
+   paths, tests, and verification steps.
+6. Fix every finding in the artifacts and save the structural and content corrections.
+7. Strip AI-isms from the corrected artifacts and save the final prose edits:
+
+${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
 
 Never edit production code or mark implementation work complete. Never create a
 missing downstream artifact as a side effect; recommend the appropriate

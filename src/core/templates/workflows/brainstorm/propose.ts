@@ -56,8 +56,6 @@ ${BRAINSTORM_GATE_POLICY_BLOCK}
 
 4. **Read the brainstorm path returned in \`dependencies\` or \`artifactPaths.brainstorm.existingOutputPaths\`** in full. This is the source of truth for scope, decisions, and open questions.
 
-${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
-
 5. **Generate or reconcile \`tasks.md\`**
 
    - **First run** (\`tasks.md\` missing): use \`template\` as the structure; populate task groups (\`## N. Group\`) and checklist items (\`- [ ] N.M Task\`) from brainstorm decisions. Tasks should be small enough to complete in one session and ordered by dependency.
@@ -67,9 +65,17 @@ ${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
      - Rename/rephrase tasks whose underlying decision changed.
      - **Preserve \`- [x]\` completion state** for tasks whose meaning is unchanged.
 
-6. **Write only to the returned \`resolvedOutputPath\`** (or resolve \`outputPath\` against the returned \`changeRoot\`). Apply \`context\` and \`rules\` from the instructions JSON as constraints — do NOT copy them into the file.
+6. **Write \`tasks.md\` only to the returned \`resolvedOutputPath\`** (or resolve \`outputPath\` against the returned \`changeRoot\`). Apply \`context\` and \`rules\` from the instructions JSON as constraints — do NOT copy them into the file.
 
-7. **Show final status**
+7. **Self-review the written \`tasks.md\`** against the approved brainstorm, dependency order, task sizing, checklist syntax, and preserved completion state.
+
+8. **Fix every finding in \`tasks.md\`** and save the structural and content corrections.
+
+9. **Strip AI-isms from the corrected artifact** and save the final prose edits:
+
+${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
+
+10. **Show final status**
 
    \`\`\`bash
    openspec status --change "<name>"

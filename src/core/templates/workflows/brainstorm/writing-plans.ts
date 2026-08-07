@@ -23,11 +23,21 @@ const WRITING_PLANS_THIN_BODY = (argDescription: string): string => `**Input**: 
 
 4. Use \`template\` from the JSON as the structure. Apply \`context\` and \`rules\` as constraints — do NOT copy them into the artifact.
 
-${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
+5. Draft \`plan.md\` from the template and resolved context.
 
-5. Write the plan to the returned resolved output path.
+6. Write the plan to the returned resolved output path.
+
+7. Self-review the written \`plan.md\` using the planning method below.
 
 ${BRAINSTORM_WRITING_PLANS_SHARED_BODY}
+
+8. Fix every finding in \`plan.md\` and save the structural and content corrections.
+
+9. Strip AI-isms from the corrected artifact and save the final prose edits:
+
+${BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK}
+
+10. Ask for user approval of \`plan.md\` before implementation.
 
 ${BRAINSTORM_INLINE_EXECUTION_POLICY_BLOCK}
 

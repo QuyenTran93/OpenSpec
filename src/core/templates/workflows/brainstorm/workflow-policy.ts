@@ -87,7 +87,6 @@ export const BRAINSTORM_WRITING_PLANS_SHARED_BODY = `Planning method:
   its expected result.
 - When available, use a review-only subagent for independent review; it must not
   edit files. Otherwise perform expanded inline self-review from a fresh pass.
-- Ask for user approval of plan.md before implementation.
 - Do not start implementation in this workflow.`;
 
 export const BRAINSTORM_INLINE_EXECUTION_POLICY_BLOCK = `Execution policy:
