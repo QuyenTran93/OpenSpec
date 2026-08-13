@@ -2,7 +2,6 @@ import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
   BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK,
   BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK,
-  BRAINSTORM_GATE_POLICY_BLOCK,
   BRAINSTORM_FOLLOW_UP_POLICY_BLOCK,
   BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
 } from './workflow-policy.js';
@@ -44,8 +43,6 @@ ${invokeNote}
 Then \`/opsx:propose\` → \`tasks.md\` (not writing-plans/apply direct).
 
 ${BRAINSTORM_FOLLOW_UP_POLICY_BLOCK}
-
-${BRAINSTORM_GATE_POLICY_BLOCK}
 
 ${BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK}`;
 

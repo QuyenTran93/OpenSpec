@@ -38,8 +38,6 @@ export const BRAINSTORM_FOLLOW_UP_POLICY_BLOCK = `**Deferred follow-up policy:**
   change, and enough context or acceptance criteria to resume it.
 - Do not create or modify TODO.md when no eligible follow-up work exists.`;
 
-export const BRAINSTORM_GATE_POLICY_BLOCK = `Before creating downstream artifacts, read the current brainstorm.md and confirm the user agrees with its chosen approach. If the design is ambiguous or still changing, ask one clarifying question at a time and update brainstorm.md first.`;
-
 export const BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK = `**Artifact prose policy:**
 
 Before writing or saving an artifact, edit its prose so it reads like deliberate

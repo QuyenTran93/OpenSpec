@@ -7,7 +7,6 @@
 import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
   BRAINSTORM_ARTIFACT_PROSE_POLICY_BLOCK,
-  BRAINSTORM_GATE_POLICY_BLOCK,
   BRAINSTORM_FOLLOW_UP_POLICY_BLOCK,
   BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
 } from './workflow-policy.js';
@@ -17,8 +16,6 @@ const PROPOSE_BODY = (argDescription: string): string => `Generate or reconcile 
 ${BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK}
 
 ${BRAINSTORM_FOLLOW_UP_POLICY_BLOCK}
-
-${BRAINSTORM_GATE_POLICY_BLOCK}
 
 ---
 
