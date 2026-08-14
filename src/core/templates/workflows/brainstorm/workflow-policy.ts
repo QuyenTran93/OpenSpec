@@ -7,6 +7,14 @@ export const BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK = `**Choice guidance:
 - A recommendation is guidance only and does not select an option or bypass confirmation. The viable option the user chooses becomes authoritative, even when it differs from the recommendation; follow it without relitigating or silently substituting another option.
 - If evidence is insufficient, ask one focused clarifying question before presenting options. Never guess. If new evidence later makes the chosen option infeasible or contradictory, surface that evidence and ask the user to decide again before changing direction.`;
 
+export const BRAINSTORM_VISUAL_DESIGN_POLICY_BLOCK = `**Visual design gate:**
+
+- When the change includes layout or component decisions, use visual exploration and obtain visual approval before finalizing the design or reconciling planning artifacts.
+- When available, prioritize the \`popular-web-designs\`, \`sketch\`, and \`humanize\` skills. Use \`popular-web-designs\` to evaluate established layout and component patterns, \`sketch\` to produce the visual options, and \`humanize\` to refine usability and interface copy. If one is unavailable, continue with the remaining skills and state the fallback used.
+- Present the relevant wireframe, mockup, or component comparison through the OpenSpec visual companion. If it is unavailable, use HTML/SVG, Mermaid, ASCII, or another inspectable visual fallback. Text alone does not satisfy this gate when layout or component choices remain unresolved.
+- Wait for the user's visual selection or approval before recording the decision as final. A later terminal response overrides an earlier visual selection.
+- After the visual decision is finalized, close any visual companion session started by the workflow with \`openspec visual stop\`. If shutdown fails, report the failure and the session details so the user can close it manually.`;
+
 export const BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK = `
 **Workflow sequence (brainstorm):**
 

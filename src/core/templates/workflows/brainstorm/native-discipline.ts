@@ -16,9 +16,10 @@ files. Evaluate its findings in the primary session. If subagents are unavailabl
 perform an expanded inline self-review from a fresh pass. Obtain user approval
 before handing off to downstream artifacts.
 
-Visual assistance is optional. Offer it only when the current question is
-materially easier to answer by seeing a UI/layout, architecture flow, state
-machine, spatial relationship, or visual comparison. Ask permission before
+Outside the required visual design gate for layout or component decisions,
+visual assistance is optional. Offer it only when the current question is
+materially easier to answer by seeing an architecture flow, state machine,
+spatial relationship, or visual comparison. Ask permission before
 running \`openspec visual start --port <port>\` (omit \`--port\` for an ephemeral
 port). Read the printed \`screenDir\` and \`events.jsonl\` paths. For each visual
 question, write a new semantic, accessible HTML fragment into \`screenDir\`;

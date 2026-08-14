@@ -66,4 +66,24 @@ describe('brainstorm update workflow', () => {
       }
     }
   });
+
+  it('requires a visual approval loop for layout and component decisions', () => {
+    for (const workflowId of ['brainstorm', 'update']) {
+      const skill = getSkillTemplates([workflowId], 'brainstorm')[0]?.template.instructions ?? '';
+      const command = getCommandTemplates([workflowId], 'brainstorm')[0]?.template.content ?? '';
+
+      for (const runtime of [skill, command]) {
+        const normalized = runtime.replace(/\s+/g, ' ');
+
+        expect(runtime, workflowId).toContain('Visual design gate:');
+        expect(normalized, workflowId).toContain('layout or component decisions');
+        expect(normalized, workflowId).toContain('humanize');
+        expect(normalized, workflowId).toContain('popular-web-designs');
+        expect(normalized, workflowId).toContain('sketch');
+        expect(normalized, workflowId).toContain('visual approval before finalizing');
+        expect(normalized, workflowId).toContain('openspec visual stop');
+        expect(normalized, workflowId).toContain('report the failure');
+      }
+    }
+  });
 });
