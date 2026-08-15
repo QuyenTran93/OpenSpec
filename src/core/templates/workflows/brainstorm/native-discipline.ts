@@ -1,12 +1,14 @@
 export const NATIVE_BRAINSTORM_METHOD = `
-Explore the project context first. Ask one clarifying question at a time. Identify
+Explore the project context first. Inspect the relevant codepaths, entrypoints,
+configs, tests, and runtime boundaries before comparing approaches. Ask one clarifying question at a time. Identify
 only genuinely viable approaches and compare them when more than one remains.
 Do not target a minimum or default option count. When only one approach is
 genuinely viable, present it directly with its rationale instead of manufacturing
 alternatives. Obtain agreement on the chosen design.
 Choose for long-term project quality, favoring a clean design and reuse. Never
 select a weaker approach because shipping speed alone makes it convenient.
-Write brainstorm.md, then review it for placeholders,
+Write brainstorm.md and record the exact files, commands, runtime signals,
+invariants, and unknowns that materially shaped the design, then review it for placeholders,
 consistency, scope, and ambiguity; fix findings inline.
 
 Review the artifact for requirements coverage and alignment between behavior and
@@ -40,6 +42,11 @@ the failing path, test one hypothesis at a time, fix the root cause, and add a
 regression test. Review requirements compliance before code quality. Verify
 review feedback against the code and requirements. Never claim completion
 without fresh verification evidence.
+
+Before the first edit, confirm the execution surface: exact package or module,
+focused test command, project-level verification command, and any required
+services, fixtures, or environment flags. For bug fixes or behavior changes,
+reproduce the current behavior or intended RED state before editing. If tooling, dependencies, or environment are missing, surface the blocker immediately instead of guessing or claiming progress.
 
 Implementation runs inline in the primary session. Subagents are limited to
 independent review or read-only research; they must not edit files, implement

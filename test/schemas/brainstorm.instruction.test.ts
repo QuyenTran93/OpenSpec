@@ -53,6 +53,7 @@ describe('brainstorm schema', () => {
     for (const marker of [
       '## Success Criteria',
       '## Current Context',
+      '## Relevant Code and Signals',
       '## Architecture',
       '## Components and Responsibilities',
       '## Interfaces and Data Flow',
@@ -70,6 +71,12 @@ describe('brainstorm schema', () => {
       'review-only subagent',
       'expanded inline self-review',
       'user approval',
+      'Inspect the relevant',
+      'codepaths, entrypoints',
+      'runtime boundaries before',
+      'exact files, commands, invariants',
+      'runtime',
+      'signals, and unknowns',
     ]) {
       expect(contract).toContain(marker);
     }
@@ -142,6 +149,7 @@ describe('brainstorm schema', () => {
       '## Architecture',
       '## Tech Stack',
       '## Global Constraints',
+      '## Preconditions and Recon',
       '## File Responsibilities',
       '**Source tasks:**',
       '**Interfaces:**',
@@ -174,6 +182,9 @@ describe('brainstorm schema', () => {
       'Replace every semantic template placeholder',
       'exact project-specific path, code-fence language, command, and expected result',
       'Raw semantic placeholders must not remain in plan.md',
+      'setup prerequisites',
+      'project-level regression commands',
+      'baseline or reproduction command',
     ]) {
       expect(contract).toContain(marker);
     }
@@ -191,6 +202,8 @@ describe('brainstorm schema', () => {
     expect(schema.apply?.instruction).toContain('If updating tasks.md fails, stop');
     expect(schema.apply?.instruction).toContain('On resume, reread tasks.md');
     expect(schema.apply?.instruction).toContain('first incomplete task');
+    expect(schema.apply?.instruction).toContain('Before the first edit, confirm the execution surface');
+    expect(schema.apply?.instruction).toContain('surface the blocker immediately instead of guessing or claiming progress');
 
     for (const marker of [
       'acceptance criteria and focused verification pass',

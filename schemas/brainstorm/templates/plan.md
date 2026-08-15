@@ -16,6 +16,10 @@
 
 <!-- Copy exact project-wide constraints from the approved brainstorm. -->
 
+## Preconditions and Recon
+
+<!-- Exact setup, services, fixtures, environment flags, baseline or reproduction commands, and current codepaths to verify before editing. -->
+
 ## File Responsibilities
 
 <!-- Files to create or modify and each file's responsibility. -->

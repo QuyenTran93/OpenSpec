@@ -22,6 +22,10 @@
 
 <!-- Relevant existing behavior, constraints, and codebase facts. -->
 
+## Relevant Code and Signals
+
+<!-- Exact files, entrypoints, commands, runtime surfaces, logs, fixtures, and unknowns that informed the design. -->
+
 ## Approaches Considered
 
 <!-- Present only genuinely viable approaches. For each, state concrete advantages and disadvantages. If one remains, present it directly; compare only when more than one remains. Do not invent options, benefits, or drawbacks. -->

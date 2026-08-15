@@ -36,6 +36,8 @@ describe('skill-generation', () => {
     expect(runtime).toContain('read-only research');
     expect(runtime).toContain('expanded inline self-review');
     expect(runtime).toContain('isolated worktree');
+    expect(runtime).toContain('Before the first edit, confirm the execution surface');
+    expect(runtime).toContain('surface the blocker immediately instead of guessing or claiming progress');
     expect(runtime).toContain('dependency order');
     expect(runtime).toContain('requirements compliance before code quality');
     expect(runtime).toContain('<planningHome.root>/TODO.md');
@@ -149,6 +151,9 @@ describe('skill-generation', () => {
       expect(content).toContain('second test-root convention');
       expect(content).toContain('Do not migrate existing tests');
       expect(content).toContain('Do not create an empty test directory');
+      expect(content).toContain('setup prerequisites');
+      expect(content).toContain('project-level verification command');
+      expect(content).toContain('baseline or reproduction command');
       expect(content).not.toContain('test-path organization');
       expect(content).toContain('Replace every semantic template placeholder');
       expect(content).toContain('exact project-specific path, code-fence language, command, and expected result');
@@ -168,6 +173,8 @@ describe('skill-generation', () => {
         expect(content, workflowId).toContain('If updating tasks.md fails, stop');
         expect(content, workflowId).toContain('On resume, reread tasks.md');
         expect(content, workflowId).toContain('first incomplete task');
+        expect(content, workflowId).toContain('Before the first edit, confirm the execution surface');
+        expect(content, workflowId).toContain('surface the blocker immediately instead of guessing or claiming progress');
       }
     }
   });

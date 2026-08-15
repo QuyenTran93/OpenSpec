@@ -19,14 +19,16 @@ artifacts:
       chooses becomes authoritative, even when it differs from the recommendation;
       follow it without relitigating or silently substituting another option.
 
-      Explore the project context before proposing changes. Ask one clarifying
-      question at a time. Identify only genuinely viable approaches and compare
-      them when more than one remains. Do not target a minimum or default option
-      count. When only one approach is genuinely viable, present it directly with
-      its benefits, limitations, and rationale instead of manufacturing
-      alternatives. Obtain agreement on the chosen design. Select for long-term
-      project quality, favoring a clean design and reuse; never choose a weaker
-      approach because shipping speed alone makes it convenient.
+      Explore the project context before proposing changes. Inspect the relevant
+      codepaths, entrypoints, configs, tests, and runtime boundaries before
+      comparing approaches. Ask one clarifying question at a time. Identify only
+      genuinely viable approaches and compare them when more than one remains. Do
+      not target a minimum or default option count. When only one approach is
+      genuinely viable, present it directly with its benefits, limitations, and
+      rationale instead of manufacturing alternatives. Obtain agreement on the
+      chosen design. Select for long-term project quality, favoring a clean
+      design and reuse; never choose a weaker approach because shipping speed
+      alone makes it convenient.
 
       If there is not enough evidence to recommend responsibly, ask one focused
       clarifying question before presenting options. Never guess. If new evidence
@@ -34,9 +36,12 @@ artifacts:
       evidence and ask the user to decide again before changing direction.
 
       Write a substantive brainstorm.md using the resolved output path returned
-      by this command. Cover success criteria, current context, viable approaches,
-      architecture, component responsibilities, interfaces and data flow, errors
-      and edge cases, compatibility and migration, testing, risks, and questions.
+      by this command. Record the exact files, commands, invariants, runtime
+      signals, and unknowns that materially shaped the design so implementation
+      starts from evidence instead of guesswork. Cover success criteria, current
+      context, viable approaches, architecture, component responsibilities,
+      interfaces and data flow, errors and edge cases, compatibility and
+      migration, testing, risks, and questions.
       Review it for placeholders, contradictions, scope, ambiguity, requirements coverage,
       and alignment between behavior and architecture; fix findings
       inline. When available, use a review-only subagent for independent review;
@@ -74,13 +79,19 @@ artifacts:
     instruction: |
       Read brainstorm.md and tasks.md from this resolved change directory. Map
       files to responsibilities and decompose the work into independently
-      testable deliverables. Include architecture, tech stack, global constraints,
-      file responsibilities, source task IDs, exact paths, interfaces, bite-sized
+      testable deliverables. Resolve the exact setup prerequisites, existing
+      verification commands, entrypoints, runtime dependencies, fixtures, and
+      affected boundaries before locking the task breakdown. Include architecture,
+      tech stack, global constraints, preconditions and recon, file
+      responsibilities, source task IDs, exact paths, interfaces, bite-sized
       checkbox steps, failing tests, RED commands and expected failures, minimal
       implementation guidance, GREEN commands and expected passes, refactoring,
-      review and commit checkpoints, and final verification. Ban placeholders and
-      undefined interfaces. Check requirements coverage, dependency order, task
-      sizing, executable commands, and identifier/type consistency.
+      review and commit checkpoints, and final verification. Include a pre-edit
+      baseline or reproduction command when behavior is changing or a bug is
+      being fixed, plus the project-level regression commands needed before
+      completion. Ban placeholders and undefined interfaces. Check requirements
+      coverage, dependency order, task sizing, executable commands, and
+      identifier/type consistency.
       Before choosing Test paths, inspect the relevant repository,
       package, or module. The existing local test convention is authoritative:
       reuse `tests/`, `test/`, or `__tests__/`, or preserve a deliberate colocated-test convention.
@@ -133,6 +144,11 @@ apply:
     follow-up exists. Excluded routine workflow-completion steps include
     manual testing, verification, archiving, automated checks, review, required
     documentation, correctness cleanup, VCS decisions, and handoff.
+    Before the first edit, confirm the execution surface: exact package or
+    module, focused test command, project-level verification command, and any
+    required services, fixtures, or environment flags. For bug fixes or behavior
+    changes, reproduce the current behavior or intended RED state before editing.
+    If tooling, dependencies, or environment are missing, surface the blocker immediately instead of guessing or claiming progress.
     A task is complete only after its acceptance criteria and focused verification pass.
     Immediately persist its - [ ] → - [x] transition in tasks.md before starting the next task.
     Never batch-fill checkboxes at the end of a session. Never mark failed, partial, or blocked work complete.

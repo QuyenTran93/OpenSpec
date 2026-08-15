@@ -74,6 +74,11 @@ completeness, preserve correctness and completeness.`;
 export const BRAINSTORM_WRITING_PLANS_SHARED_BODY = `Planning method:
 - Read brainstorm.md and tasks.md in full.
 - Check that the scope is one coherent change.
+- Resolve the exact setup prerequisites, services, fixtures, environment flags,
+  entrypoints, and affected boundaries before locking the plan.
+- Resolve the exact focused test command, project-level verification command,
+  and baseline or reproduction command when behavior is changing or a bug is
+  being fixed.
 - Map files to responsibilities before decomposing work.
 - Before choosing Test paths, inspect the relevant repository, package, or module.
   The existing local test convention is authoritative: reuse \`tests/\`, \`test/\`, or \`__tests__/\`,
@@ -99,6 +104,12 @@ export const BRAINSTORM_INLINE_EXECUTION_POLICY_BLOCK = `Execution policy:
 - Implementation always runs inline in the primary session.
 - Establish or verify an isolated worktree when safe and available. Preserve
   existing dirty overlapping work instead of replacing it implicitly.
+- Before the first edit, confirm the execution surface: exact package or module,
+  focused test command, project-level verification command, and any required
+  services, fixtures, or environment flags.
+- For bug fixes or behavior changes, reproduce the current behavior or intended
+  RED state before editing.
+- If tooling, dependencies, or environment are missing, surface the blocker immediately instead of guessing or claiming progress.
 - Execute tasks in dependency order and keep task completion state current.
 - Use test-first development for behavior changes and systematic root-cause
   debugging for unexpected behavior.
