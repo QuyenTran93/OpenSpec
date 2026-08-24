@@ -37,7 +37,6 @@ describe('brainstorm schema', () => {
       schema.apply?.instruction ?? '',
     ].join('\n');
 
-    expect(instructions).toContain('Ask one clarifying');
     expect(instructions).toContain('stable numeric task IDs');
     expect(instructions).toContain('RED → GREEN → REFACTOR');
     expect(instructions).toContain('fresh verification evidence');
@@ -62,15 +61,7 @@ describe('brainstorm schema', () => {
       '## Testing Strategy',
       '## Risks and Mitigations',
       '## Questions',
-      'only genuinely viable approaches',
-      'long-term project quality',
-      'clean design and reuse',
-      'shipping speed alone',
       'requirements coverage',
-      'independent review',
-      'review-only subagent',
-      'expanded inline self-review',
-      'user approval',
       'Inspect the relevant',
       'codepaths, entrypoints',
       'runtime boundaries before',
@@ -88,30 +79,16 @@ describe('brainstorm schema', () => {
     const instruction = schema.artifacts.find((item) => item.id === 'brainstorm')?.instruction ?? '';
     const normalized = instruction.replace(/\s+/g, ' ');
 
-    expect(normalized).toContain('exactly one option as `(Recommended)`');
-    expect(normalized).toContain('briefly explain why');
-    expect(normalized).toContain('ask one focused clarifying question');
-    expect(normalized).toContain('Never guess');
-    expect(normalized).toContain('does not select it for the user');
-    expect(normalized).toContain('Do not target a minimum or default option count');
-    expect(normalized).toContain('When only one approach is genuinely viable, present it directly');
-    expect(normalized).toContain('Only when two or more genuinely viable options remain');
-    expect(normalized).toContain('concrete advantages and disadvantages for every presented approach');
-    expect(normalized).toContain('Do not invent benefits or drawbacks');
-    expect(normalized).toContain('the user chooses becomes authoritative');
-    expect(normalized).toContain('ask the user to decide again before changing direction');
-    expect(normalized).not.toContain('compare two or three viable approaches');
+    expect(normalized).toContain('workflow prompt supplies the shared choice');
+    expect(normalized).not.toContain('Only when two or more genuinely viable options remain');
   });
 
-  it('applies choice guidance before the first question', () => {
+  it('delegates shared choice guidance to the workflow prompt', () => {
     const instruction = schema.artifacts.find((item) => item.id === 'brainstorm')?.instruction ?? '';
     const normalized = instruction.replace(/\s+/g, ' ');
-    const policyIndex = normalized.indexOf('Apply this guidance from the first question onward');
-    const questionIndex = normalized.indexOf('Ask one clarifying question');
-
+    const policyIndex = normalized.indexOf('workflow prompt supplies the shared choice');
     expect(policyIndex).toBeGreaterThanOrEqual(0);
-    expect(questionIndex).toBeGreaterThanOrEqual(0);
-    expect(policyIndex).toBeLessThan(questionIndex);
+    expect(normalized).not.toContain('Apply this guidance from the first question onward');
   });
 
   it('defines an executable plan contract and always-inline execution policy', () => {

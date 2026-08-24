@@ -8,56 +8,19 @@ artifacts:
     template: brainstorm.md
     requires: []
     instruction: |
-      Apply this guidance from the first question onward; introductory and
-      clarification questions are not exempt. State concrete advantages and
-      disadvantages for every presented approach. Only when two or more genuinely
-      viable options remain, mark exactly one option as `(Recommended)` and briefly
-      explain why it best fits the known project context, requirements, constraints,
-      and long-term quality. Do not invent benefits or drawbacks merely to make the
-      presentation look balanced. The recommendation is guidance only and does not
-      select it for the user or bypass confirmation. The viable option the user
-      chooses becomes authoritative, even when it differs from the recommendation;
-      follow it without relitigating or silently substituting another option.
-
-      Explore the project context before proposing changes. Inspect the relevant
-      codepaths, entrypoints, configs, tests, and runtime boundaries before
-      comparing approaches. Ask one clarifying question at a time. Identify only
-      genuinely viable approaches and compare them when more than one remains. Do
-      not target a minimum or default option count. When only one approach is
-      genuinely viable, present it directly with its benefits, limitations, and
-      rationale instead of manufacturing alternatives. Obtain agreement on the
-      chosen design. Select for long-term project quality, favoring a clean
-      design and reuse; never choose a weaker approach because shipping speed
-      alone makes it convenient.
-
-      If there is not enough evidence to recommend responsibly, ask one focused
-      clarifying question before presenting options. Never guess. If new evidence
-      later makes the chosen option infeasible or contradictory, surface that
-      evidence and ask the user to decide again before changing direction.
-
       Write a substantive brainstorm.md using the resolved output path returned
-      by this command. Record the exact files, commands, invariants, runtime
-      signals, and unknowns that materially shaped the design so implementation
+      by this command. Inspect the relevant codepaths, entrypoints, configs,
+      tests, and runtime boundaries before comparing approaches. Record the
+      exact files, commands, invariants, runtime signals, and unknowns that materially
+      shaped the design so implementation
       starts from evidence instead of guesswork. Cover success criteria, current
       context, viable approaches, architecture, component responsibilities,
       interfaces and data flow, errors and edge cases, compatibility and
       migration, testing, risks, and questions.
       Review it for placeholders, contradictions, scope, ambiguity, requirements coverage,
       and alignment between behavior and architecture; fix findings
-      inline. When available, use a review-only subagent for independent review;
-      otherwise perform an expanded inline self-review from a fresh pass. Evaluate
-      review findings rather than accepting them blindly. Obtain user approval
-      before handing off to propose. Do not require an external plugin. Treat
-      follow-up as accepted product or engineering scope deliberately deferred
-      beyond this change. Keep work required for the current requirements and
-      success criteria in this change. Record only eligible deferred work in
-      <planningHome.root>/TODO.md: preserve existing content, reconcile
-      semantically equivalent entries, and include the deferred outcome, reason,
-      originating change, and resumable context or acceptance criteria. Do not
-      create or modify TODO.md when no eligible follow-up exists. Excluded routine
-      workflow-completion steps include manual testing, verification, archiving,
-      automated checks, review, required documentation, correctness cleanup, VCS
-      decisions, and handoff.
+      inline. The workflow prompt supplies the shared choice, review, prose, and
+      follow-up policies; apply those policies while creating this artifact.
 
   - id: tasks
     generates: tasks.md

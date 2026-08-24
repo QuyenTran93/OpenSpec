@@ -77,7 +77,7 @@ describe('brainstorm artifact-only end-to-end smoke flow', () => {
     const ctx = loadChangeContext(projectRoot, 'demo');
     const inst = generateInstructions(ctx, 'brainstorm', projectRoot);
     expect(inst.outputPath).toBe('brainstorm.md');
-    expect(inst.instruction).toContain('Ask one clarifying');
+    expect(inst.instruction).toContain('workflow prompt supplies the shared choice');
     expect(inst.instruction).not.toContain('superpowers:');
   });
 

@@ -71,6 +71,18 @@ describe('skill-generation', () => {
     }
   });
 
+  it('keeps the workflow sequence only on the brainstorm entrypoint', () => {
+    const entrypoint = getSkillTemplates(['brainstorm'], 'brainstorm')[0].template.instructions;
+    expect(entrypoint).toContain('Workflow sequence (brainstorm):');
+
+    for (const workflowId of ['propose', 'writing-plans', 'update', 'apply', 'archive']) {
+      const skill = getSkillTemplates([workflowId], 'brainstorm')[0].template.instructions;
+      const command = getCommandTemplates([workflowId], 'brainstorm')[0].template.content;
+      expect(skill, workflowId).not.toContain('Workflow sequence (brainstorm):');
+      expect(command, workflowId).not.toContain('Workflow sequence (brainstorm):');
+    }
+  });
+
   it('scopes the artifact prose policy to brainstorm planning artifact writers', () => {
     const included = ['brainstorm', 'propose', 'writing-plans', 'update'];
 

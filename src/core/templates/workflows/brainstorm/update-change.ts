@@ -4,7 +4,6 @@ import {
   BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK,
   BRAINSTORM_FOLLOW_UP_POLICY_BLOCK,
   BRAINSTORM_VISUAL_DESIGN_POLICY_BLOCK,
-  BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
 } from './workflow-policy.js';
 
 const UPDATE_BODY = (input: string): string => `Revise an existing brainstorm change while keeping planning artifacts coherent.
@@ -12,8 +11,6 @@ const UPDATE_BODY = (input: string): string => `Revise an existing brainstorm ch
 ${BRAINSTORM_CHOICE_RECOMMENDATION_POLICY_BLOCK}
 
 ${BRAINSTORM_VISUAL_DESIGN_POLICY_BLOCK}
-
-${BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK}
 
 ${BRAINSTORM_FOLLOW_UP_POLICY_BLOCK}
 

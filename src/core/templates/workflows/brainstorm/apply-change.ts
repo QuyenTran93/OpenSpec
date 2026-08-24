@@ -8,7 +8,6 @@ import type { SkillTemplate, CommandTemplate } from '../../types.js';
 import {
   BRAINSTORM_FOLLOW_UP_POLICY_BLOCK,
   BRAINSTORM_INLINE_EXECUTION_POLICY_BLOCK,
-  BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK,
 } from './workflow-policy.js';
 import { APPLY_EXECUTION_ENVIRONMENT_POLICY_BLOCK } from '../shared/execution-environment-policy.js';
 import { NATIVE_APPLY_DISCIPLINE } from './native-discipline.js';
@@ -34,8 +33,6 @@ export function getBrainstormApplyChangeSkillTemplate(): SkillTemplate {
     name: 'openspec-apply-change',
     description: 'Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks.',
     instructions: `Implement tasks from an OpenSpec change.
-
-${BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK}
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -199,8 +196,6 @@ export function getOpsxBrainstormApplyCommandTemplate(): CommandTemplate {
     category: 'Workflow',
     tags: ['workflow', 'artifacts', 'experimental'],
     content: `Implement tasks from an OpenSpec change.
-
-${BRAINSTORM_WORKFLOW_SEQUENCE_BLOCK}
 
 **Input**: Optionally specify a change name (e.g., \`/opsx:apply add-auth\`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
