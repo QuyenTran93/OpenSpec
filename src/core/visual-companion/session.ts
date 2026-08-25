@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import type { VisualSessionInfo } from './types.js';
+import type { VisualEvent, VisualSessionInfo } from './types.js';
 
 export function parseVisualPort(value?: string): number {
   if (value === undefined) return 0;
@@ -70,4 +70,16 @@ export function readLatestSession(projectPath: string): VisualSessionInfo | null
     }
   }
   return null;
+}
+
+export function readVisualEvents(stateDir: string): VisualEvent[] {
+  const eventsPath = path.join(stateDir, 'events.jsonl');
+  if (!fs.existsSync(eventsPath)) return [];
+  return fs.readFileSync(eventsPath, 'utf8').split('\n').filter(Boolean).flatMap((line) => {
+    try {
+      const event = JSON.parse(line) as VisualEvent;
+      return typeof event.sessionId === 'string' && typeof event.screen === 'string' &&
+        typeof event.choice === 'string' && typeof event.timestamp === 'number' ? [event] : [];
+    } catch { return []; }
+  });
 }

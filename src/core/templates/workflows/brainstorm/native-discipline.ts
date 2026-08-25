@@ -23,10 +23,11 @@ visual assistance is optional. Offer it only when the current question is
 materially easier to answer by seeing an architecture flow, state machine,
 spatial relationship, or visual comparison. Ask permission before
 running \`openspec visual start --port <port>\` (omit \`--port\` for an ephemeral
-port). Read the printed \`screenDir\` and \`events.jsonl\` paths. For each visual
+port). Read the printed \`screenDir\` path. For each visual
 question, write a new semantic, accessible HTML fragment into \`screenDir\`;
 mark selectable buttons/cards with a short \`data-choice\` value. Wait for the
-corresponding JSONL choice event, then confirm it in the terminal. A later
+corresponding choice with \`openspec visual wait --json --since <timestamp>\`,
+then confirm it in the terminal. A later
 terminal answer always overrides a visual selection. On Remote SSH, tell the
 user to forward the printed port in the IDE Ports panel and open the printed
 localhost URL; never try to open the remote browser. Requirements, scope, APIs,

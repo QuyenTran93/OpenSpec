@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import type { Command } from 'commander';
-import { createVisualSession, detectRemoteEnvironment, parseVisualPort, readLatestSession } from '../core/visual-companion/session.js';
+import { createVisualSession, detectRemoteEnvironment, parseVisualPort, readLatestSession, readVisualEvents } from '../core/visual-companion/session.js';
 import { serveVisualSession } from '../core/visual-companion/server.js';
 
 async function waitForInfo(infoPath: string) {
@@ -54,6 +54,22 @@ export function registerVisualCommand(program: Command): void {
     if (!info) throw new Error('No running visual companion session');
     printInfo(info, Boolean(options.json));
   });
+  visual.command('wait').description('Wait for a visual companion choice')
+    .option('--project <path>', 'Project root', '.')
+    .option('--since <timestamp>', 'Ignore events at or before this timestamp', '0')
+    .option('--timeout <seconds>', 'Maximum wait time', '300')
+    .option('--json').action(async (options) => {
+      const info = readLatestSession(options.project);
+      if (!info) throw new Error('No running visual companion session');
+      const since = Number(options.since);
+      const deadline = Date.now() + Number(options.timeout) * 1000;
+      while (Date.now() <= deadline) {
+        const event = readVisualEvents(info.stateDir).find((candidate) => candidate.timestamp > since);
+        if (event) { if (options.json) console.log(JSON.stringify(event)); else console.log(`Visual choice: ${event.choice}`); return; }
+        await new Promise((resolve) => setTimeout(resolve, 250));
+      }
+      throw new Error('Timed out waiting for a visual companion choice');
+    });
   visual.command('stop').option('--project <path>', 'Project root', '.').option('--json').action(async (options) => {
     const info = readLatestSession(options.project);
     if (!info) throw new Error('No running visual companion session');
