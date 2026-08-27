@@ -8,6 +8,12 @@ artifacts:
     template: brainstorm.md
     requires: []
     instruction: |
+      Present only genuinely viable approaches. Only when two or more genuinely
+      viable options remain, compare concrete advantages and disadvantages, mark exactly one
+      option as `(Recommended)`, and explain why. The recommendation is guidance
+      only; the user chooses becomes authoritative. If evidence is insufficient,
+      ask one focused question before recommending and never guess.
+
       Write a substantive brainstorm.md using the resolved output path returned
       by this command. Inspect the relevant codepaths, entrypoints, configs,
       tests, and runtime boundaries before comparing approaches. Record the

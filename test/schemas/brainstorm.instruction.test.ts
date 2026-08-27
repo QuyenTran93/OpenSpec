@@ -79,15 +79,16 @@ describe('brainstorm schema', () => {
     const instruction = schema.artifacts.find((item) => item.id === 'brainstorm')?.instruction ?? '';
     const normalized = instruction.replace(/\s+/g, ' ');
 
-    expect(normalized).toContain('workflow prompt supplies the shared choice');
-    expect(normalized).not.toContain('Only when two or more genuinely viable options remain');
+    expect(normalized).toContain('Only when two or more genuinely viable options remain');
+    expect(normalized).toContain('mark exactly one option as `(Recommended)`');
+    expect(normalized).toContain('The recommendation is guidance only');
+    expect(normalized).toContain('the user chooses becomes authoritative');
   });
 
-  it('delegates shared choice guidance to the workflow prompt', () => {
+  it('keeps compact choice guidance in canonical artifact instructions', () => {
     const instruction = schema.artifacts.find((item) => item.id === 'brainstorm')?.instruction ?? '';
     const normalized = instruction.replace(/\s+/g, ' ');
-    const policyIndex = normalized.indexOf('workflow prompt supplies the shared choice');
-    expect(policyIndex).toBeGreaterThanOrEqual(0);
+    expect(normalized).toContain('Only when two or more genuinely viable options remain');
     expect(normalized).not.toContain('Apply this guidance from the first question onward');
   });
 
